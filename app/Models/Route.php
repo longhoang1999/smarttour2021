@@ -4,8 +4,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Route extends Model
 {
-    protected $table = "route";
-    protected $primaryKey = "ro_id";
+    protected $table = "tour";
+    protected $primaryKey = "to_id";
     public $timestamps = false;
 }
 

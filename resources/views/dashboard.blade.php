@@ -100,7 +100,7 @@
                 <div class="row justify-content-center">
                     <!-- Portfolio Item 1-->
                     <div class="col-md-6 col-lg-4 mb-5">
-                        <div class="portfolio-item mx-auto" data-toggle="modal" data-target="#portfolioModal1">
+                        <div class="portfolio-item mx-auto" id="StarttourNow">
                             <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
                                 <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
                             </div>
@@ -284,40 +284,6 @@
         <div class="scroll-to-top d-lg-none position-fixed">
             <a class="js-scroll-trigger d-block text-center text-white rounded" href="#page-top"><i class="fa fa-chevron-up"></i></a>
         </div>
-        <!-- Portfolio Modals-->
-        <!-- Portfolio Modal 1-->
-        <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" role="dialog" aria-labelledby="portfolioModal1Label" aria-hidden="true">
-            <div class="modal-dialog modal-xl" role="document">
-                <div class="modal-content">
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true"><i class="fas fa-times"></i></span>
-                    </button>
-                    <div class="modal-body text-center">
-                        <div class="container">
-                            <div class="row justify-content-center">
-                                <div class="col-lg-8">
-                                    <!-- Portfolio Modal - Title-->
-                                    <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0" id="portfolioModal1Label">{{ trans('messages.Startanewtour') }}</h2>
-                                    <!-- Icon Divider-->
-                                    <div class="divider-custom">
-                                        <div class="divider-custom-line"></div>
-                                        <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                        <div class="divider-custom-line"></div>
-                                    </div>
-                                    <!-- Portfolio Modal - Image-->
-                                    <img class="img-fluid rounded mb-5" src="{{asset('assets/img/portfolio/cabin.png')}}" alt="" />
-                                    <!-- Portfolio Modal - Text-->
-                                    <p class="mb-5">{{ trans('messages.buttonStartNow') }}</p>
-                                    <a href="{{route('user.maps')}}" class="btn btn-primary">
-                                        {{ trans('messages.Starttournow') }}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <!-- Portfolio Modal 2-->
         <div class="portfolio-modal modal fade" id="portfolioModal2" tabindex="-1" role="dialog" aria-labelledby="portfolioModal2Label" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
@@ -353,28 +319,18 @@
                                          ?>
                                         @if ( count($route) > 0 )
                                             @foreach($route as $value)
-                                                <?php $des_1 = Destination::where('de_id',$value->ro_route_1)->select('de_name')->first();?>
-                                                <?php $des_2 = Destination::where('de_id',$value->ro_route_2)->select('de_name')->first();?>
-                                                <?php $des_3 = Destination::where('de_id',$value->ro_route_3)->select('de_name')->first();?>
-                                                <?php $des_4 = Destination::where('de_id',$value->ro_route_4)->select('de_name')->first();?>
-                                                <?php $des_5 = Destination::where('de_id',$value->ro_route_5)->select('de_name')->first();?>
-                                                <p class="lead text-center tour" data-id="{{$value->ro_id}}">
-                                                    @if(!empty($des_1))
-                                                    <i class="fas fa-street-view point"></i> {{$des_1->de_name}} - 
-                                                    @endif
-                                                    @if(!empty($des_2))
-                                                    <i class="fas fa-street-view point"></i> {{$des_2->de_name}} - 
-                                                    @endif
-                                                    @if(!empty($des_3))
-                                                    <i class="fas fa-street-view point"></i> {{$des_3->de_name}} - 
-                                                    @endif
-                                                    @if(!empty($des_4))
-                                                    <i class="fas fa-street-view point"></i> {{$des_4->de_name}} - 
-                                                    @endif
-                                                    @if(!empty($des_5))
-                                                    <i class="fas fa-street-view point"></i> {{$des_5->de_name}} - 
-                                                    @endif
-                                                    Start day: {{date('d/m/Y', strtotime($value->dateCreated))}}
+                                                <?php 
+                                                    $des_1 = "";
+                                                    $pieces = explode("-", $value->to_des);
+                                                    for ($i=0; $i < count($pieces)-1; $i++) { 
+                                                        $description = Destination::where('de_id',$pieces[$i])->first();
+                                                        $des_1 = $des_1.$description->de_name.'--';
+                                                    }
+                                                 ?>
+                                                 <!-- <i class="fas fa-street-view point"></i> -->
+                                                <p class="lead text-center tour" data-id="{{$value->to_id}}">
+                                                    <span style="font-style: italic;font-weight: bold;">{{$value->to_name}}: </span>{{$des_1}} - 
+                                                    Start day: {{date('d/m/Y', strtotime($value->to_startDay))}}
                                                 </p>
                                             @endforeach
                                         @else
@@ -444,10 +400,16 @@
                                         <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Averagetraveltime') }}:</span> {{ trans('messages.NoInformation') }}</p>
                                     @endif
                                     <!-- de_link -->
-                                    @if($value->de_link != "")
-                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Linkongooglemap') }}:</span> <a target="_blank" href="{{$value->de_link}}">{{ trans('messages.Linkhere') }}</a></p>
+                                    @if($value->de_map != "")
+                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Linkongooglemap') }}:</span> <a target="_blank" href="{{$value->de_map}}">{{ trans('messages.Linkhere') }}</a></p>
                                     @else
                                         <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Linkongooglemap') }}:</span> {{ trans('messages.NoInformation') }}</p>
+                                    @endif
+                                    <!-- de_vr -->
+                                    @if($value->de_link != "")
+                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.LinkVR') }} :</span> <a target="_blank" href="{{$value->de_link}}">{{ trans('messages.Linkhere') }}</a></p>
+                                    @else
+                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.LinkVR') }} :</span> {{ trans('messages.NoInformation') }}</p>
                                     @endif
                                     <button class="btn btn-primary" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
@@ -504,7 +466,7 @@
                         <p class="text_content">{{ trans('messages.Avatar') }}</p>
                         <div class="btn_upload">{{ trans('messages.Upload') }}</div>
                         <p class="text_content" id="file_name"></p>
-                        <input type="file" class="form-control" id="input_File" name="file">
+                        <input type="file" class="form-control" id="input_File" name="file" accept="image/*">
                     </div>
                     <div class="col-md-4 col-sm-6 col-6"><p class="text_content">Email</p></div>
                     <div class="col-md-8 col-sm-6 col-6" id="text_email"></div>
@@ -625,6 +587,9 @@
         </script>
         <script type="text/javascript">
             $(document).ready(function(){
+                $("#StarttourNow").click(function(){
+                    location.replace("{{route('user.maps')}}");
+                });
                 $("#input_File").change(function(){
                     $(".btn_upload").css("background","#ff8304");
                     $("#file_name").css("display","block");
@@ -804,6 +769,8 @@
                           success:function(data){ 
                             //alert(data);
                             drawRoutes(data[0],data[1]);
+                            //console.log(data[0]);
+                            //console.log(data[1]);
                          }
                     });
                 });
@@ -864,11 +831,10 @@
 
                     //create new marker
                     for(var i = 0; i<locats.length;i++){
+                        //console.log(locats[i]);
                       addMarkers(locats[i],i,labelName[i]);
                     }
                 }
-
-                    //Create marker and event
                 function addMarkers(locats,index,labelName){
                     var icon = {
                       path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
@@ -877,12 +843,16 @@
                       strokeColor: 'white',
                       strokeWeight: 3,
                       scale: 1.4,
+                    },
+                      label = {
+                        text: labelName.label.toString(),
+                        color: colorlist[index%5],
+                        fontWeight: 'bold'  
                     };
-                    console.log(labelName);
                     var marker = new google.maps.Marker({
                           map: map,
                           position: locats,
-                          label: labelName.label.toString(),
+                          label:label, 
                           icon: icon
                     });
 
@@ -901,7 +871,7 @@
                     infowindow.addListener('closeclick',()=>{
                         marker.setIcon(icon);
                         marker.setMap(map);
-                        marker.setLabel(labelName.label.toString());
+                        marker.setLabel(label);
                     });
 
                     markersArray.push(marker);

@@ -5,24 +5,8 @@
 @stop
 @section('header_styles')
 	<link rel="stylesheet" href="{{asset('css/adminDashboard.css')}}">
-  <style>
-    .box2 a {
-        color: white;
-    }
-    .user_content{display: block;}
-    .user_content .addPlace{background: #eaecf4;}
-    #map{height: 500px;width: 100%}
-    .mapBorder{
-      margin-bottom: 1rem;
-      width: 100%;
-      padding: .5rem;
-      box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-      border-radius: 5px;
-    }
-    #btn_addPlace,#btn_addPlace_2{display: none;}
-    #Form_add{display: none;}
-    #link{overflow-x: auto;}
-  </style>
+  <link rel="stylesheet" href="{{asset('css/addPlace.css')}}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" />
 @stop
 @section('content')
   @if ($message = Session::get('status'))
@@ -73,6 +57,11 @@
               <p class="text-right pb-3" id="placeName"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
+              <p class="font-weight-bold text-left pb-3">Image</p>
+            </div>
+            <div class="col-md-9 col-sm-6 col-6" id="placeImage">
+            </div>
+            <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">Longitude</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
@@ -103,10 +92,16 @@
               <p class="text-right pb-3" id="duration"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Link</p>
+              <p class="font-weight-bold text-left pb-3">Link on google map</p>
             </div>
-            <div class="col-md-9 col-sm-6 col-6">
-              <p class="text-right pb-3" id="link"></p>
+            <div class="col-md-9 col-sm-6 col-6 text-right">
+              <a href="#" class="pb-3" id="link" target="_blank">Link here</a>
+            </div>
+            <div class="col-md-3 col-sm-6 col-6">
+              <p class="font-weight-bold text-left pb-3">Link on VR</p>
+            </div>
+            <div class="col-md-9 col-sm-6 col-6 text-right">
+              <a href="#" class="pb-3" id="link_vr" target="_blank">Link here</a>
             </div>
           </div>
         </div>
@@ -157,33 +152,11 @@
               <div class="form-group">
                 <label for="inputName">Name</label>
                 <input type="text" class="form-control" id="inputName" placeholder="Enter name" required="" name="de_name">
-              </div>
-              <style>
-                .open_inputFile{
-                  display: block;
-                  width: 10%;
-                  text-align: center;
-                  color: white;
-                  margin: 1rem 0;
-                  padding: 0.4rem;
-                  border-radius: 1rem;
-                  cursor: pointer;
-                  background: rgb(88,92,186);
-                  background: linear-gradient(
-              90deg
-              , rgba(88,92,186,1) 0%, rgba(74,155,219,1) 35%, rgba(96,136,242,1) 72%, rgba(20,181,232,1) 100%);
-                }
-                .open_inputFile:hover{
-                  background: rgb(61,63,122);
-                  background: linear-gradient(90deg, rgba(61,63,122,1) 0%, rgba(59,119,167,1) 35%, rgba(78,106,181,1) 72%, rgba(15,143,184,1) 100%);
-                }
-                #inputImage{display: none;}
-                .file_name{font-style: italic; font-weight: 600;display: none;}
-              </style>    
+              </div>  
               <div class="form-group">
                 <label for="inputName">Image</label>
                 <div class="open_inputFile">Upload here</div>
-                <p class="file_name">âcscas</p>
+                <p class="file_name"></p>
                 <input type="file" class="form-control" id="inputImage" name="de_image" accept=".jpg,.png">
               </div>
               <div class="form-group">
@@ -200,7 +173,11 @@
               </div>
               <div class="form-group">
                 <label for="googleLink">Google link</label>
-                <input type="text" class="form-control" id="googleLink" readonly="" required="" name="de_link">
+                <input type="text" class="form-control" id="googleLink" readonly="" required="" name="de_map">
+              </div>
+              <div class="form-group">
+                <label for="googleLink">VR link</label>
+                <input type="text" class="form-control" id="vrLink" name="de_link">
               </div>
               <button type="submit" class="btn btn-primary">Add Place</button>
             </form>
@@ -212,6 +189,7 @@
 	<!-- datatable -->
   	<script type="text/javascript" src="{{ asset('datatables/js/jquery.dataTables.js') }}" ></script>
   	<script type="text/javascript" src="{{ asset('datatables/js/dataTables.bootstrap4.js') }}" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
         $(".open_inputFile").click(function(){
@@ -268,13 +246,25 @@
                   alert(data)
                 else
                 {
+                  $("#placeImage").empty();
                   $("#placeName").html(data[0]);
                   $("#longitude").html(data[1]);
                   $("#latitude").html(data[2]);
                   $("#description").html(data[3]);
                   $("#shortdes").html(data[4]);
                   $("#duration").html(data[5]);
-                  $("#link").html(data[6]);
+                  if(data[6] != "")
+                  {
+                    $("#link_vr").attr("href",data[6]);
+                  }
+                  if(data[7] != "")
+                  {
+                    $("#link").attr("href",data[7]);
+                  }
+                  if(data[8] != "") 
+                  {
+                    $("#placeImage").append('<a data-fancybox="gallery" href="'+data[8]+'"><img class="img-fluid rounded mb-5" style="width:100%;" src="'+data[8]+'" alt=""></a>');
+                  }
                 }
              }
         });
@@ -560,6 +550,7 @@
               method:"POST",
               data:{_token:_token,inputLink:inputLink},
               success:function(data){ 
+                $("#inputName").val("");
                 $("#inputName").val(data);
                 $("#inputName").css("readonly","");
              }

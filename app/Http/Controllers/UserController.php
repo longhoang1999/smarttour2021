@@ -56,7 +56,7 @@ class UserController extends Controller
             $user = Auth::user();
             if($user->us_type == "0")
             {
-                $route = Route::where('ro_id_user',$user->us_id)->get();
+                $route = Route::where('to_id_user',$user->us_id)->get();
                 return redirect()->route('user.dashboard')->with("route",$route);
             }
             else
@@ -73,9 +73,9 @@ class UserController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        $route = Route::where('ro_id_user',$user->us_id)->get();
+        $route = Route::where('to_id_user',$user->us_id)->get();
         session()->put('route',$route);
-        $des = Destination::select('de_name','de_image','de_description','de_shortdes','de_duration','de_link')->get();
+        $des = Destination::select('de_name','de_image','de_description','de_shortdes','de_duration','de_link','de_map')->get();
         return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$des]);
     }
     public function logout(){
@@ -98,14 +98,25 @@ class UserController extends Controller
     {
         $user = Auth::user();
         $route = new Route();
-        $route->ro_id_user = $user->us_id;
-        $i=1;
+        $route->to_id_user = $user->us_id;
+        $i=0;
+        $des = "";
         foreach ($req->locatsList as  $value) {
-            $ro_route = "ro_route_".$i;
-            $route->$ro_route = $req->locatsList[$i-1];
+            $des = $des.$req->locatsList[$i]."-";
             $i++;
         }
-        $route->dateCreated = date('Y-m-d', strtotime(Carbon::now()));
+        $route->to_des = $des;
+        $route->to_starttime = $req->timeStart;
+        $route->to_endtime = $req->timeEnd;
+        $route->to_comback = $req->to_comback;
+        $route->to_optimized = $req->to_optimized;
+        $route->to_name = $req->nameTour;
+
+        if($req->coordinates != "")
+        {
+            $route->to_startLocat = $req->coordinates;
+        }
+        $route->to_startDay = date('Y-m-d', strtotime(Carbon::now()));
         $route->save();
     }
     
@@ -381,34 +392,23 @@ class UserController extends Controller
     //hàm treo
     public function checkTour(Request $req)
     {
-        $route = Route::where('ro_id',$req->inputLink)->first();
+        $route = Route::where('to_id',$req->inputLink)->first();
         $array = array();
-        if($route->ro_route_1 != "")
-            $array = Arr::add($array, 1 ,$route->ro_route_1);
-        if($route->ro_route_2 != "")
-            $array = Arr::add($array, 2 ,$route->ro_route_2);
-        if($route->ro_route_3 != "")
-            $array = Arr::add($array, 3 ,$route->ro_route_3);
-        if($route->ro_route_4 != "")
-            $array = Arr::add($array, 4 ,$route->ro_route_4);
-        if($route->ro_route_5 != "")
-            $array = Arr::add($array, 5 ,$route->ro_route_5);
-
-        $de = Destination::
-            select('de_id','de_name','de_lat','de_lng','de_duration','de_link','de_description')
-            ->whereIn('de_id',$array)
-            ->get();
-        $destination  = array();
-        foreach ($de as $value) {
-            $latlng = (object)array('lat' => $value->de_lat, 'lng' => $value->de_lng);
-            array_push($destination,$latlng);
+        $pieces = explode("-", $route->to_des);
+        for ($i=0; $i < count($pieces)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces[$i]);
         }
-        //label
-        $label = array();
-        foreach ($de as $value) {
-            $labelName = (object)array('label' => $value->de_name);
+        $array_2 = array();$label = array();
+        foreach ($array as $value) {
+            $de = Destination::
+                select('de_id','de_name','de_lat','de_lng','de_duration','de_link','de_description')
+                ->where('de_remove',$value)
+                ->first();
+            $latlng = (object)array('lat' => $de->de_lat, 'lng' => $de->de_lng);
+            array_push($array_2,$latlng);
+            $labelName = (object)array('label' => $de->de_name);
             array_push($label,$labelName);
         }
-        return [$destination,$label];
+        return [$array_2,$label];
     }
 }

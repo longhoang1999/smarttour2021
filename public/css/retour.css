@@ -1,5 +1,6 @@
 body{padding-top: 4.8rem;
   position: relative;
+  padding-top: 6rem;
 }
 .menu_siteBar{
   position: fixed;
@@ -243,4 +244,12 @@ header .slider div{width: 100%;min-height:40rem; }
 }
 .content_footer_1 p{
   margin: 0;
+}
+#map{
+  min-height: 50rem;
+}
+.menu_siteBar{box-shadow: 0px 6px 20px #a3a0a0;}
+#search-panel .container{
+  padding: 0;
+  padding-top: .5rem;
 }

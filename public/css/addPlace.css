@@ -1,0 +1,41 @@
+.box2 a {
+    color: white;
+}
+.user_content{display: block;}
+.user_content .addPlace{background: #eaecf4;}
+#map{height: 500px;width: 100%}
+.mapBorder{
+  margin-bottom: 1rem;
+  width: 100%;
+  padding: .5rem;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+  border-radius: 5px;
+}
+#btn_addPlace,#btn_addPlace_2{display: none;}
+#Form_add{display: none;}
+#link{overflow-x: auto;}
+.open_inputFile{
+  display: block;
+  width: 10%;
+  text-align: center;
+  color: white;
+  margin: 1rem 0;
+  padding: 0.4rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  background: rgb(88,92,186);
+  background: linear-gradient(
+90deg
+, rgba(88,92,186,1) 0%, rgba(74,155,219,1) 35%, rgba(96,136,242,1) 72%, rgba(20,181,232,1) 100%);
+}
+.open_inputFile:hover{
+  background: rgb(61,63,122);
+  background: linear-gradient(90deg, rgba(61,63,122,1) 0%, rgba(59,119,167,1) 35%, rgba(78,106,181,1) 72%, rgba(15,143,184,1) 100%);
+}
+#inputImage{display: none;}
+.file_name{font-style: italic; font-weight: 600;display: none;}
+#link,#link_vr{    color: blue;
+    text-decoration: underline;
+    font-style: italic;
+    font-weight: bold;
+}

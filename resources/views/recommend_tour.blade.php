@@ -1135,13 +1135,6 @@ function customLabel(marker) {
   <script src="https://use.fontawesome.com/releases/v5.15.1/js/all.js" crossorigin="anonymous"></script>
   </head>
   <body>
-    <style>
-      body{padding-top: 6rem;}
-      #map{
-        min-height: 50rem;
-      }
-      .menu_siteBar{box-shadow: 0px 6px 20px #a3a0a0;}
-    </style>
     <div class="menu_siteBar">
       <div class="logoDashboard">
         <a href="{{route('user.dashboard')}}">TOUR ADVICE</a>
@@ -1456,7 +1449,7 @@ function customLabel(marker) {
                         <p class="text_content">{{ trans('messages.Avatar') }}</p>
                         <div class="btn_upload">{{ trans('messages.Upload') }}</div>
                         <p class="text_content" id="file_name"></p>
-                        <input type="file" class="form-control" id="input_File" name="file">
+                        <input type="file" class="form-control" id="input_File" name="file" accept="image/*">
                     </div>
                     <div class="col-md-4 col-sm-6 col-6"><p class="text_content">Email</p></div>
                     <div class="col-md-8 col-sm-6 col-6" id="text_email"></div>
@@ -1506,6 +1499,34 @@ function customLabel(marker) {
   </div>
 </div>
 <!-- /modal -->
+<!-- Modal -->
+<div class="modal fade" id="enterNameTour" tabindex="-1" role="dialog" aria-labelledby="enterNameTourLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="enterNameTourLabel">Enter name tour</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-4 col-sm-6 col-6">Name Tour</div>
+            <div class="col-md-8 col-sm-6 col-6">
+              <input type="text" class="form-control" placeholder="Enter Name Tour" name="nameTour">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="btnSaveNameTour">Save Tour</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Modal -->
     <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.4/utils/Draggable.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.4/TweenMax.min.js'></script>
@@ -1513,18 +1534,44 @@ function customLabel(marker) {
 <script type="text/javascript">
   $(document).ready(function(){
       $("#saveTour").click(function(){
-        let $url_path = '{!! url('/') !!}';
-        let _token = $('meta[name="csrf-token"]').attr('content');
-        let routeDetail=$url_path+"/saveTour";
-        $.ajax({
-              url:routeDetail,
-              method:"get",
-              data:{_token:_token,locatsList:locatsList},
-              success:function(data){ 
-                alert("Your tour has been saved");
-                $("#saveTour").css("display","none")
-              }
+          $("#enterNameTour").modal("show");
+      });
+      $("#btnSaveNameTour").click(function(){
+          let nameTour = $('input[name="nameTour"]').val();
+          if(nameTour == "")
+          {
+            alert("Please enter the tour name first");
+          }
+          else
+          {
+            let coordinates = "";
+            if(starlocat != undefined)
+            {
+              coordinates = starlocat.lat+"-"+starlocat.lng;
+            }
+            let $url_path = '{!! url('/') !!}';
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            let routeDetail=$url_path+"/saveTour";
+            let timeStart = $('#time').val();
+            let timeEnd = $('#time-end').val();
+            let to_comback;
+            if ($('#is-back').is(':checked'))
+            {
+                to_comback = "1";
+            }
+            else to_comback = "0";
+            let to_optimized = $('input[name="durdis"]').val();
+            $.ajax({
+                  url:routeDetail,
+                  method:"get",
+                  data:{_token:_token,locatsList:locatsList,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,nameTour:nameTour,coordinates:coordinates},
+                  success:function(data){ 
+                    alert("Your tour has been saved");
+                    $("#saveTour").css("display","none");
+                    $("#enterNameTour").modal("hide");
+                  }
             });
+          }
       });
       $(".menu_title_start").click(function(){
         location.reload();

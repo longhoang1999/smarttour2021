@@ -12,6 +12,7 @@ use App\Models\Route;
 use App\Models\Feedback;
 use App\Models\Destination;
 use App\Models\Path;
+use PHPMailer;
 
 use Illuminate\Support\Arr;
 use Carbon\Carbon;
@@ -27,7 +28,7 @@ class AdminController extends Controller
     }
     public function showAllAccount()
     {
-    	$allAccount=User::where('us_type',"0")->get();
+    	$allAccount=User::get();
         return DataTables::of($allAccount)
             ->addColumn(
                 'stt',
@@ -36,9 +37,50 @@ class AdminController extends Controller
                     return $stt;
                 }
             )
-            
-            ->rawColumns(['stt'])
+            ->addColumn(
+                'position',
+                function ($allAccount) {
+                    if($allAccount->us_type == "0")
+                    {
+                        $position = '<span class="badge badge-warning">User</span>';
+                    }
+                    else if($allAccount->us_type == "1")
+                        $position = '<span class="badge badge-primary">Admin</span>';
+                    return $position;
+                }
+            )
+            ->addColumn(
+                'actions',
+                function ($allAccount) {
+                    $actions = '<button type="button" data-id="'.$allAccount->us_id.'"  class="btn btn-info btn-sm btn-block" data-toggle="modal" data-target="#modalDetail">
+                          Detail
+                        </button>';
+                    if($allAccount->us_type != "1")
+                    {
+                        $actions = $actions.'<button type="button" data-id="'.$allAccount->us_id.'" class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#modalDelete">
+                              Delete
+                            </button>';
+                    }
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','position','actions'])
             ->make(true);
+    }
+    public function deleteAcc($id)
+    {
+        $feedback = Feedback::where('fb_us_id',$id)->get();
+        foreach ($feedback as $value) {
+            $value->delete();
+        }
+        $tour = Route::where("to_id_user",$id)->get();
+        foreach ($tour as $value) {
+            $value->delete();
+        }
+        $user = User::where("us_id",$id)->first();
+        File::deleteDirectory(public_path('uploadUsers/'.$user->us_code));
+        $user->delete();
+        return back()->with("status","You have successfully deleted this account");
     }
     public function feedback()
     {
@@ -130,6 +172,7 @@ class AdminController extends Controller
     	$destination->de_lng = $req->de_lng;
     	$destination->de_description = $req->de_description;
     	$destination->de_shortdes = $req->de_shortdes;
+        $destination->de_map = $req->de_map;
     	$destination->de_link = $req->de_link;
     	$destination->de_duration = floatval($req->de_duration)*60*60;
         //img
@@ -269,8 +312,13 @@ class AdminController extends Controller
     	$des = Destination::where("de_remove",$remove)->first();
     	if(!empty($des))
     	{
+            if($des->de_image != "")
+            {
+                $image = asset($des->de_image);
+            }
+            else $image="";
     		$duration = floatval($des->de_duration)/60/60;
-    		return [$des->de_name,$des->de_lng,$des->de_lat,$des->de_description,$des->de_shortdes,$duration,$des->de_link];
+    		return [$des->de_name,$des->de_lng,$des->de_lat,$des->de_description,$des->de_shortdes,$duration,$des->de_link,$des->de_map,$image];
     	}
     	else
     	{
@@ -372,5 +420,110 @@ class AdminController extends Controller
         }
         return "UploadOk";
     }
-    
+
+    public function checkUserAdmin(Request $req)
+    {
+        $user = User::where("us_id",$req->id)->first();
+        if($user->us_image == "")
+            $status = false;
+        else
+            $status = true;
+        return [asset($user->us_image),$user->us_email,$user->us_fullName,$user->us_gender,$user->us_age,$status,$user->us_checkEmail,$user->us_type];
+    }
+    public function addaccount(Request $req)
+    {
+        $this->validate($req,[
+            'us_email'=>'required|email',
+            'us_password'=>'required|min:0|max:32',
+            'us_confirm'=>'required|min:0|max:32',
+            'us_fullname' => 'required',
+            'us_image' => 'mimes:jpg,png'
+        ],[
+            'us_email.required' => 'Bạn phải nhập email',
+            'us_email.email' => 'Sai cấu chúc email',
+            'us_password.required' => "Bạn phải nhập mật khẩu",
+            'us_password.min' => "Mật khẩu quá ngắn",
+            'us_password.max' => "Mật khẩu quá dài",
+            'us_confirm.required' => "Bạn phải nhập xác nhận mật khẩu",
+            'us_confirm.min' => "Xác nhận mật khẩu quá ngắn",
+            'us_confirm.max' => "Xác nhận mật khẩu quá dài",
+            'us_fullname.required' => 'Bạn phải nhập full name',
+            'us_image.mimes' => 'Sai cấu trúc file ảnh'
+        ]);
+        if($req->us_password == $req->us_confirm)
+        {
+            $userCheck = User::where("us_email",$req->us_email)->first();
+            if(empty($userCheck))
+            {
+                $user = new User();
+                $user->us_email = $req->us_email;
+                $user->us_password = Hash::make($req->us_password);
+                $user->us_fullName = $req->us_fullname;
+                $user->us_gender = $req->us_gender;
+                $user->us_age = $req->us_age;
+                $user->us_type = $req->us_type;
+                // code
+                $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                $user->us_code = substr(str_shuffle($permitted_chars), 0, 20); 
+                $path = public_path().'/uploadUsers/' . $user->us_code;
+                File::makeDirectory( $path,0777,true);
+                $user->save();
+                if($req->file('us_image'))
+                {
+                    $image = $req->file('us_image');
+                    $picName = time().'.'.$image->getClientOriginalExtension();
+                    $image->move(public_path('uploadUsers/'.$user->us_code), $picName);
+                    $user->us_image='uploadUsers/'.$user->us_code.'/'.$picName;
+                    $user->save();
+                }
+                //gửi mail
+                require_once '../app/Providers/PHPMailer/PHPMailerAutoload.php'; 
+                $mail = new PHPMailer();
+                $mail->isSMTP();
+                $mail->SMTPSecure = 'tls';
+                $mail->SMTPAuth = true;
+                
+                $mail->SMTPOptions = array(
+                    'ssl' => array(
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true
+                    )
+                );
+                $mail->CharSet = 'UTF-8';
+                $mail->Host = 'smtp.gmail.com';
+                $mail->Port = 587;
+                $mail->Username = 'longhoanghai8499@gmail.com';
+                $mail->Password = 'shikatori142922188aA';
+                $mail->isHTML(true);
+                $mail->setFrom('system@gmail.com', 'Tour Advce System');
+                $mail->addAddress($user->us_email, 'User');
+                $mail->Subject = 'The message confirms you have successfully registered!';
+
+                $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                $maso= substr(str_shuffle($permitted_chars), 0, 6);
+                $user->us_checkEmail = $maso;
+                $user->save();
+                $str='
+                <h2>The message confirms you have successfully registered!</h2>
+                <small>(This is an automated message. Please do not reply)</small>
+                <h4>To verify your email please click the button below</h4>
+                <p>Email information: '.$user->us_email.'</p>
+                <p>Full name information: '.$user->us_fullName.'</p>
+                <p>Verification: <a href="'.route('checkEmail',['id' => $user->us_id,'key'=>$user->us_checkEmail]).'" style="background: #9a46f5;color: white;padding: .5rem 1rem;text-decoration:none;cursor:pointer;border-radius:15px">Verification</a> </p>
+                ';
+                $mail->Body = $str;
+                $mail->send();
+                return back()->with("status","Create Account Success");
+            }
+            else
+            {
+                return back()->with("error","Email address already exists");
+            }
+        }
+        else
+        {
+            return back()->with("error","Confirm password wrong");
+        }
+    }
 }

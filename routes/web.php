@@ -81,10 +81,11 @@ Route::group(
 		//dash board
 		Route::get("generalInfor","AdminController@generalInfor")->name('admin.generalInfor');
 		Route::post("getLatLng","AdminController@getLatLng")->name("admin.getLatLng");
-
 		Route::get("updatePath","AdminController@updatePath")->name("admin.updatePath");
-		
-		
+		//delete user
+		Route::get("deleteAcc/{id}","AdminController@deleteAcc")->name("admin.deleteAcc");
+		Route::post("checkUserAdmin","AdminController@checkUserAdmin")->name("admin.checkUserAdmin");
+		Route::post("addaccount","AdminController@addaccount")->name("admin.addaccount");
 	}
 );
 

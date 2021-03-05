@@ -59,6 +59,7 @@
 			<div class="container-fluid header">
 				<div class="row content">
 					<div class="input_group col-md-5">
+						<a href="{{route('user.dashboard')}}" target="_blank" class="btn btn-info">Go to website</a>
 					</div>
 					<div class="col-md-7 text-right">
 						<div id="div_admin" class="float-right">
@@ -66,6 +67,7 @@
 							<img src="{{asset('assets/img/portfolio/cabin.png')}}" alt="" class="avatar">
 							<div class="profile_admin" style="z-index: 10">
 								<ul>
+									<!-- đường kẻ -->
 									<!-- <div class="dropdown-divider"></div> -->
 									<li>
 										<a href="{{route('logout')}}">
@@ -89,6 +91,7 @@
 	</div>
 	<!-- Js -->
 	<script type="text/javascript" src="{{asset('vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+	<script type="text/javascript" src="{{asset('vendor/bootstrap/js/bootstrap.min.js')}}"></script>
 	<script type="text/javascript" src="{{asset('js/admin.js')}}"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="{{ asset('vendor/bootstrap/js/bootstrap.min.js') }}"></script>

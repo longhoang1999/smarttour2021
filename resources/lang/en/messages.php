@@ -32,6 +32,7 @@ return [
     'NoInformation' => 'No information',
     'Linkhere' => 'Link here',
     'Linkongooglemap' =>'Link on google map',
+    'LinkVR' =>'Link on VR',
     'Averagetraveltime' => 'Average travel time',
     'Description' => 'Description',
     'Shortdescription' => 'Short description',
