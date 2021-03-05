@@ -1,0 +1,114 @@
+.point{color: #ef4e29;}
+.Language{position: relative;font-size: 1em;color: white;margin: 0 1rem}
+.lan_title{cursor: pointer; border-radius: 18px;
+     border: 2px solid white;
+     padding: .5em;
+ }
+.lan_title span{margin-right: .5rem;}
+.lan_more{position: absolute;
+    background: white;
+    border-radius: 15px;
+    top: 3em;
+    width: 100%;
+    color: #2c3e50;
+    overflow: hidden;
+    display: none;
+}
+.lan_more p{margin: 0;
+    padding: .8rem .2rem;
+    text-align: center;
+    cursor: pointer;
+}
+.lan_more p:hover{
+    background: #2c3e50;
+    color: white;
+}
+.tour{cursor: pointer;}
+.tour:hover{color: blue;}
+#map{
+    height: 36em;
+    width: 100%;display: none;
+}
+#text_img{
+    width: 45%;
+    height: 20rem;
+    border-radius: 19rem;
+    margin: auto;
+}
+#text_img img{width: 100%}
+.text_content{
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+.btn_upload{
+    width: 15%;
+    margin: 1rem auto;
+    background: #6c9aca;
+    padding: .5rem 0;
+    color: white;
+    cursor: pointer;
+    border-radius: 10px;
+    display: none;
+}
+#input_File,#input_fullName,#input_gender,#input_age,#btn_submitInfo{display: none;}
+#default_img,#text_img{
+    display: none;
+}
+img#default_img {
+    width: 50%;
+    margin: auto;
+}
+header{padding: 0 !important; position: relative;}
+header .slider div{width: 100%;min-height:40rem; } 
+#div_Logo{
+    position: absolute;bottom: 2rem;left: 8rem;
+}
+#li_person,#li_more{position: relative;}
+#div_person,#div_more{position: absolute;
+    background: white;
+    border-radius: 15px;
+    top: 3em;
+    width: 100%;
+    color: #2c3e50;
+    overflow: hidden;
+    display: none;
+}
+#div_person p,#div_more a{margin: 0;cursor: pointer; display: block;width: 100%;
+    padding: 1rem 1rem;
+}
+#div_person p:hover,#div_more a:hover{background: #2c3e50; color: #1abc9c !important;}
+#div_more{
+    min-width: 10rem;
+}
+#div_more a{
+    color: #2c3e50 !important; text-decoration: none;
+}
+.tourPlace .downPlace {
+   max-width: 40rem;
+   max-height: 20rem;
+}
+.downPlace p{
+    font-family: auto;
+}
+.openClickHere{
+    color: #bf1717;
+    font-style: italic;
+    cursor: pointer;
+}
+.openClickHere:hover{
+    text-decoration: underline;
+    color: red;
+}
+.openChangePass{
+    display: none;
+}
+.openItems{
+    display: none;
+}
+.modal-body {
+    padding-top: 1rem;
+}
+#file_name{
+    display: none;
+    margin: 0 auto;
+}

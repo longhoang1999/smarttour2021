@@ -1,0 +1,57 @@
+.title {
+    color: #5a5c69;
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 1rem;
+}
+.AllClass_Table .AllClass_Table_title {
+    border-radius: 3px 3px 0 0;
+    margin-top: 1rem;
+    padding: .5rem;
+    background: #f8f9fc;
+    text-align: center;
+}
+.AllClass_Table .AllClass_Table_content {
+    width: 100%;
+    background: white;
+    margin: 1rem auto;
+    margin-top: 0;
+    border-radius: 0 0 3px 3px;
+    padding: 1.5rem;
+}
+.AllClass_Table {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+div#Table_AllClass_filter {
+    float: right;
+}
+.pagination {
+    float: right;
+}
+.AllClass_Table .AllClass_Table_title p {
+    color: #4e73df;
+    font-weight: bold;
+    font-size: 18px;
+}
+#exampleModal h6{
+    margin-bottom: 2rem;
+}
+#exampleModal p{
+    margin-bottom: 2rem;
+}
+
+.map-marker-label {
+    position: absolute;
+    color: red;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: -45px;
+    margin-left: 20px;
+ }
+ .map-marker-label {
+      position: absolute;
+      color: #ea4335;
+      font-size: 16px;
+      text-shadow: 1px 0 0 #fff, -1px 0 0 #fff, 0 1px 0 #fff, 0 -1px 0 #fff, 1px 1px #fff;
+      margin: 0;
+  }

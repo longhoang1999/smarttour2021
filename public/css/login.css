@@ -1,0 +1,121 @@
+#btn_register {
+    margin-left: 1rem;
+    color: #555555;
+    line-height: 1.2;
+    display: block;
+    font-family: auto;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    padding: 0 20px;
+    min-width: 120px;
+    height: 50px;
+    border-radius: 25px;
+    background: white;
+    position: relative;
+    z-index: 1;
+    transition: all 0.4s;
+}
+#btn_register:hover{
+	background: -webkit-linear-gradient(bottom, #ffee75, #b224ef);
+    color: white;
+}
+.header{
+    min-height: 15rem;
+    width: 100%;
+    background: white;
+    position: relative;
+    z-index: 12;
+    box-shadow: 0px 7px 20px #b9b9b9;
+}
+.namePage{
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    color: #ffffff;
+    font-family: auto;
+    font-size: 5em;
+    text-shadow: 8px 1px 12px #020202;
+    font-weight: bold;
+    cursor: pointer;
+}
+.moreInfor{
+	position: absolute;
+    color: white;
+    right: 4rem;
+    font-style: italic;
+    bottom: 1.4rem;
+    text-shadow: 0 0 12px black;
+    font-size: 1em;
+    cursor: pointer;
+}
+.body_main{position: relative; padding-bottom: 5rem;}
+#div_login{margin-top: 6rem;}
+.text_title {
+    position: absolute;
+    top: 3.2rem;
+    font-family: auto;
+    font-weight: bold;
+    font-style: italic;
+    color: #006fb0;
+    font-size: 2em;
+    cursor: pointer;
+}
+.text_title:hover{color: #005384;}
+input,select{
+    font-family: auto;
+}
+.footer{
+	padding-top: 5rem;
+    padding-bottom: 5rem;
+    background-color: #013b5f;
+    color: #fff;
+    display: block;
+    box-sizing: border-box;
+}
+.text-center {
+    text-align: center !important;
+}
+.btn-social {
+    border-radius: 100%;
+    display: inline-flex;
+    width: 3.25rem;
+    height: 3.25rem;
+    font-size: 1.25rem;
+    justify-content: center;
+    align-items: center;
+}
+.copyright {
+    background-color: #005e98;
+}
+.btn-outline-light:hover {
+    color: #212529;
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+}
+.footer h4{font-weight: bold;font-family: auto}
+.footer p{color: white;font-family: auto; }
+.footer{
+    background-color: #6c93ab;
+}
+#div_login{
+	width: 70%;
+    box-shadow: 9px 9px 12px #c5bbbb;
+    background: rgb(100,138,214);
+background: linear-gradient(0deg, rgba(100,138,214,1) 0%, rgba(130,171,200,1) 28%, rgba(81,164,187,1) 76%, rgba(156,210,210,0.9948354341736695) 100%);
+}
+.container-login100::before {
+    background-color: rgb(255 255 255 / 90%);
+}
+#btn_forgot{
+    cursor: pointer;
+}
+#icon_correct,#icon_incorrect{
+    display: none;
+}
+#btn_senKey,#formCheckKey{
+    display: none;
+}
+#key_incorrect{
+    display: none;
+}
