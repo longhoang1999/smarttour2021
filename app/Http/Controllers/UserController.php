@@ -38,7 +38,7 @@ class UserController extends Controller
         }
         else
         {
-            $des = Destination::select('de_name','de_image','de_description','de_shortdes','de_duration','de_link')->get();
+            $des = Destination::select('de_name','de_image','de_description','de_shortdes','de_duration','de_link','de_map')->get();
             return view("generalinterface",['des'=>$des]);
         }
     }

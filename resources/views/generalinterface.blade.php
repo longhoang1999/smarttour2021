@@ -361,7 +361,6 @@
             </div>
         </div>
 
-        <!-- Place Modal 3-->
         <?php $i=1; ?>
         @foreach($des as $value)
         <div class="portfolio-modal modal fade" id="placeModal{{$i}}" tabindex="-1" role="dialog" aria-labelledby="portfolioModal3Label" aria-hidden="true">
@@ -411,10 +410,16 @@
                                         <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Averagetraveltime') }}:</span> {{ trans('messages.NoInformation') }}</p>
                                     @endif
                                     <!-- de_link -->
-                                    @if($value->de_link != "")
-                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Linkongooglemap') }}:</span> <a target="_blank" href="{{$value->de_link}}">{{ trans('messages.Linkhere') }}</a></p>
+                                    @if($value->de_map != "")
+                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Linkongooglemap') }}:</span> <a target="_blank" href="{{$value->de_map}}">{{ trans('messages.Linkhere') }}</a></p>
                                     @else
                                         <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Linkongooglemap') }}:</span> {{ trans('messages.NoInformation') }}</p>
+                                    @endif
+                                    <!-- de_vr -->
+                                    @if($value->de_link != "")
+                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.LinkVR') }} :</span> <a target="_blank" href="{{$value->de_link}}">{{ trans('messages.Linkhere') }}</a></p>
+                                    @else
+                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.LinkVR') }} :</span> {{ trans('messages.NoInformation') }}</p>
                                     @endif
                                     <button class="btn btn-primary" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
