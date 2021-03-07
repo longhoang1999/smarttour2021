@@ -327,7 +327,11 @@
                                         @if ( count($route) > 0 )
                                             @foreach($route as $value)
                                                 <?php 
-                                                    $des_1 = "";
+                                                    if($value->to_startLocat == "")
+                                                    {
+                                                       $des_1 = ""; 
+                                                    }
+                                                    else $des_1 = "Start Location--";
                                                     $pieces = explode("-", $value->to_des);
                                                     for ($i=0; $i < count($pieces)-1; $i++) { 
                                                         $description = Destination::where('de_id',$pieces[$i])->first();
@@ -335,7 +339,7 @@
                                                     }
                                                  ?>
                                                  <!-- <i class="fas fa-street-view point"></i> -->
-                                                <p class="lead text-center tour" data-id="{{$value->to_id}}">
+                                                <p style="font-family: auto" class="lead text-center tour" data-id="{{$value->to_id}}">
                                                     <span style="font-style: italic;font-weight: bold;">{{$value->to_name}}: </span>{{$des_1}} - 
                                                     Start day: {{date('d/m/Y', strtotime($value->to_startDay))}}
                                                 </p>

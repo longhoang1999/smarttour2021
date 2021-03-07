@@ -42,10 +42,10 @@ class AdminController extends Controller
                 function ($allAccount) {
                     if($allAccount->us_type == "0")
                     {
-                        $position = '<span class="badge badge-warning">User</span>';
+                        $position = '<span class="badge badge-warning">'.trans("admin.User").'</span>';
                     }
                     else if($allAccount->us_type == "1")
-                        $position = '<span class="badge badge-primary">Admin</span>';
+                        $position = '<span class="badge badge-primary">'.trans("admin.Admin").'</span>';
                     return $position;
                 }
             )
@@ -53,12 +53,12 @@ class AdminController extends Controller
                 'actions',
                 function ($allAccount) {
                     $actions = '<button type="button" data-id="'.$allAccount->us_id.'"  class="btn btn-info btn-sm btn-block" data-toggle="modal" data-target="#modalDetail">
-                          Detail
+                          '.trans("admin.Detail").'
                         </button>';
                     if($allAccount->us_type != "1")
                     {
                         $actions = $actions.'<button type="button" data-id="'.$allAccount->us_id.'" class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#modalDelete">
-                              Delete
+                              '.trans("admin.Delete").'
                             </button>';
                     }
                     return $actions;
@@ -115,12 +115,64 @@ class AdminController extends Controller
             ->addColumn(
                 'action',
                 function ($feedback) {
-                    $action = '<button class="btn btn-sm btn-info btn-block" data-id="'.$feedback->fb_id.'" data-toggle="modal" data-target="#exampleModal">Detail</button>';
+                    $action = '<button class="btn btn-sm btn-info btn-block" data-id="'.$feedback->fb_id.'" data-toggle="modal" data-target="#exampleModal">'.trans("admin.Detail").'</button>';
+                    $action = $action.'<button class="btn btn-sm btn-success btn-block" data-id="'.$feedback->fb_id.'" data-toggle="modal" data-target="#modalAnswer">'.trans("admin.Replytofeedback").'</button>';
                     return $action;
                 }
             )
             ->rawColumns(['stt','email','fullName','action'])
             ->make(true);
+    }
+    public function getEmail(Request $req)
+    {
+        $email = User::where("us_id",$req->recipient)->first();
+        if($email->us_checkEmail != "")
+        {
+            $status = "false";
+        }
+        else $status = "true";
+        return [$email->us_email,$status];
+    }
+    public function sendFeedback(Request $req)
+    {
+        require_once '../app/Providers/PHPMailer/PHPMailerAutoload.php'; 
+        $mail = new PHPMailer();
+        $mail->isSMTP();
+        $mail->SMTPSecure = 'tls';
+        $mail->SMTPAuth = true;
+        
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
+        $mail->CharSet = 'UTF-8';
+        $mail->Host = 'smtp.gmail.com';
+        $mail->Port = 587;
+        $mail->Username = 'longhoanghai8499@gmail.com';
+        $mail->Password = 'shikatori142922188aA';
+        $mail->isHTML(true);
+        $mail->setFrom('system@gmail.com', 'Tour Advce System');
+        $mail->addAddress($req->emailRecipient, 'User');
+        $mail->Subject = 'Email reply to your feedback!';
+        $str='
+        <h2>Email reply to your feedback!</h2>
+        <small>(This is an automated message. Please do not reply)</small>
+        <h4>Title email: '.$req->titleEmail.'</h4>
+        <p>Content email: '.$req->content.'</p>
+        ';
+        $mail->Body = $str;
+        if($mail->send())
+        {
+            return back()->with("success","Email successfully sent");
+        }
+        else
+        {
+            return back()->with("error","Cannot send email");
+        }
+        
     }
     public function detaiFeedback(Request $req,$id)
     {
@@ -154,7 +206,7 @@ class AdminController extends Controller
             ->addColumn(
                 'actions',
                 function ($destination) {
-                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">Detail</button>';
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
                     return $actions;
                 }
             )
@@ -299,8 +351,8 @@ class AdminController extends Controller
             ->addColumn(
                 'actions',
                 function ($destination) {
-                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">Detail</button>';
-                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDelete">Remove</button>';
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
+                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
                     return $actions;
                 }
             )
@@ -365,8 +417,8 @@ class AdminController extends Controller
             ->addColumn(
                 'actions',
                 function ($destination) {
-                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">Detail</button>';
-                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalEdit">Edit</button>';
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
+                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalEdit">'.trans("admin.Edit").'</button>';
                     return $actions;
                 }
             )
@@ -555,13 +607,6 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
-                'fullName',
-                function ($route) {
-                    $fullName = User::select('us_fullName')->where("us_id",$route->to_id_user)->first();
-                    return $fullName->us_fullName;
-                }
-            )
-            ->addColumn(
                 'startLocat',
                 function ($route) {
                     if($route->to_startLocat == "")
@@ -600,7 +645,7 @@ class AdminController extends Controller
                     }
                     else
                     {
-                        $startTime = $route->to_starttime;
+                        $startTime = date('h:i:s a', strtotime($route->to_starttime));
                     }
                     return $startTime;
                 }
@@ -614,7 +659,7 @@ class AdminController extends Controller
                     }
                     else
                     {
-                        $endTime = $route->to_endtime;
+                        $endTime = date('h:i:s a', strtotime($route->to_endtime));
                     }
                     return $endTime;
                 }
@@ -622,12 +667,64 @@ class AdminController extends Controller
             ->addColumn(
                 'actions',
                 function ($route) {
-                    $actions = '<a href="'.route('admin.editTour',$route->to_id).'" target="_blank" class="btn btn-block btn-danger btn-sm">Edit Tour</a>';
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-id="'.$route->to_id.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
+                    $actions =$actions.'<a href="'.route('admin.editTour',$route->to_id).'" target="_blank" class="btn btn-block btn-danger btn-sm">'.trans("admin.EditTour").'</a>';
                     return $actions;
                 }
             )
             ->rawColumns(['stt','fullName','startLocat','Detail','startTime','endTime','actions'])
             ->make(true);
+    }
+    public function routeDetail(Request $req)
+    {
+        $route = Route::where("to_id",$req->recipient)->first();
+        $user = User::where("us_id",$route->to_id_user)->first();
+
+        $creator = $user->us_fullName;
+        $tourName = $route->to_name;
+        if($route->to_startLocat != "")
+        {
+            $pieces = explode("-", $route->to_startLocat);
+            $startLocat = "Coordinates: {lat:".$pieces[0]." , lng:".$pieces[1]."}";
+        }
+        else $startLocat = '<span class="badge badge-warning">'.trans("admin.Notavailable").'</span>';
+
+        $pieces_2 = explode("-", $route->to_des);
+        $array = array();
+        for ($i=0; $i < count($pieces_2)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces_2[$i]);
+        }
+        $Detail = "";
+        foreach ($array as $value) {
+            $desName = Destination::select('de_name')->where("de_remove",$value)->first();
+            $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+        }
+        if($route->to_comback == "0")
+        {
+            $comeBack = '<span class="badge badge-warning">'.trans("admin.Noreturn").'</span>';
+        }
+        else if($route->to_comback == "1")
+        {
+            $comeBack = '<span class="badge badge-success">'.trans("admin.Havecomeback").'</span>';
+        }
+        if($route->to_optimized == "0")
+        {
+            $Optimized = '<span class="badge badge-warning">'.trans("admin.Notoptimal").'</span>';
+        }
+        else if($route->to_optimized == "1")
+        {
+            $Optimized = '<span class="badge badge-success">'.trans("admin.Optimizedforduration").'</span>';
+        }
+        else if($route->to_optimized == "2")
+        {
+            $Optimized = '<span class="badge badge-success">'.trans("admin.Optimizedforcost").'</span>';
+        }
+        $starttime = date('h:i:s a', strtotime($route->to_starttime));
+        if($route->to_endtime != "")
+            $endtime = date('h:i:s a', strtotime($route->to_endtime));
+        else
+            $endtime = '<span class="badge badge-success">'.trans("admin.Thereisnoendtime").'</span>';
+        return [$creator,$tourName,$startLocat,$Detail,$starttime,$endtime,$comeBack,$Optimized];
     }
     public function editTour($id)
     {

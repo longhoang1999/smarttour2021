@@ -13,6 +13,18 @@
 @stop
 @section('content')
 	<div class="title"><p class="text-uppercase">{{ trans("admin.infoFeedback") }}</p></div>
+  @if ($message = Session::get('error'))
+      <div class="alert alert-danger alert-block">
+          <button type="button" class="close" data-dismiss="alert">x</button>
+          <strong>{{$message}}</strong>
+      </div>
+  @endif
+  @if ($message = Session::get('success'))
+      <div class="alert alert-success alert-block">
+          <button type="button" class="close" data-dismiss="alert">x</button>
+          <strong>{{$message}}</strong>
+      </div>
+  @endif
 	<div class="AllClass_Table">
         <div class="AllClass_Table_title">
           <p>{{ trans("admin.infoFeedback") }}</p>
@@ -81,6 +93,55 @@
     </div>
   </div>
 </div>
+<!-- modal reply -->
+<div class="modal fade" id="modalAnswer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">{{ trans('admin.Replytofeedback') }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{{route('admin.sendFeedback')}}" method="post">
+      <div class="modal-body">
+          <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+          <div class="container-fluid">
+            <div class="row">
+              <!-- recipient email -->
+              <input type="hidden" name="emailRecipient" id="emailRecipient">
+              <div class="col-md-12 col-sm-12 col-12 mb-2">
+                <label for="titleEecipient" class="font-weight-bold text-italic">{{ trans('admin.Replytofeedback') }}</label>
+              </div>
+              <div class="col-md-12 col-sm-12 col-12 mb-2">
+                <span class="text-italic" id="p_email"></span><span id="verification"></span>
+              </div>
+              <!-- title -->
+              <div class="col-md-12 col-sm-12 col-12 mb-2">
+                <label for="titleEmail" class="font-weight-bold text-italic">{{ trans('admin.TitleEmailFeedback') }}</label>
+              </div>
+              <div class="col-md-12 col-sm-12 col-12 mb-2">
+                <input id="titleEmail" type="text" class="form-control" placeholder="{{ trans('admin.TitleEmailFeedback') }}" required="" name="title">
+              </div>
+              <!-- content -->
+              <div class="col-md-12 col-sm-12 col-12 mb-2">
+                <label for="contentEmail" class="font-weight-bold text-italic">{{ trans('admin.ResponseEmailContent') }}</label>
+              </div>
+              <div class="col-md-12 col-sm-12 col-12 mb-2">
+                <textarea class="form-control" required="" id="contentEmail" name="content" style="min-height: 13rem">{{ trans('admin.ContentReply') }}</textarea>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <input type="submit" class="btn btn-success" value="{{ trans('admin.Replytofeedback') }}">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- /modal reply -->
 @stop
 @section('footer-js')
 	<!-- datatable -->
@@ -142,6 +203,33 @@
                     $(".textFullName").append(data[1]);
                     $(".textContent").append(data[2]);
                     $(".textStar").append(data[3]);
+               }
+          });
+        });
+      $('#modalAnswer').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget)
+            var recipient = button.data('id');
+            var routeDetail=$url_path+"/getEmail";
+            $.ajax({
+                url:routeDetail,
+                method:"POST",
+                data:{_token:_token,recipient:recipient},
+                success:function(data){ 
+                    $("#p_email").empty();
+                    $("#p_email").append(data[0]);
+                    $("#emailRecipient").val("");
+                    $("#emailRecipient").val(data[0]);
+                    $("#verification").empty();
+                    $("#titleEmail").val("");
+                    $("#titleEmail").val("Send: "+data[0]);
+                    if(data[1] == "false")
+                    {
+                      $("#verification").append('&nbsp;&nbsp;<span class="badge badge-danger">{{ trans("admin.Unverifiedemail") }}</span>');
+                    }
+                    else if(data[1] == "true")
+                    {
+                      $("#verification").append('&nbsp;&nbsp;<span class="badge badge-success">{{ trans("admin.Verifiedemail") }}</span>');
+                    }
                }
           });
         });

@@ -45,7 +45,7 @@
                       <th>{{ trans('admin.NamePlace') }}</th>
                       <th>{{ trans('admin.Longitude') }}</th>
                       <th>{{ trans('admin.Latitude') }}</th>
-                      <th>{{ trans('admin.Duration') }}</th>
+                      <th>{{ trans('admin.Duration') }} ({{ trans('admin.hours') }})</th>
                       <th>{{ trans('admin.Actions') }}</th>
                   </tr>
                   </thead>

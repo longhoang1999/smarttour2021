@@ -31,10 +31,17 @@ Route::post("postLogin","UserController@postLogin")->name("postLogin");
 Route::post("register","UserController@register")->name("register");
 
 //Auth::routes();
-Route::get('maps/showmap','MapDirectController@showmap')->name('showmap');
-Route::get('maps/processroute','MapDirectController@processroute')->name('processroute');
-Route::get('maps/updpath','MapDirectController@updpath')->name('updpath');
-Route::get('maps.gettimeline','MapDirectController@gettimeline')->name('gettimeline');
+Route::group(
+	['middleware' => ['locale'] ],
+	function(){
+		Route::get('maps/showmap','MapDirectController@showmap')->name('showmap');
+		Route::get('maps/processroute','MapDirectController@processroute')->name('processroute');
+		Route::get('maps/updpath','MapDirectController@updpath')->name('updpath');
+		Route::get('maps.gettimeline','MapDirectController@gettimeline')->name('gettimeline');
+		
+	}
+);
+
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('logout','UserController@logout')->name('logout');
@@ -93,8 +100,10 @@ Route::group(
 		Route::get("history","AdminController@history")->name("admin.history");
 		Route::get("showAllRoute","AdminController@showAllRoute")->name("admin.showAllRoute");
 		Route::get("editTour/{id}","AdminController@editTour")->name('admin.editTour');
-
 		Route::get("editRoute/{id}","AdminController@editRoute")->name("user.editRoute");
+		Route::post("routeDetail","AdminController@routeDetail")->name("admin.routeDetail");
+		Route::post("getEmail","AdminController@getEmail")->name("admin.getEmail");
+		Route::post("sendFeedback","AdminController@sendFeedback")->name("admin.sendFeedback");
 	}
 );
 

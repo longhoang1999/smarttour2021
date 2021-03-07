@@ -121,6 +121,7 @@ function showMap(){
   //Reset all html onclick
   document.querySelectorAll(".reset-all").forEach(ele=>{
     ele.addEventListener('click',function(){
+    $("#get-route").text("Let's go");
     $("#saveTour").css("display","none");
     //Reset options
     $('.container').empty();
@@ -566,25 +567,25 @@ function showMap(){
     i=0;
     if(starlocat!= undefined){
       i=1;
-      title[0].innerText = "Your location";
+      title[0].innerText = '{{ trans("messages.YourLo") }}';
       $(title[0]).css('color','#ea4335');
       $(body[0]).append(
-        '<p> Start the tour at your location at '+timeline[0] +'</p>'
+        '<p> {{ trans("messages.Startthetourat") }} {{ trans("messages.yourLo") }} {{ trans("messages.At") }} '+timeline[0] +'</p>'
       );
       if($('#is-back').is(':checked')){
-        title[timeline.length-1 ].innerText = "Your location";
+        title[timeline.length-1 ].innerText = '{{ trans("messages.YourLo") }}';
         $(body[timeline.length-1]).append(
-        '<p>Come back to your location.</p>');
+        '<p>{{ trans("messages.CmBck") }} {{ trans("messages.yourLo") }}.</p>');
       } else {
         $(body[timeline.length-1]).append(
-        '<p> Finish the tour at '+ idToData(locatsList[locatsList.length-1],'text') +' at '+timeline[timeline.length-1]+'</p>'
+        '<p> {{ trans("messages.Finish") }} '+ idToData(locatsList[locatsList.length-1],'text') +' {{ trans("messages.At") }} '+timeline[timeline.length-1]+'</p>'
         );
         
       }
     } else{
       $(body[0]).append(
-        '<p> Start the tour at '+idToData(locatsList[0],'text')+' at '+timeline[0] +' and visit in '+converttime(idToData(locatsList[0],'duration'))+
-        '</p><br><p>'+idToData(locatsList[0],'description')+'</p><p><a href="'+idToData(locatsList[0],'link')+'"target="_blank">View the location</a></p><div class="show-more">Show more <i class="fa fa-chevron-down" aria-hidden="true"></i></div>'
+        '<p> {{ trans("messages.Startthetourat") }} '+idToData(locatsList[0],'text')+' {{ trans("messages.At") }} '+timeline[0] +' {{ trans("messages.VisIn") }} '+converttime(idToData(locatsList[0],'duration'))+
+        '</p><br><p>'+idToData(locatsList[0],'description')+'</p><p><a href="'+idToData(locatsList[0],'link')+'"target="_blank">View the location</a></p><div class="show-more">{{ trans("messages.Showmore") }} <i class="fa fa-chevron-down" aria-hidden="true"></i></div>'
       ); 
       $(heading[0]).append('<div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-utensils" value="'+0+'"></i></div><span class="nearby-find-text">Restaurant</span></div><div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-store" value="'+0+'"></i></div><span class="nearby-find-text">Store</span></div><div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-coffee" value="'+0+'"></i></div><span class="nearby-find-text">Coffe Store</span></div>');
 
@@ -592,11 +593,11 @@ function showMap(){
       if($('#is-back').is(':checked')){
         title[timeline.length-1].innerText = idToData(locatsList[0],'text');
         $(body[timeline.length-1]).append(
-            '<p>Come back to '+idToData(locatsList[0],'text')+' at '+timeline[timeline.length-1]+'</p>'
+            '<p>{{ trans("messages.CmBck") }} '+idToData(locatsList[0],'text')+' {{ trans("messages.At") }} '+timeline[timeline.length-1]+'</p>'
         );
       } else {
         $(body[timeline.length-1]).append(
-          '<p> Finish the tour at '+ idToData(locatsList[locatsList.length-1],'text') +' at '+timeline[timeline.length-1]+'</p>'
+          '<p> {{ trans("messages.Finish") }} '+ idToData(locatsList[locatsList.length-1],'text') +' {{ trans("messages.At") }} '+timeline[timeline.length-1]+'</p>'
         );
       }
     }
@@ -606,16 +607,16 @@ function showMap(){
       if(i+1<timeline.length){
         title[i].innerText = idToData(locatsList[j],'text');
       // title[i+1].innerText = idToData(locatsList[j],'text');
-        title[i+1].innerText = "Travel to the next location";
+        title[i+1].innerText = '{{ trans("messages.TralTo") }}';
         $(title[i+1]).css('color','red');
       }
       
       if(i>0&&i<timeline.length-1){
         $(heading[i]).append('<div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-utensils" value="'+j+'"></i></div><span class="nearby-find-text">Restaurant</span></div><div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-store" value="'+j+'"></i></div><span class="nearby-find-text">Store</span></div><div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-coffee" value="'+j+'"></i></div><span class="nearby-find-text">Coffe Store</span></div>');
-        $(body[i]).append('<p>Arrive '+ idToData(locatsList[j],'text') +' at '+timeline[i]+' and visit in '+ converttime(idToData(locatsList[j],'duration'))+'</p><br><p>'+idToData(locatsList[j],'description')+'</p><p><a href="'+idToData(locatsList[j],'link')+'" target="_blank">View the location</a></p><div class="show-more">Show more <i class="fa fa-chevron-down" aria-hidden="true"></i></div>');
+        $(body[i]).append('<p>{{ trans("messages.Arr") }} '+ idToData(locatsList[j],'text') +' {{ trans("messages.At") }} '+timeline[i]+' {{ trans("messages.VisIn") }} '+ converttime(idToData(locatsList[j],'duration'))+'</p><br><p>'+idToData(locatsList[j],'description')+'</p><p><a href="'+idToData(locatsList[j],'link')+'" target="_blank">View the location</a></p><div class="show-more">{{ trans("messages.Showmore") }} <i class="fa fa-chevron-down" aria-hidden="true"></i></div>');
       }
       if(i<timeline.length-2){
-        $(body[i+1]).append('<p>Complete the visit to '+idToData(locatsList[j],'text')+' at '+timeline[i+1]+' and go to the next destination</p>');
+        $(body[i+1]).append('<p>{{ trans("messages.CplVis") }} '+idToData(locatsList[j],'text')+' {{ trans("messages.At") }} '+timeline[i+1]+' {{ trans("messages.GoNxt") }}</p>');
       }
       j++;
     }
@@ -623,12 +624,12 @@ function showMap(){
     var showmore = document.getElementsByClassName("show-more");
     for(i= 0 ; i<showmore.length;i++){
       showmore[i].addEventListener('click',function(){
-        if(this.innerText=="Show more "){
+        if(this.innerText=="{{ trans("messages.Showmore") }} "){
           this.parentElement.parentElement.setAttribute('style','max-height: none');
-          this.innerHTML = 'Hide <i class="fa fa-chevron-up" aria-hidden="true"></i>';
+          this.innerHTML = '{{ trans("messages.Hide") }} <i class="fa fa-chevron-up" aria-hidden="true"></i>';
         } else {
           this.parentElement.parentElement.setAttribute('style','max-height: 174px'); 
-          this.innerHTML = 'Show more <i class="fa fa-chevron-down" aria-hidden="true"></i>';
+          this.innerHTML = '{{ trans("messages.Showmore") }} <i class="fa fa-chevron-down" aria-hidden="true"></i>';
         }
       });
     }
@@ -1464,8 +1465,8 @@ function customLabel(marker) {
     <!--timeline ends-->
     <!-- control panel -->
     <div id="switch-tab" class="control-panel">
-      <button class="tablinks active" onclick="openTab(event, 'map')"  id="tab-map">Map</button>
-      <button class="tablinks" id="tab-timeline" style="display: none;" onclick="openTab(event, 'timeline')">Timeline</button>
+      <button class="tablinks active" onclick="openTab(event, 'map')"  id="tab-map">{{ trans('messages.Map') }}</button>
+      <button class="tablinks" id="tab-timeline" style="display: none;" onclick="openTab(event, 'timeline')">{{ trans('messages.Timeline') }}</button>
     </div>
     <div id="search-panel" class="control-panel">
         <div id="search-panel-control">
@@ -1478,38 +1479,38 @@ function customLabel(marker) {
               <a href="#" class="tooltip-test" title="Click to reset"><i class="fa fa-undo fa-lg" aria-hidden="true"></i></a>
             </div>
           </div>
-          <button id="add-button">Add location</button>
-          <button id="get-route">Let's go</button>
+          <button id="add-button">{{ trans('messages.Addlocation') }}</button>
+          <button id="get-route">{{ trans('messages.findWay') }}</button>
           <!-- <button id="get-route" style="display: none;">Update</button> -->
         </div>
         <div id="your-start" style="display: none;"> 
-          Your start location<span id="your-start-close">×</span>
+          {{ trans('messages.Yourstartlocation') }}<span id="your-start-close">×</span>
         </div>
         <div class="container">  
         </div>
       </div>
       <div id="switch-tab" class="control-panel">
-        <button class="tablinks" onclick=""  id="saveTour">Save Tour</button>
-        <button class="tablinks reset-all"  onclick="">Reset</button>
+        <button class="tablinks" onclick=""  id="saveTour">{{ trans('messages.SaveTour') }}</button>
+        <button class="tablinks reset-all"  onclick="">{{ trans('messages.Reset') }}</button>
       </div>
       <div id="options-control" class="control-panel">
-        <div id="options-control-title"><b>Select tour options</b></div>
+        <div id="options-control-title"><b>{{ trans('messages.Selecttouroptions') }}</b></div>
         <div class="options-list options-list1">
-          <div><b>Select the start time:</b></div>
+          <div><b>{{ trans('messages.Selectthestarttime') }}:</b></div>
           <input type="time" id="time" value="07:00" style="width: 100%;">
         </div>
         <div class="options-list">
-          <div><b>Select the end time:</b></div>
+          <div><b>{{ trans('messages.Selecttheendtime') }}:</b></div>
           <input type="time" id="time-end" value="" style="width: 100%;">
         </div>
         <div class="options-list">
-          <input type="checkbox" id='is-back'> <b>Come back the start?</b>
+          <input type="checkbox" id='is-back'> <b>{{ trans('messages.Comebackthestart') }}</b>
         </div>
         <div class="options-list">
-          <div><input type="checkbox" id='is-opt' checked><b> Optimized</b></div>
+          <div><input type="checkbox" id='is-opt' checked><b> {{ trans('messages.Optimized') }}</b></div>
           <div id="is-opt-sub">
-            <input type="radio" class="dur-dis" name="durdis" value="1" checked> Duration   
-            <input type="radio" class="dur-dis" name="durdis" value="2"> Cost
+            <input type="radio" class="dur-dis" name="durdis" value="1" checked> {{ trans('messages.Duration') }}   
+            <input type="radio" class="dur-dis" name="durdis" value="2"> {{ trans('messages.Cost') }}
           </div>
             
         </div>
@@ -1520,8 +1521,6 @@ function customLabel(marker) {
           &#10095;
         </button> -->
       </div>
-      <button type="button" id="saveTour">Save Tour</button>
-      
     <!-- Footer-->
     <footer class="footer text-center">
         <div class="footer_1 footer_div">
@@ -1657,7 +1656,7 @@ function customLabel(marker) {
   <div class="modal-dialog modal-dm">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="enterNameTourLabel">Enter name tour</h5>
+        <h5 class="modal-title" id="enterNameTourLabel">{{ trans('messages.Enternametour') }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -1665,16 +1664,16 @@ function customLabel(marker) {
       <div class="modal-body">
         <div class="container-fluid">
           <div class="row">
-            <div class="col-md-4 col-sm-6 col-6">Name Tour</div>
+            <div class="col-md-4 col-sm-6 col-6">{{ trans('messages.NameTour') }}</div>
             <div class="col-md-8 col-sm-6 col-6">
-              <input type="text" class="form-control" placeholder="Enter Name Tour" name="nameTour">
+              <input type="text" class="form-control" placeholder="{{ trans('messages.NameTour') }}" name="nameTour">
             </div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="btnSaveNameTour">Save Tour</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('messages.CloseWindow') }}</button>
+        <button type="button" class="btn btn-primary" id="btnSaveNameTour">{{ trans('messages.SaveTour') }}</button>
       </div>
     </div>
   </div>
@@ -1685,16 +1684,16 @@ function customLabel(marker) {
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="clickWarningLabel">Warning</h5>
+        <h5 class="modal-title" id="clickWarningLabel">{{ trans('messages.Warning') }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <p class="text-danger">Do you want to change your start location ?</p>
+        <p class="text-danger">{{ trans('messages.WantChange') }}</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="change-click">Change</button>
+        <button type="button" class="btn btn-primary" id="change-click">{{ trans('messages.Change') }}</button>
       </div>
     </div>
   </div>
@@ -1705,16 +1704,16 @@ function customLabel(marker) {
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="timeAlertLabel">Warning</h5>
+        <h5 class="modal-title" id="timeAlertLabel">{{ trans('messages.Warning') }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true" id="timeAlert-close">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <p class="text">The travel time has exceeded the selected time. Click close to delete some locations or choose the another end time.  Click 'Auto delete locations' we will delete some locations and Optimized the routes automaticaly.</p>
+        <p class="text">{{ trans('messages.OverTime') }}</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="del-time-click">Auto delete locations</button>
+        <button type="button" class="btn btn-primary" id="del-time-click">{{ trans('messages.Autodeletelocations') }}</button>
       </div>
     </div>
   </div>
@@ -1760,7 +1759,14 @@ function customLabel(marker) {
                 to_comback = "1";
             }
             else to_comback = "0";
-            let to_optimized = $('input[name="durdis"]').val();
+            let to_optimized;
+            if ($('#is-opt').is(':checked') == false)
+            {
+              to_optimized="0";
+            }
+            else{
+              to_optimized = $('input[name="durdis"]').val();
+            }
             $.ajax({
                   url:routeDetail,
                   method:"get",

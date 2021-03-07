@@ -67,11 +67,14 @@
 					<div class="col-md-7 text-right">
 						<div id="div_admin" class="float-right">
 							<span>{{$us_fullName}}</span>
-							<img src="{{asset('assets/img/portfolio/cabin.png')}}" alt="" class="avatar">
+							<?php use Illuminate\Support\Facades\Auth;
+								$user= Auth::user();
+							 ?>
+							<img src="{{asset($user->us_image)}}" alt="" class="avatar">
 							<div class="profile_admin" style="z-index: 10">
 								<ul>
 									<li>
-										<a href="#">
+										<a href="#" id="a_accModal">
 											<i class="fas fa-user-secret"></i>
 											<span>{{ trans('admin.Youraccount') }}</span>
 										</a>
@@ -130,6 +133,143 @@
 			  </div>
 			</div>
 			<!-- /modal -->
+			<!-- accModal -->
+			<style>
+				#text_img_person {
+				    width: 45%;
+				    height: 20rem;
+				    border-radius: 19rem;
+				    margin: auto;
+				}
+				img#default_img_person {
+				    width: 50%;
+				    margin: auto;
+				}
+				.text_content {
+				    font-weight: bold;
+				    margin-bottom: 2rem;
+				}
+				.btn_upload_person {
+				    width: 15%;
+				    margin: 1rem auto;
+				    background: #6c9aca;
+				    padding: .5rem 0;
+				    color: white;
+				    cursor: pointer;
+				    border-radius: 10px;
+				    display: none;
+				}
+				#file_name_person {
+				    display: none;
+				    margin: 0 auto;
+				}
+				#input_File_person, #input_fullName_person, #input_gender_person, #input_age_person, #btn_submitInfo_person {
+				    display: none;
+				}
+				.openChangePass_person{
+				    display: none;
+				}
+				.openClickHere_person {
+				    color: #bf1717;
+				    font-style: italic;
+				    cursor: pointer;
+				}
+				.openItems_person {
+				    display: none;
+				}
+			</style>	
+			<div class="modal fade" id="accModal" tabindex="-1" role="dialog" aria-labelledby="personalModal" aria-hidden="true">
+			  <div class="modal-dialog modal-lg">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title" id="personalModal">{{ trans('messages.Yourpersonalinformation') }}</h5>
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			          <span aria-hidden="true">&times;</span>
+			        </button>
+			      </div>
+			      <div class="modal-body">
+			        @if ($message = Session::get('success'))
+			            <div class="alert alert-success alert-block">
+			                <button type="button" class="close" data-dismiss="alert">x</button>
+			                <strong>{{$message}}</strong>
+			            </div>
+			        @endif
+			        @if (count($errors) > 0)
+			            <div class="alert alert-danger">
+			                <ul>
+			                    @foreach ($errors->all() as $error)
+			                        <li>{{ $error }}</li>
+			                    @endforeach
+			                </ul>
+			            </div>
+			        @endif
+			        <div class="container-fluid">
+			            <div class="row">
+			                <div class="col-md-12 col-sm-12 col-12 text-center">
+			                    <div id="text_img_person" class="mb-5" ></div>
+			                    <img class="mb-5" src="{{asset('assets/img/avataaars.svg')}}" alt="" id="default_img_person" />
+			                </div>
+			            </div>
+			        </div>
+			        <form action="{{route('user.editInfo')}}" method="post" id="formFixInfor_person" enctype="multipart/form-data">
+			            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+			            <div class="container-fluid">
+			                <div class="row">
+			                    <div class="col-md-12 col-sm-12 col-12 text-center mb-2">
+			                        <p class="text_content">{{ trans('messages.Avatar') }}</p>
+			                        <div class="btn_upload_person">{{ trans('messages.Upload') }}</div>
+			                        <p class="text_content" id="file_name_person"></p>
+			                        <input type="file" class="form-control" id="input_File_person" name="file" accept="image/*">
+			                    </div>
+			                    <div class="col-md-4 col-sm-6 col-6"><p class="text_content">Email</p></div>
+			                    <div class="col-md-8 col-sm-6 col-6" id="text_email_person"></div>
+			                    <div class="col-md-4 col-sm-6 col-6"><p class="text_content">{{ trans('messages.FullName') }}</p></div>
+			                    <div class="col-md-8 col-sm-6 col-6" id="text_fullName_person"></div>
+			                    <div class="col-md-8 col-sm-6 col-6" id="input_fullName_person">
+			                        <input type="text" placeholder="Enter your fullname" class="form-control" name="fullName">
+			                    </div>
+			                    <div class="col-md-4 col-sm-6 col-6"><p class="text_content">{{ trans('messages.Gender') }}</p></div>
+			                    <div class="col-md-8 col-sm-6 col-6" id="text_gender_person"></div>
+			                    <div class="col-md-8 col-sm-6 col-6" id="input_gender_person">
+			                        <select name="gender" class="form-control">
+			                            <option value="Male">{{ trans('messages.Male') }}</option>
+			                            <option value="Female">{{ trans('messages.Female') }}</option>
+			                        </select>
+			                    </div>
+			                    <div class="col-md-4 col-sm-6 col-6"><p class="text_content">{{ trans('messages.Age') }}</p></div>
+			                    <div class="col-md-8 col-sm-6 col-6" id="text_age_person"></div>
+			                    <div class="col-md-8 col-sm-6 col-6" id="input_age_person">
+			                        <input type="number" placeholder="Enter your age" class="form-control" name="age">
+			                    </div>
+			                    <!-- pass -->
+
+			                    <p class="col-md-12 col-sm-12 col-12 openChangePass_person text-info">{{ trans('messages.ifYouchange') }}. <span class="openClickHere_person">{{ trans('messages.clickHere') }}</span></p>
+			                    <div class="col-md-4 col-sm-6 col-6"><p class="text_content openItems_person">{{ trans('messages.oldPassword') }}</p></div>
+			                    <div class="col-md-8 col-sm-6 col-6 openItems_person" id="input_Oldpassword_person">
+			                        <input type="password" placeholder="{{ trans('messages.oldPassword') }}" class="form-control" name="oldpass">
+			                    </div>
+			                    <div class="col-md-4 col-sm-6 col-6"><p class="text_content openItems_person">{{ trans('messages.newPassword') }}</p></div>
+			                    <div class="col-md-8 col-sm-6 col-6 openItems_person" id="input_password_person">
+			                        <input type="password" placeholder="{{ trans('messages.newPassword') }}" class="form-control" name="newpass">
+			                    </div>
+			                    <div class="col-md-4 col-sm-6 col-6 openItems_person"><p class="text_content">{{ trans('messages.confirmPassword') }}</p></div>
+			                    <div class="col-md-8 col-sm-6 col-6 openItems_person" id="input_Confirmpassword_person">
+			                        <input type="password" placeholder="{{ trans('messages.confirmPassword') }}" class="form-control" name="confirmpass">
+			                    </div>
+			                </div>   
+			            </div>
+			        </form> 
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('messages.CloseWindow') }}</button>
+			        <button type="button" class="btn btn-success" id="btn_editInfo_person">{{ trans('messages.Editinformation') }}</button>
+			        <button type="button" class="btn btn-primary" id="btn_submitInfo_person">{{ trans('messages.SubmitEdit') }}</button>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+
+			<!-- /accModal -->
 			<div class="content-main">
 				@yield('content')
 			</div>
@@ -150,9 +290,85 @@
 			$("#a_settingModal").click(function(){
 				$("#modalSetting").modal("show");
 			});
+			$("#a_accModal").click(function(){
+				$("#accModal").modal("show");
+			});
 			$("#sitebar .name").click(function(){
 				window.location.replace("{{route('admin.generalInfor')}}");
 			});
+			$('#accModal').on('show.bs.modal', function (event) {
+                let _token = $('meta[name="csrf-token"]').attr('content');
+                let $url_path = '{!! url('/') !!}';
+                let routeCheckUser=$url_path+"/checkUser";
+                $.ajax({
+                      url:routeCheckUser,
+                      method:"POST",
+                      data:{_token:_token},
+                      success:function(data){ 
+                        $("#text_email_person").empty();
+                        $("#text_fullName_person").empty();
+                        $("#text_gender_person").empty();
+                        $("#text_age_person").empty();
+                        if(data[5] == false)
+                        {
+                            $("#default_img_person").css("display","block");
+                            $("#text_img_person").css("display","none");
+                        }
+                        else
+                        {
+                            $("#default_img_person").css("display","none");
+                            $("#text_img_person").css("display","block");
+                            $("#text_img_person").css("background","url('"+data[0]+"')");
+                            $("#text_img_person").css("background-size","cover");
+                            $("#text_img_person").css("background-repeat","no-repeat");
+                        }
+                        if(data[6] != "")
+                        {
+                            $("#text_email_person").append(data[1]+"<span class='text-danger' style='font-style: italic;'> (Chưa xác minh)</span>");
+                        }
+                        if(data[6] == "")
+                        {
+                            $("#text_email_person").append(data[1]+"<span class='text-success' style='font-style: italic;'> (Đã xác minh)</span>");
+                        }
+                        $("#text_fullName_person").append(data[2]);
+                        $("#text_gender_person").append(data[3]);
+                        $("#text_age_person").append(data[4]);
+                        //append input
+                        $("#input_age_person input").val(data[4]);
+                        $("#input_gender_person select").val(data[3]);
+                        $("#input_fullName_person input").val(data[2]);
+                     }
+                });
+                $("#btn_editInfo_person").click(function(){
+                    //ẩn
+                    $("#text_fullName_person").slideUp("fast");
+                    $("#text_age_person").slideUp("fast");
+                    $("#text_gender_person").slideUp("fast");
+                    //hiện
+                    $(".openChangePass_person").css('display','block');
+                    $("#btn_submitInfo_person").css("display","block");
+                    $(".btn_upload_person").slideDown("fast");
+                    $("#input_age_person").slideDown("fast");
+                    $("#input_gender_person").slideDown("fast");
+                    $("#input_fullName_person").slideDown("fast");
+                    $("#btn_editInfo_person").css("display","none");
+                });
+                $(".btn_upload_person").click(function(){
+                    $("#input_File_person").click();
+                });
+                $("#btn_submitInfo_person").click(function(){
+                    $("#formFixInfor_person").submit();
+                });
+                $(".openClickHere_person").click(function(){
+                    $(".openItems_person").css("display","block");
+                    $(".openChangePass_person").css("display","none");
+                });
+                $("#input_File_person").change(function(){
+                    $(".btn_upload_person").css("background","#ff8304");
+                    $("#file_name_person").css("display","block");
+                    $("#file_name_person").html($("#input_File_person").val().split('\\').pop());
+                });
+            });
 		});
 	</script>
 </body>
