@@ -9,7 +9,7 @@ body{padding-top: 4.8rem;
   background: #2c3e50;
   padding: 1rem 8rem;
   width: 100%;
-  z-index: 10;
+  z-index: 1000;
   display: flex;
 }
 .menuDashboard ul{
@@ -121,16 +121,18 @@ body{padding-top: 4.8rem;
 }
 
 #saveTour {
+    height: 90%;
+    margin-top: 3px;
+    width: 48%;
     color: white;
     background: #4267b2;
     padding: .5rem 1rem;
     border: 0;
     cursor: pointer;
     font-size: 18px;
-    position: absolute;
     border-radius: 5px;
     display: none;
-    bottom: 0;
+    bottom: 0; 
 }
 .footer{min-height: 15rem;margin-top: 60rem;
     padding: 3rem 10rem;

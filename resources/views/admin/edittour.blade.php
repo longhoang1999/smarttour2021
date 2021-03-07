@@ -33,6 +33,7 @@ var locationsdata = [],// All data of location
     disresponse,
     choosendur = 0,
     staMarker;// Start location marker
+
 const colorlist = ['#418bca','#00bc8c','#f89a14','#ef6f6c','#5bc0de','#811411']
 // $(document).ready()
 function initMap(){
@@ -208,7 +209,16 @@ function showMap(){
 
   //get route button
   $("#get-route").click(()=>{
-    
+     @if($startLocat != "")
+     if(staMarker != undefined) staMarker.setMap(null);
+        $('.map-marker-label').remove();
+    staMarker = new google.maps.Marker({
+        label: 'Your start location',
+    });
+    staMarker.setMap(map);
+    staMarker.setPosition(starlocat);
+    customLabel(staMarker);
+  @endif
     setOptions();
     if(locatsList.length>1){
       if(!isopt){
@@ -1489,7 +1499,7 @@ function customLabel(marker) {
         </div>
       </div>
       <div id="switch-tab" class="control-panel">
-        <button class="tablinks" onclick=""  id="saveTour">Save Tour</button>
+        <button class="tablinks" onclick=""  id="saveTour">Edit Tour</button>
         <button class="tablinks reset-all"  onclick="">Reset</button>
       </div>
       <div id="options-control" class="control-panel">
@@ -1520,7 +1530,9 @@ function customLabel(marker) {
           &#10095;
         </button> -->
       </div>
-      <button type="button" id="saveTour">Save Tour</button>
+      <style>
+        #saveTour{display: block;}
+      </style>
       
     <!-- Footer-->
     <footer class="footer text-center">
@@ -1726,6 +1738,47 @@ function customLabel(marker) {
     <script type="text/javascript" src="{{asset('vendor/bootstrap/js/bootstrap.min.js')}}"></script>
 <script type="text/javascript">
   $(document).ready(function(){
+      <?php use Illuminate\Support\Arr; ?>
+      @if($startLocat!="")
+          <?php 
+            $pieces = explode("-", $startLocat);
+           ?>
+          var start_1 = {{$pieces[0]}};
+          var start_2 = {{$pieces[1]}};
+          starlocat = {
+            lat: start_1,
+            lng: start_2
+          } 
+      @endif
+      <?php 
+          $pieces_2 = explode("-", $to_des);
+          $array = array();
+          for ($i=0; $i < count($pieces_2)-1; $i++) {
+              $array = Arr::add($array, $i ,$pieces_2[$i]);
+          }
+       ?>
+      @foreach($array as $value)
+        locatsList.push('{{$value}}');
+      @endforeach
+      $("#time").val('{{$to_starttime}}');
+      @if($to_endtime != "")
+        $("#time-end").val('{{$to_endtime}}');
+      @endif
+      @if($to_comback == '1')
+        $('#is-back').prop('checked',true);
+      @endif
+      @if($to_optimized == '1')
+        $('.dur-dis[value="1"]').prop('checked', true);
+      @elseif($to_optimized == '2')
+        $('.dur-dis[value="2"]').prop('checked', true);
+      @else
+        $('#is-opt').prop('checked',false);
+      @endif
+      // auto click
+      setTimeout(function(){
+          $('#get-route').trigger('click');
+      }, 200);
+
       $("#comback_admin").click(function(){
           location.replace("{{route('admin.generalInfor')}}");
       });
@@ -1751,7 +1804,8 @@ function customLabel(marker) {
             }
             let $url_path = '{!! url('/') !!}';
             let _token = $('meta[name="csrf-token"]').attr('content');
-            let routeDetail=$url_path+"/saveTour";
+            let routeId = {{$id}};
+            let routeDetail=$url_path+"/editRoute/"+routeId;
             let timeStart = $('#time').val();
             let timeEnd = $('#time-end').val();
             let to_comback;
@@ -1766,9 +1820,7 @@ function customLabel(marker) {
                   method:"get",
                   data:{_token:_token,locatsList:locatsList,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,nameTour:nameTour,coordinates:coordinates},
                   success:function(data){ 
-                    alert("Your tour has been saved");
-                    $("#saveTour").css("display","none");
-                    $("#enterNameTour").modal("hide");
+                    location.replace("{{route('admin.history')}}")
                   }
             });
           }

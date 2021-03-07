@@ -32,7 +32,7 @@ class MapDirectController {
 		// array_unshift($tmparr,$this->origin);
 		if($this->dello == 0 ){
 		//calculating from time 
-			if($this->durordis){
+			if($this->durordis ==1){
 				for($i = 0; $i <count($arr); $i++){
 					$value = DB::table('destination')
 							->where('de_id',$arr[$i])
@@ -81,7 +81,7 @@ class MapDirectController {
 				}
 			}
 		} else {
-			if($this->durordis){
+			if($this->durordis == 1){
 				$i=0;
 				while($i!=-1&&$i < count($arr)){
 					array_push($tmparr,$arr[$i]);

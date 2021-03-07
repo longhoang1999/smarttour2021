@@ -32,8 +32,15 @@ class UserController extends Controller
     }
     public function login()
     {
-        $des = Destination::select('de_name','de_image','de_description','de_shortdes','de_duration','de_link')->get();
-        return view("generalinterface",['des'=>$des]);
+        if(Auth::check())
+        {
+            return redirect()->route("user.dashboard");
+        }
+        else
+        {
+            $des = Destination::select('de_name','de_image','de_description','de_shortdes','de_duration','de_link')->get();
+            return view("generalinterface",['des'=>$des]);
+        }
     }
     // public function viewlogin()
     // {
@@ -406,9 +413,17 @@ class UserController extends Controller
                 ->first();
             $latlng = (object)array('lat' => $de->de_lat, 'lng' => $de->de_lng);
             array_push($array_2,$latlng);
-            $labelName = (object)array('label' => $de->de_name);
+            $labelName = $de->de_name;
             array_push($label,$labelName);
         }
-        return [$array_2,$label];
+        //start locat
+        if($route->to_startLocat != "")
+        {
+            $array_3 = array();
+            $startLocat = explode("-", $route->to_startLocat);
+            $objStartLocat = (object)array('lat' => $startLocat[0], 'lng' => $startLocat[1]);
+        }
+        else $objStartLocat = "";
+        return [$array_2,$label,$objStartLocat];
     }
 }

@@ -6,27 +6,27 @@
 @section('header_styles')
 	<link rel="stylesheet" href="{{asset('css/adminDashboard.css')}}">
   <style>
-    .box3 a {
+    .box4 a {
         color: white;
     }
   </style>
 @stop
 @section('content')
-	<div class="title"><p class="text-uppercase">account information in the system</p></div>
+	<div class="title"><p class="text-uppercase">{{ trans("admin.infoFeedback") }}</p></div>
 	<div class="AllClass_Table">
         <div class="AllClass_Table_title">
-          <p>Account information in the system</p>
+          <p>{{ trans("admin.infoFeedback") }}</p>
         </div>
         <div class="AllClass_Table_content">
             <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
                   <thead>
                   <tr>
-                      <th>Order</th>
+                      <th>{{ trans("admin.Order") }}</th>
                       <th>Email</th>
-                      <th>FullName</th>
-                      <th>Content</th>
-                      <th>Star</th>
-                      <th>Actions</th>
+                      <th>{{ trans("admin.FullName") }}</th>
+                      <th>{{ trans("admin.Content") }}</th>
+                      <th>{{ trans("admin.Star") }}</th>
+                      <th>{{ trans("admin.Actions") }}</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -40,7 +40,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Detail Feedback</h5>
+        <h5 class="modal-title" id="exampleModalLabel">{{ trans("admin.DetailFeedback") }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -55,19 +55,19 @@
               <p class="textEmail"></p>
             </div>
             <div class="col-md-6 col-sm-6 col-6">
-              <h6 class="font-weight-bold">FullName</h6>
+              <h6 class="font-weight-bold">{{ trans("admin.FullName") }}</h6>
             </div>
             <div class="col-md-6 col-sm-6 col-6">
               <p class="textFullName"></p>
             </div>
             <div class="col-md-6 col-sm-6 col-6">
-              <h6 class="font-weight-bold">Feedback Content</h6>
+              <h6 class="font-weight-bold">{{ trans("admin.Content") }}</h6>
             </div>
             <div class="col-md-6 col-sm-6 col-6">
               <p class="textContent"></p>
             </div>
             <div class="col-md-6 col-sm-6 col-6">
-              <h6 class="font-weight-bold">Number Star</h6>
+              <h6 class="font-weight-bold">{{ trans("admin.Star") }}</h6>
             </div>
             <div class="col-md-6 col-sm-6 col-6">
               <p class="textStar"></p>
@@ -76,7 +76,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans("admin.Close") }}</button>
       </div>
     </div>
   </div>
@@ -90,6 +90,16 @@
   	<script>
     $(function() {
         var table = $('#Table_AllClass').DataTable({
+          "language": {
+          "emptyTable": "{{trans('admin.emptyTable')}}",
+          "sLengthMenu": "{{ trans('admin.showEntries') }}",
+          "search": "{{ trans('admin.search') }}",
+          "info": "{{ trans('admin.showingToOf') }}",
+          "paginate": {
+            "previous": "{{ trans('admin.previous') }}",
+            "next": "{{ trans('admin.next') }}"
+          }
+        },
           "order": [[ 1, 'asc' ]],
             processing: true,
             serverSide: true,

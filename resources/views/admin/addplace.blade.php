@@ -15,21 +15,21 @@
           <strong>{{$message}}</strong>
       </div>
   @endif
-	<div class="title"><p class="text-uppercase">information of places in the system</p></div>
+	<div class="title"><p class="text-uppercase">{{ trans('admin.inforPlace') }}</p></div>
 	<div class="AllClass_Table">
         <div class="AllClass_Table_title">
-          <p>Information of places in the system</p>
+          <p>{{ trans('admin.inforPlace') }}</p>
         </div>
         <div class="AllClass_Table_content">
             <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
                   <thead>
                   <tr>
-                      <th>Order</th>
-                      <th>Name</th>
-                      <th>Longitude</th>
-                      <th>Latitude</th>
-                      <th>Duration</th>
-                      <th>Actions</th>
+                      <th>{{ trans('admin.Order') }}</th>
+                      <th>{{ trans('admin.NamePlace') }}</th>
+                      <th>{{ trans('admin.Longitude') }}</th>
+                      <th>{{ trans('admin.Latitude') }}</th>
+                      <th>{{ trans('admin.Duration') }}</th>
+                      <th>{{ trans('admin.Actions') }}</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -42,7 +42,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalDetailLabel">Detail Place</h5>
+        <h5 class="modal-title" id="modalDetailLabel">{{ trans('admin.DetailPlace') }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -51,76 +51,76 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Place Name</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.NamePlace') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-right pb-3" id="placeName"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Image</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.Image') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6" id="placeImage">
             </div>
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Longitude</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.Longitude') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-right pb-3" id="longitude"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Latitude</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.Latitude') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-right pb-3" id="latitude"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Description</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.Description') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-right pb-3" id="description"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Shortdes</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.Shortdes') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-right pb-3" id="shortdes"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Duration (hours)</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.Duration') }} ({{ trans('admin.hours') }})</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-right pb-3" id="duration"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Link on google map</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.linkmap') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6 text-right">
-              <a href="#" class="pb-3" id="link" target="_blank">Link here</a>
+              <a href="#" class="pb-3" id="link" target="_blank">{{ trans('admin.Linkhere') }}</a>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Link on VR</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.linkVR') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6 text-right">
-              <a href="#" class="pb-3" id="link_vr" target="_blank">Link here</a>
+              <a href="#" class="pb-3" id="link_vr" target="_blank">{{ trans('admin.Linkhere') }}</a>
             </div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
       </div>
     </div>
   </div>
 </div>
 <!-- /Modal -->
-  <div class="title"><p class="text-uppercase">add the location to the database</p></div>
-  <small class="text-info">(Get google map url or click on the map below to add locations)</small>
+  <div class="title"><p class="text-uppercase">{{ trans('admin.addlocation') }}</p></div>
+  <small class="text-info">({{ trans('admin.getUrl') }})</small>
   <div class="container-fluid">
     <div class="form-group">
-      <label for="inputLink">Link google map</label>
+      <label for="inputLink">{{ trans('admin.linkggmap') }}</label>
       <div class="row">
         <div class="col-md-9 col-12 col-sm-12">
-          <input type="text" class="form-control" id="inputLink" placeholder="Get link google map" required="">
+          <input type="text" class="form-control" id="inputLink" placeholder="{{ trans('admin.linkggmap') }}" required="">
         </div>
         <div class="col-md-3 col-12 col-sm-12">
           <button type="button" class="btn btn-primary" id="btn_getLink">Get link</button>
@@ -131,55 +131,55 @@
   <div class="mapBorder">
     <div id="map" class="tabcontent"></div>
   </div>
-  <button class="btn btn-info" id="btn_addPlace">Add place according to the link</button>
-  <button class="btn btn-info" id="btn_addPlace_2">Add Place according click map</button>
+  <button class="btn btn-info" id="btn_addPlace">{{ trans('admin.addplaceForlink') }}</button>
+  <button class="btn btn-info" id="btn_addPlace_2">{{ trans('admin.addplaceForClick') }}</button>
 
   <div class="AllClass_Table" id="Form_add">
         <div class="AllClass_Table_title">
-          <p>Information of the location you choose</p>
+          <p>{{ trans('admin.inforYouChosse') }}</p>
         </div>
         <div class="AllClass_Table_content">
             <form action="{{route('admin.postaddPlace')}}" method="post" id="formAddPlace" enctype="multipart/form-data">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />
               <div class="form-group">
-                <label for="inputLongitude">Longitude</label>
-                <input type="text" class="form-control" id="inputLongitude" placeholder="Enter longitude" required="" readonly="" name="de_lng">
+                <label for="inputLongitude">{{ trans('admin.Longitude') }}</label>
+                <input type="text" class="form-control" id="inputLongitude" placeholder="{{ trans('admin.Longitude') }}" required="" readonly="" name="de_lng">
               </div>
               <div class="form-group">
-                <label for="inputLatitude">Latitude</label>
-                <input type="text" class="form-control" id="inputLatitude" placeholder="Enter latitude" required="" readonly="" name="de_lat">
+                <label for="inputLatitude">{{ trans('admin.Latitude') }}</label>
+                <input type="text" class="form-control" id="inputLatitude" placeholder="{{ trans('admin.Latitude') }}" required="" readonly="" name="de_lat">
               </div>
               <div class="form-group">
-                <label for="inputName">Name</label>
-                <input type="text" class="form-control" id="inputName" placeholder="Enter name" required="" name="de_name">
+                <label for="inputName">{{ trans('admin.NamePlace') }}</label>
+                <input type="text" class="form-control" id="inputName" placeholder="{{ trans('admin.NamePlace') }}" required="" name="de_name">
               </div>  
               <div class="form-group">
-                <label for="inputName">Image</label>
-                <div class="open_inputFile">Upload here</div>
+                <label for="inputName">{{ trans('admin.Image') }}</label>
+                <div class="open_inputFile">{{ trans('admin.Upload') }}</div>
                 <p class="file_name"></p>
                 <input type="file" class="form-control" id="inputImage" name="de_image" accept=".jpg,.png">
               </div>
               <div class="form-group">
-                <label for="inputDescription">Description</label>
-                <textarea class="form-control" id="inputDescription" required="" placeholder="Enter description" name="de_description"></textarea>
+                <label for="inputDescription">{{ trans('admin.Description') }}</label>
+                <textarea class="form-control" id="inputDescription" required="" placeholder="{{ trans('admin.Description') }}" name="de_description"></textarea>
               </div>
               <div class="form-group">
-                <label for="inputShortdes">Brief description</label>
-                <input type="text" class="form-control" id="inputShortdes" placeholder="Enter brief description" required="" name="de_shortdes">
+                <label for="inputShortdes">{{ trans('admin.Shortdes') }}</label>
+                <input type="text" class="form-control" id="inputShortdes" placeholder="{{ trans('admin.Shortdes') }}" required="" name="de_shortdes">
               </div>
               <div class="form-group">
-                <label for="inputDuration">Average travel time (hours)</label>
-                <input type="number" class="form-control" id="inputDuration" placeholder="Enter duration" required="" name="de_duration" step="0.1">
+                <label for="inputDuration">{{ trans('admin.avgTime') }} ({{ trans('admin.hours') }})</label>
+                <input type="number" class="form-control" id="inputDuration" placeholder="{{ trans('admin.avgTime') }}" required="" name="de_duration" step="0.1">
               </div>
               <div class="form-group">
-                <label for="googleLink">Google link</label>
+                <label for="googleLink">{{ trans('admin.linkmap') }}</label>
                 <input type="text" class="form-control" id="googleLink" readonly="" required="" name="de_map">
               </div>
               <div class="form-group">
-                <label for="googleLink">VR link</label>
+                <label for="googleLink">{{ trans('admin.linkVR') }}</label>
                 <input type="text" class="form-control" id="vrLink" name="de_link">
               </div>
-              <button type="submit" class="btn btn-primary">Add Place</button>
+              <button type="submit" class="btn btn-primary">{{ trans('admin.AddPlace') }}</button>
             </form>
         </div>
     </div>
@@ -206,6 +206,16 @@
     <script>
     $(function() {
         var table = $('#Table_AllClass').DataTable({
+          "language": {
+          "emptyTable": "{{trans('admin.emptyTable')}}",
+          "sLengthMenu": "{{ trans('admin.showEntries') }}",
+          "search": "{{ trans('admin.search') }}",
+          "info": "{{ trans('admin.showingToOf') }}",
+          "paginate": {
+            "previous": "{{ trans('admin.previous') }}",
+            "next": "{{ trans('admin.next') }}"
+          }
+        },
           "lengthMenu": [[5, 10, -1], [5, 10,"All"]],
           "order": [[ 1, 'asc' ]],
             processing: true,

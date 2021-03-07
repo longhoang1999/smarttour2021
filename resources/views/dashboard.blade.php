@@ -53,6 +53,13 @@
                         <li class="nav-item mx-0 mx-lg-1" id="li_person">
                             <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#">{{ trans('messages.Youraccount') }} <i class="fas fa-sort-down"></i></a>
                             <div id="div_person">
+                                <?php 
+                                    use Illuminate\Support\Facades\Auth;
+                                    $user = Auth::user();
+                                ?>
+                                @if($user->us_type == "1")
+                                    <p id="comback_admin">{{ trans('messages.adminPage') }}</p>
+                                @endif
                                 <p id="personalInfo">{{ trans('messages.Aboutyou') }}</p>
                                 <p id="p_logout">{{ trans('messages.Logout') }}</p>
                             </div>
@@ -534,6 +541,9 @@
         <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
         <script type="text/javascript">
             $(document).ready(function(){
+                $("#comback_admin").click(function(){
+                    location.replace("{{route('admin.generalInfor')}}");
+                });
                 $('.autoplay').slick({
                     slidesToShow: 1,
                     slidesToScroll: 1,
@@ -767,10 +777,15 @@
                           method:"POST",
                           data:{_token:_token,inputLink:inputLink},
                           success:function(data){ 
-                            //alert(data);
+                            console.log(data);
+                            if(data[2] != "")
+                            {
+                                data[2].lat = parseFloat(data[2].lat);
+                                data[2].lng = parseFloat(data[2].lng);
+                                data[0].unshift(data[2]);
+                                data[1].unshift('Điểm bắt đầu của bạn');
+                            }
                             drawRoutes(data[0],data[1]);
-                            //console.log(data[0]);
-                            //console.log(data[1]);
                          }
                     });
                 });
@@ -797,7 +812,6 @@
                     for(var i=0;i<polylines.length;i++){
                       polylines[i].setMap(null);
                     }
-
                     for (i = 0; i < legs.length; i++) {
                       (i>=5&&i%5 == 0)?index = 4:((starlocat != undefined)?index = (i%5)-1:index = (i%5));
                       if(starlocat != undefined && i==0) index = 5;
@@ -822,20 +836,22 @@
                 };
 
                   //Draw marker on map
-                function markersOnMap(locats,labelName){  
+                function markersOnMap(locats,labelName){console.log(locats);  
                     //clear marker 
+                    
                     for(var i =0 ; i<markersArray.length;i++){
                       markersArray[i].setMap(null);
                     }
                     markersArray = []; 
 
                     //create new marker
-                    for(var i = 0; i<locats.length;i++){
-                        //console.log(locats[i]);
+                    for(i=0; i<locats.length;i++){
+                        console.log(locats[i]);
                       addMarkers(locats[i],i,labelName[i]);
                     }
                 }
                 function addMarkers(locats,index,labelName){
+                    console.log(index);
                     var icon = {
                       path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
                       fillColor: colorlist[index%5],
@@ -845,7 +861,7 @@
                       scale: 1.4,
                     },
                       label = {
-                        text: labelName.label.toString(),
+                        text: labelName,
                         color: colorlist[index%5],
                         fontWeight: 'bold'  
                     };

@@ -52,9 +52,9 @@
       }
 
       #search-panel {
-        height: 400px;       
+        height: auto;       
         font-size: 15px;
-        position: relative;
+        /*position: relative;*/
       }
 
       #search-panel-control{
@@ -65,7 +65,7 @@
      
 
       #search-panel button {
-        padding: 10px 5px;
+        padding: 7px 5px;
         width: 49%;
         font-size: 18px;
         border-radius: 5px;
@@ -88,17 +88,67 @@
         color: white; 
       }
 
+      #your-start{
+        position: relative;
+        height: 40px;
+        width: 97%;
+        border: 0px solid rgba(123, 123, 123, 0.498039);
+        border-radius: 4px;
+        color: white;
+        line-height: 40px;
+        padding-left: 15px;
+        font-size: 18px;
+        font-weight: 400;
+        background-color: #ea4335;
+        box-shadow: rgba(0,0,0,0.2) 0px 1px 2px 0px;
+      }
+
+      #your-start-close{
+        color: white;
+        font-weight: bold;
+        font-size: 20px;
+        cursor: pointer;
+        position: absolute;
+        right: .5rem;
+      }
       .container {
         position: relative; 
-        top: 145px;
+        top: 130px;
         left: 50%;   
         width: 100%;
-        height: 290px;
+        height: 270px;
         opacity: 0;
         visibility: hidden;
         -webkit-transform: translate(-50%, -50%);
         transform: translate(-50%, -50%);
       } 
+
+      .list-item {  
+        position: absolute;
+        float: left;
+       /* top: 0;
+        left: 0; */ 
+        height: 40px;
+        width: 100%;  
+        z-index: -10px;
+      }
+
+      .item-content {
+        height: 100%;
+        width: 97%;
+        border: 0px solid rgba(123, 123, 123, 0.498039);
+        border-radius: 4px;
+        color: rgb(153, 153, 153);
+        /*color: white;*/
+        line-height: 40px;
+        padding-left: 15px;
+        font-size: 18px;
+        font-weight: 400;
+        background-color: rgb(255, 255, 255);
+        box-shadow: rgba(0,0,0,0.2) 0px 1px 2px 0px;
+        overflow: hidden;
+        position: absolute;
+      }
 
       #select-box{
         border-radius: 4px;
@@ -243,12 +293,12 @@
       }
 
       #switch-tab{
-        height: 70px;
+        height: 50px;
         position: relative;
       }
       #switch-tab::before{
-        top: 20px;
-        bottom: 20px;
+        top: 10px;
+        bottom: 10px;
         position: absolute;
         content: ' ';
         width: 2px;
@@ -305,32 +355,9 @@
       
       
 
-      .list-item {  
-        position: absolute;
-        float: left;
-       /* top: 0;
-        left: 0; */ 
-        height: 40px;
-        width: 100%;  
-        z-index: -10px;
-      }
+      
 
-      .item-content {
-        height: 100%;
-        width: 97%;
-        border: 0px solid rgba(123, 123, 123, 0.498039);
-        border-radius: 4px;
-        color: rgb(153, 153, 153);
-        /*color: white;*/
-        line-height: 40px;
-        padding-left: 15px;
-        font-size: 20px;
-        font-weight: 400;
-        background-color: rgb(255, 255, 255);
-        box-shadow: rgba(0,0,0,0.2) 0px 1px 2px 0px;
-        overflow: hidden;
-        position: absolute;
-      }
+      
 
       .tooltiptext {
         visibility: hidden;
@@ -487,7 +514,7 @@
 
         .timeline-panel{
           overflow: hidden;
-          max-height: 174px;
+          max-height: 185px;
         }
 
         .show-more{
@@ -568,7 +595,7 @@
           opacity: 0.7;
         }
 
-        .fa-cutlery{
+        /*.fa-cutlery{
           background: #418bca;
           color: white;
           padding: 15px;
@@ -577,12 +604,38 @@
           text-align: center;
           border-radius: 50%;
           float: left;
-        }
-        .restaurant-find{
+        }*/
+        /*.restaurant-find{
           height: auto;
           width: 100%;
           padding: auto;
+        }*/
+        .nearby-find{
+          width: 100%;
+          display: flex;
         }
+      .nearby-find-content{
+        width: 25%;
+        margin: auto;
+        position: relative;
+      }
+      .nearby-find-icon{
+        display: inline-block;
+        width: 3.25rem;
+        height: 3.25rem;
+        border: 2px solid black;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+        border-radius: 2rem;
+        font-size: 1.25rem;
+        padding: 10px;
+        cursor: pointer;
+        float: left;
+      }
+      .nearby-find-text{
+        float: left;
+      }
 
         /*.restaurant-pick select{
           width: 100%;

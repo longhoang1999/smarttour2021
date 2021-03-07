@@ -69,4 +69,5 @@ return [
     'incorrectKey' => 'key is incorrect',
     'Notification' => 'Notification',
     'defaultPass' => 'Your password has been changed to your email. Access your account and change your password!',
+    'adminPage' => 'Admin page',
 ];

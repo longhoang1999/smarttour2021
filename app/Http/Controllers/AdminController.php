@@ -379,7 +379,7 @@ class AdminController extends Controller
     	if(!empty($des))
     	{
     		$duration = floatval($des->de_duration)/60/60;
-    		return [$des->de_name,$des->de_lng,$des->de_lat,$des->de_description,$des->de_shortdes,$duration,$des->de_link];
+    		return [$des->de_name,$des->de_lng,$des->de_lat,$des->de_description,$des->de_shortdes,$duration,$des->de_link,$des->de_map];
     	}
     	else
     	{
@@ -525,5 +525,140 @@ class AdminController extends Controller
         {
             return back()->with("error","Confirm password wrong");
         }
+    }
+    public function changeLanguage(Request $req)
+    {
+        if($req->lang == "vi")
+        {
+            \Session::put('website_language', 'vi');
+        }
+        if($req->lang == "en")
+        {
+            \Session::put('website_language', 'en');
+        }
+        return back();
+    }
+    public function history()
+    {
+        $user = Auth::user();
+        return view('admin.history',['us_fullName'=>$user->us_fullName]);
+    }
+    public function showAllRoute()
+    {
+        $route = Route::get();
+        return DataTables::of($route)
+            ->addColumn(
+                'stt',
+                function ($route) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'fullName',
+                function ($route) {
+                    $fullName = User::select('us_fullName')->where("us_id",$route->to_id_user)->first();
+                    return $fullName->us_fullName;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($route) {
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $startLocat = $route->to_startLocat;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'Detail',
+                function ($route) {
+                    $pieces = explode("-", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $desName = Destination::select('de_name')->where("de_remove",$value)->first();
+                        $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+                    }
+                    return $Detail;
+                }
+            )
+            ->addColumn(
+                'startTime',
+                function ($route) {
+                    if($route->to_starttime == "")
+                    {
+                        $startTime ='<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $startTime = $route->to_starttime;
+                    }
+                    return $startTime;
+                }
+            )
+            ->addColumn(
+                'endTime',
+                function ($route) {
+                    if($route->to_endtime == "")
+                    {
+                        $endTime ='<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $endTime = $route->to_endtime;
+                    }
+                    return $endTime;
+                }
+            )  
+            ->addColumn(
+                'actions',
+                function ($route) {
+                    $actions = '<a href="'.route('admin.editTour',$route->to_id).'" target="_blank" class="btn btn-block btn-danger btn-sm">Edit Tour</a>';
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','fullName','startLocat','Detail','startTime','endTime','actions'])
+            ->make(true);
+    }
+    public function editTour($id)
+    {
+        $route = Route::where("to_id",$id)->first();
+        //echo $route->startLocat;
+        $user = Auth::user();
+        return view('admin.edittour',['us_fullName'=>$user->us_fullName,'startLocat'=>$route->to_startLocat,'to_des'=>$route->to_des,'to_starttime'=>$route->to_starttime,'to_endtime'=>$route->to_endtime,'to_comback'=>$route->to_comback,'to_optimized'=>$route->to_optimized,'id'=>$id]);
+    }
+    public function editRoute(Request $req,$id)
+    {
+        $user = Auth::user();
+        $route = Route::where("to_id",$id)->first();
+        $route->to_id_user = $user->us_id;
+        $i=0;
+        $des = "";
+        foreach ($req->locatsList as  $value) {
+            $des = $des.$req->locatsList[$i]."-";
+            $i++;
+        }
+        $route->to_des = $des;
+        $route->to_starttime = $req->timeStart;
+        $route->to_endtime = $req->timeEnd;
+        $route->to_comback = $req->to_comback;
+        $route->to_optimized = $req->to_optimized;
+        $route->to_name = $req->nameTour;
+
+        if($req->coordinates != "")
+        {
+            $route->to_startLocat = $req->coordinates;
+        }
+        $route->to_startDay = date('Y-m-d', strtotime(Carbon::now()));
+        $route->save();
     }
 }

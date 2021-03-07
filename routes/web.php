@@ -48,14 +48,16 @@ Route::group(
 		})->name("user.maps");
 		Route::post("feedback","UserController@feedback")->name("user.feedback");
 		Route::get("saveTour","UserController@saveTour")->name("user.saveTour");
+
 		Route::post("checkTour","UserController@checkTour")->name("user.checkTour");
+
 		Route::post("checkUser","UserController@checkUser")->name("user.checkUser");
 		Route::post("editInfo","UserController@editInfo")->name("user.editInfo");
 		
 	}
 );
 Route::group(
-	['middleware' => ['userLogin','checkAdmin'] ],
+	['middleware' => ['userLogin','checkAdmin','locale'] ],
 	function(){
 		//admin
 		Route::get("dashboardAdmin","AdminController@dashboard")->name("admin.dashboard");
@@ -86,6 +88,13 @@ Route::group(
 		Route::get("deleteAcc/{id}","AdminController@deleteAcc")->name("admin.deleteAcc");
 		Route::post("checkUserAdmin","AdminController@checkUserAdmin")->name("admin.checkUserAdmin");
 		Route::post("addaccount","AdminController@addaccount")->name("admin.addaccount");
+		//language
+		Route::post("changeLanguage","AdminController@changeLanguage")->name('admin.changeLanguage');
+		Route::get("history","AdminController@history")->name("admin.history");
+		Route::get("showAllRoute","AdminController@showAllRoute")->name("admin.showAllRoute");
+		Route::get("editTour/{id}","AdminController@editTour")->name('admin.editTour');
+
+		Route::get("editRoute/{id}","AdminController@editRoute")->name("user.editRoute");
 	}
 );
 

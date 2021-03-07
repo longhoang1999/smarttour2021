@@ -69,4 +69,5 @@ return [
     'Notification' => 'Thông báo',
     'defaultPass' => 'Mật khẩu của bạn đã được thay đổi thành email của bạn. Hãy truy cập tài khoản của bạn và thay đổi mật khẩu của bạn!',
     'LinkVR' =>'Đường dẫn tới VR',
+    'adminPage' => 'Trang Admin',
 ];

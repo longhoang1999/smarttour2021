@@ -34,8 +34,8 @@
               <div class="card-body">
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Number of accounts in the system</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{$totalAcc}} accounts</div>
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ trans('admin.totalAcc') }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{$totalAcc}} {{ trans('admin.accounts') }}</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-portrait fa-2x text-acc"></i>
@@ -50,8 +50,8 @@
               <div class="card-body">
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">The number of places in the system</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{$totalDes}} places</div>
+                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ trans('admin.totalPlace') }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{$totalDes}} {{ trans('admin.places') }}</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-map-marker-alt fa-2x text-place"></i>
@@ -65,7 +65,7 @@
               <div class="card-body">
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Average number of ratings of the system</div>
+                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ trans('admin.avgStar') }}</div>
                     <div class="row no-gutters align-items-center">
                       <div class="col-auto">
                         <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{number_format((float)$avgStar, 2, '.', '')}}</div>
@@ -90,8 +90,8 @@
               <div class="card-body">
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Number of system feedback</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{$totalFeedback}} feedback</div>
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ trans('admin.totalFeedback') }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{$totalFeedback}} {{ trans('admin.feedback') }}</div>
                   </div>
                   <div class="col-auto">
                     <i class="far fa-comments fa-2x text-feedback"></i>
@@ -103,10 +103,10 @@
       </div>
   </div>
 
-  <div class="title"><p class="text-uppercase">General information chart</p></div>
+  <div class="title"><p class="text-uppercase">{{ trans('admin.chartDashboard') }}</p></div>
   <div class="AllClass_Table">
         <div class="AllClass_Table_title">
-          <p class="text-lowercase">General information chart</p>
+          <p class="text-lowercase">{{ trans('admin.chartDashboard') }}</p>
         </div>
         <div class="AllClass_Table_content">
             <div class="chart">
@@ -123,10 +123,10 @@
         type: 'bar',
         data: {
           labels: [
-            'Total number of accounts','Total number of places','Average number of stars','Total user feedback'
+            '{{ trans("admin.chartTotalAcc") }}','{{ trans("admin.chartTotalPlace") }}','{{ trans("admin.StarAvg") }}','{{ trans("admin.chartTotalFeedback") }}'
           ],
           datasets: [{ 
-              label: 'General information',
+              label: '{{ trans("admin.Generalinformation") }}',
               data: [
                 '{{$totalAcc}}','{{$totalDes}}','{{number_format((float)$avgStar, 2, '.', '')}}','{{$totalFeedback}}'
               ],
