@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Route;
 use App\Models\Feedback;
 use App\Models\Destination;
+use App\Models\Language;
 use App\Models\Path;
 use PHPMailer;
 
@@ -187,7 +188,14 @@ class AdminController extends Controller
     }
     public function showDestination()
     {
-    	$destination = Destination::get();
+        $destination = Language::where("language","en")->get();
+            foreach ($destination as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $value["de_remove"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_duration"] = $des->de_duration;
+            }
         return DataTables::of($destination)
         	->addColumn(
                 'stt',
@@ -213,17 +221,87 @@ class AdminController extends Controller
             ->rawColumns(['stt','duration','actions'])
             ->make(true);
     }
+    public function showDestinationVN ()
+    {
+        $destination = Language::where("language","vn")->get();
+            foreach ($destination as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $value["de_remove"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_duration"] = $des->de_duration;
+            }
+        return DataTables::of($destination)
+            ->addColumn(
+                'stt',
+                function ($destination) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'duration',
+                function ($destination) {
+                    $duration = floatval($destination->de_duration)/60/60;
+                    return $duration;
+                }
+            )
+            ->addColumn(
+                'actions',
+                function ($destination) {
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','duration','actions'])
+            ->make(true);
+    }
+    public function showDestinationEditVN ()
+    {
+        $destination = Language::where("language","vn")->get();
+            foreach ($destination as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $value["de_remove"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_duration"] = $des->de_duration;
+            }
+        return DataTables::of($destination)
+            ->addColumn(
+                'stt',
+                function ($destination) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'duration',
+                function ($destination) {
+                    $duration = floatval($destination->de_duration)/60/60;
+                    return $duration;
+                }
+            )
+            ->addColumn(
+                'actions',
+                function ($destination) {
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
+                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalEdit">'.trans("admin.Edit").'</button>';
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','duration','actions'])
+            ->make(true);
+        
+    }
     public function postaddPlace(Request $req)
     {
     	$randomletter = substr(str_shuffle("abcdefghijklmnopqrstuvwxyz0123456789QAZXSWEDCRFVTGBYHNUJMIKLPO"), 0, 27);
     	$destination = new Destination();
     	$destination->de_id = $randomletter;
     	$destination->de_remove = $randomletter;
-    	$destination->de_name = $req->de_name;
+    	$destination->de_name = $req->de_name_vn;
     	$destination->de_lat = $req->de_lat;
     	$destination->de_lng = $req->de_lng;
-    	$destination->de_description = $req->de_description;
-    	$destination->de_shortdes = $req->de_shortdes;
         $destination->de_map = $req->de_map;
     	$destination->de_link = $req->de_link;
     	$destination->de_duration = floatval($req->de_duration)*60*60;
@@ -237,6 +315,23 @@ class AdminController extends Controller
             $destination->de_image='imgPlace/'.$picName;
         }
     	$destination->save();
+
+        $lang_vn = new Language();
+        $lang_vn->des_id = $randomletter;
+        $lang_vn->language = "vn";
+        $lang_vn->de_name = $req->de_name_vn;
+        $lang_vn->de_description = $req->de_description_vn;
+        $lang_vn->de_shortdes = $req->de_shortdes_vn;
+        $lang_vn->save();
+        
+        $lang_en = new Language();
+        $lang_en->des_id = $randomletter;
+        $lang_en->language = "en";
+        $lang_en->de_name = $req->de_name_en;
+        $lang_en->de_description = $req->de_description_en;
+        $lang_en->de_shortdes = $req->de_shortdes_en;
+        $lang_en->save();
+        
 
         $array = array();
         $array = Arr::add($array, 0 ,$randomletter);
@@ -332,7 +427,14 @@ class AdminController extends Controller
     }
     public function showDestinationRemove()
     {
-    	$destination = Destination::get();
+        $destination = Language::where("language","en")->get();
+            foreach ($destination as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $value["de_remove"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_duration"] = $des->de_duration;
+            }
         return DataTables::of($destination)
         	->addColumn(
                 'stt',
@@ -359,23 +461,83 @@ class AdminController extends Controller
             ->rawColumns(['stt','duration','actions'])
             ->make(true);
     }
-    public function showDetail(Request $req,$remove)
+    public function showDestinationRemoveVN()
     {
-    	$des = Destination::where("de_remove",$remove)->first();
-    	if(!empty($des))
-    	{
-            if($des->de_image != "")
-            {
-                $image = asset($des->de_image);
+        $destination = Language::where("language","vn")->get();
+            foreach ($destination as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $value["de_remove"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_duration"] = $des->de_duration;
             }
-            else $image="";
-    		$duration = floatval($des->de_duration)/60/60;
-    		return [$des->de_name,$des->de_lng,$des->de_lat,$des->de_description,$des->de_shortdes,$duration,$des->de_link,$des->de_map,$image];
-    	}
-    	else
-    	{
-    		return "Can not find data";
-    	}
+        return DataTables::of($destination)
+            ->addColumn(
+                'stt',
+                function ($destination) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'duration',
+                function ($destination) {
+                    $duration = floatval($destination->de_duration)/60/60;
+                    return $duration;
+                }
+            )
+            ->addColumn(
+                'actions',
+                function ($destination) {
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
+                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','duration','actions'])
+            ->make(true);
+    }
+    public function showDetail(Request $req,$remove,$lang)
+    {
+        if($lang == "en")
+        {
+            $des = Language::where("language","en")->where("des_id",$remove)->first();
+            $de = Destination::where("de_remove",$remove)->first();
+            if(!empty($des) && !empty($de))
+            {
+                if($de->de_image != "")
+                {
+                    $image = asset($de->de_image);
+                }
+                else $image="";
+                $duration = floatval($de->de_duration)/60/60;
+                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image];
+            }
+            else
+            {
+                return "Can not find data";
+            }
+            
+        }
+        else if($lang == "vn")
+        {
+            $des = Language::where("language","vn")->where("des_id",$remove)->first();
+            $de = Destination::where("de_remove",$remove)->first();
+            if(!empty($des) && !empty($de))
+            {
+                if($de->de_image != "")
+                {
+                    $image = asset($de->de_image);
+                }
+                else $image="";
+                $duration = floatval($de->de_duration)/60/60;
+                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image];
+            }
+            else
+            {
+                return "Can not find data";
+            }
+        }
     }
     public function placeDelete($remove)
     {
@@ -387,7 +549,10 @@ class AdminController extends Controller
         foreach ($path_end as $value) {
             $value->delete();
         }
-
+        $lang = Language::where("des_id",$remove)->get();
+        foreach ($lang as $value) {
+            $value->delete();
+        }
     	$des = Destination::where("de_remove",$remove)->first();
     	if(!empty($des))
     	{
@@ -398,7 +563,14 @@ class AdminController extends Controller
     }
     public function showDestinationEdit()
     {
-    	$destination = Destination::get();
+        $destination = Language::where("language","en")->get();
+            foreach ($destination as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $value["de_remove"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_duration"] = $des->de_duration;
+            }
         return DataTables::of($destination)
         	->addColumn(
                 'stt',
@@ -425,30 +597,103 @@ class AdminController extends Controller
             ->rawColumns(['stt','duration','actions'])
             ->make(true);
     }
-    public function showDetailEdit($remove)
-    {
-    	$des = Destination::where("de_remove",$remove)->first();
-    	if(!empty($des))
-    	{
-    		$duration = floatval($des->de_duration)/60/60;
-    		return [$des->de_name,$des->de_lng,$des->de_lat,$des->de_description,$des->de_shortdes,$duration,$des->de_link,$des->de_map];
-    	}
-    	else
-    	{
-    		return "Can not find data";
-    	}
+    public function showDetailEdit($remove,$lang)
+    {   
+        if($lang == "en")
+        {
+            $des = Language::where("language","en")->where("des_id",$remove)->first();
+            $de = Destination::where("de_remove",$remove)->first();
+            if(!empty($des) && !empty($de))
+            {
+                if($de->de_image != "")
+                {
+                    $image = asset($de->de_image);
+                }
+                else $image="";
+                $duration = floatval($de->de_duration)/60/60;
+                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image];
+            }
+            else
+            {
+                return "Can not find data";
+            }
+            
+        }
+        else if($lang == "vn")
+        {
+            $des = Language::where("language","vn")->where("des_id",$remove)->first();
+            $de = Destination::where("de_remove",$remove)->first();
+            if(!empty($des) && !empty($de))
+            {
+                if($de->de_image != "")
+                {
+                    $image = asset($de->de_image);
+                }
+                else $image="";
+                $duration = floatval($de->de_duration)/60/60;
+                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image];
+            }
+            else
+            {
+                return "Can not find data";
+            }
+        }
     }
-    public function formEditPlace(Request $req,$remove)
+    public function formEditPlace(Request $req,$remove,$lang)
     {
-    	$des = Destination::where("de_remove",$remove)->first();
-    	if(!empty($des))
-    	{
-    		$des->de_name=$req->placeName;
-    		$des->de_description=$req->description;
-    		$des->de_shortdes=$req->shortdes;
-    		$des->de_duration= floatval($req->duration)*60*60;
-    		$des->save();
-    	}
+        if($lang == "en")
+        {
+            $des = Language::where("language","en")->where("des_id",$remove)->first();
+            $de = Destination::where("de_remove",$remove)->first();
+            if(!empty($des) && !empty($de))
+            {
+                $des->de_name=$req->placeName;
+                $des->de_description=$req->description;
+                $des->de_shortdes=$req->shortdes;
+                $des->save();
+                $de->de_duration= floatval($req->duration)*60*60;
+                $de->de_lat=$req->latitude_edit;
+                $de->de_lng=$req->longitude_edit;
+                $de->de_map=$req->link_edit;
+                $de->de_link=$req->de_link;
+                if($req->file('image'))
+                {
+                    $image = $req->file('image');
+                    File::delete(public_path($de->de_image));
+                    $picName = time().'.'.$image->getClientOriginalExtension();
+                    $image->move(public_path('imgPlace/'), $picName);
+                    $de->de_image='imgPlace/'.$picName;
+                }
+                $de->save();
+            }
+        }
+        else if($lang == "vn")
+        {
+            $des = Language::where("language","vn")->where("des_id",$remove)->first();
+            $de = Destination::where("de_remove",$remove)->first();
+            if(!empty($des) && !empty($de))
+            {
+                $des->de_name=$req->placeName;
+                $des->de_description=$req->description;
+                $des->de_shortdes=$req->shortdes;
+                $des->save();
+                $de->de_name = $req->placeName;
+                $de->de_duration= floatval($req->duration)*60*60;
+                $de->de_lat=$req->latitude_edit;
+                $de->de_lng=$req->longitude_edit;
+                $de->de_map=$req->link_edit;
+                $de->de_link=$req->de_link;
+                if($req->file('image'))
+                {
+                    $image = $req->file('image');
+                    File::delete(public_path($de->de_image));
+                    $picName = time().'.'.$image->getClientOriginalExtension();
+                    $image->move(public_path('imgPlace/'), $picName);
+                    $de->de_image='imgPlace/'.$picName;
+                }
+                $de->save();
+            }
+        }
     	return back()->with("status","You have successfully corrected");
     }
     public function generalInfor()

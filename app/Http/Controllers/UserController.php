@@ -10,6 +10,9 @@ use App\Models\Route;
 use App\Models\Feedback;
 use App\Models\User;
 use App\Models\Destination;
+use App\Models\ShareTour;
+use App\Models\Language;
+use Session;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -38,14 +41,32 @@ class UserController extends Controller
         }
         else
         {
-            $des = Destination::select('de_name','de_image','de_description','de_shortdes','de_duration','de_link','de_map')->get();
-            return view("generalinterface",['des'=>$des]);
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+            {
+                $lang = Language::where("language","vn")->get();
+                foreach ($lang as $value) {
+                    $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
+                    $value["de_image"] = $des->de_image;
+                    $value["de_duration"] = $des->de_duration;
+                    $value["de_link"] = $des->de_link;
+                    $value["de_map"] = $des->de_map;
+                }
+                return view("generalinterface",['des'=>$lang]);
+            }
+            else
+            {
+                $lang = Language::where("language","en")->get();
+                foreach ($lang as $value) {
+                    $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
+                    $value["de_image"] = $des->de_image;
+                    $value["de_duration"] = $des->de_duration;
+                    $value["de_link"] = $des->de_link;
+                    $value["de_map"] = $des->de_map;
+                }
+                return view("generalinterface",['des'=>$lang]);
+            }
         }
     }
-    // public function viewlogin()
-    // {
-    //     return view("login");
-    // }
     public function postLogin(Request $req)
     {
     	$this->validate($req,[
@@ -79,11 +100,36 @@ class UserController extends Controller
     }
     public function dashboard()
     {
-        $user = Auth::user();
-        $route = Route::where('to_id_user',$user->us_id)->get();
-        session()->put('route',$route);
-        $des = Destination::select('de_name','de_image','de_description','de_shortdes','de_duration','de_link','de_map')->get();
-        return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$des]);
+        if(Session::has('website_language') && Session::get('website_language') == "vi")
+        {
+            $user = Auth::user();
+            $route = Route::where('to_id_user',$user->us_id)->get();
+            session()->put('route',$route);
+            $lang = Language::where("language","vn")->get();
+            foreach ($lang as $value) {
+                $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
+                $value["de_image"] = $des->de_image;
+                $value["de_duration"] = $des->de_duration;
+                $value["de_link"] = $des->de_link;
+                $value["de_map"] = $des->de_map;
+            }
+            return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang]);
+        }
+        else
+        {
+            $user = Auth::user();
+            $route = Route::where('to_id_user',$user->us_id)->get();
+            session()->put('route',$route);
+            $lang = Language::where("language","en")->get();
+            foreach ($lang as $value) {
+                $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
+                $value["de_image"] = $des->de_image;
+                $value["de_duration"] = $des->de_duration;
+                $value["de_link"] = $des->de_link;
+                $value["de_map"] = $des->de_map;
+            }
+            return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang]);
+        }
     }
     public function logout(){
         Auth::logout();
@@ -125,8 +171,24 @@ class UserController extends Controller
         }
         $route->to_startDay = date('Y-m-d', strtotime(Carbon::now()));
         $route->save();
+        return $route->to_id;
     }
-    
+    public function shareTour(Request $req)
+    {
+        $share = new ShareTour();
+        $share->sh_to_id = $req->ro_id;
+        $share->number_star = $req->star;
+        $share->content = $req->content;
+        if($req->file('image_tour'))
+        {
+            $image = $req->file('image_tour');
+            $picName = time().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('img_ShareTour'), $picName);
+            $share->image='img_ShareTour/'.$picName;
+        }
+        $share->save();
+        return redirect()->route('user.editTour',$req->ro_id);
+    }
     public function register(Request $req)
     {
         $this->validate($req,[
@@ -407,13 +469,33 @@ class UserController extends Controller
         }
         $array_2 = array();$label = array();
         foreach ($array as $value) {
-            $de = Destination::
-                select('de_id','de_name','de_lat','de_lng','de_duration','de_link','de_description')
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+            {
+                $lang = Language::where("language","vn")->where("des_id",$value)->first();
+                $de = Destination::
+                select('de_id','de_lat','de_lng','de_duration','de_link')
                 ->where('de_remove',$value)
                 ->first();
-            $latlng = (object)array('lat' => $de->de_lat, 'lng' => $de->de_lng);
+                $lang["de_lat"] = $de->de_lat;
+                $lang["de_lng"] = $de->de_lng;
+                $lang["de_link"] = $de->de_link;
+                $lang["de_duration"] = $de->de_duration;
+            }
+            else
+            {
+                $lang = Language::where("language","en")->where("des_id",$value)->first();
+                $de = Destination::
+                select('de_id','de_lat','de_lng','de_duration','de_link')
+                ->where('de_remove',$value)
+                ->first();
+                $lang["de_lat"] = $de->de_lat;
+                $lang["de_lng"] = $de->de_lng;
+                $lang["de_link"] = $de->de_link;
+                $lang["de_duration"] = $de->de_duration;
+            }
+            $latlng = (object)array('lat' => $lang->de_lat, 'lng' => $lang->de_lng);
             array_push($array_2,$latlng);
-            $labelName = $de->de_name;
+            $labelName = $lang->de_name;
             array_push($label,$labelName);
         }
         //start locat
@@ -424,6 +506,24 @@ class UserController extends Controller
             $objStartLocat = (object)array('lat' => $startLocat[0], 'lng' => $startLocat[1]);
         }
         else $objStartLocat = "";
+
+        if($route->to_comback == 1)
+        {
+            if($route->to_startLocat != "")
+            {
+                $startLocat_2 = explode("-", $route->to_startLocat);
+                $startLocat_2[0] = floatval($startLocat_2[0]);
+                $startLocat_2[1] = floatval($startLocat_2[1]);
+                $objStartLocat_2 = (object)array('lat' => $startLocat_2[0], 'lng' => $startLocat_2[1]);
+                array_push($label,trans('messages.startLocation'));
+                array_push($array_2,$objStartLocat_2);
+            }
+            else
+            {
+                array_push($label,$label[0]);
+                array_push($array_2,$array_2[0]);
+            }
+        }
         return [$array_2,$label,$objStartLocat];
     }
 }

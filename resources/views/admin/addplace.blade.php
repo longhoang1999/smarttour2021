@@ -7,6 +7,9 @@
 	<link rel="stylesheet" href="{{asset('css/adminDashboard.css')}}">
   <link rel="stylesheet" href="{{asset('css/addPlace.css')}}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" />
+  <style type="text/css">
+    textarea{min-height: 15rem;}
+  </style>
 @stop
 @section('content')
   @if ($message = Session::get('status'))
@@ -21,6 +24,14 @@
           <p>{{ trans('admin.inforPlace') }}</p>
         </div>
         <div class="AllClass_Table_content">
+            <div style="display: flex;">
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Language shown</span> 
+              <select id="selectLang" class="form-control" style="width: 40%">
+                <option hidden="">--Your choice--</option>
+                <option selected="" value="en">English</option>
+                <option value="vn">Tiếng việt</option>
+              </select>
+            </div>
             <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
                   <thead>
                   <tr>
@@ -141,6 +152,55 @@
         <div class="AllClass_Table_content">
             <form action="{{route('admin.postaddPlace')}}" method="post" id="formAddPlace" enctype="multipart/form-data">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+              <h4 class="font-weight-bold font-italic text-primary text-uppercase">-- information describing the location</h4>
+
+              <div style="display: flex;">
+                <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Language selection</span> 
+                <select id="selectLang_add" class="form-control" style="width: 40%">
+                  <option hidden="">--Your choice--</option>
+                  <option selected="" value="en">English</option>
+                  <option value="vn">Tiếng việt</option>
+                </select>
+              </div>
+              <style>
+                .div_addfor_vn{display: none;}
+              </style>
+              <!-- Place Name -->
+              <div class="div_addfor_en">
+                <div class="form-group">
+                  <label for="inputName">{{ trans('admin.NamePlace') }} - for English</label>
+                  <input type="text" class="form-control" id="inputName" placeholder="{{ trans('admin.NamePlace') }}" required="" name="de_name_en">
+                </div>
+                <!-- Des -->
+                <div class="form-group">
+                  <label for="inputDescription">{{ trans('admin.Description') }} - for English</label>
+                  <textarea class="form-control" id="inputDescription" required="" placeholder="{{ trans('admin.Description') }}" name="de_description_en"></textarea>
+                </div>
+                <!-- Short -->
+                <div class="form-group">
+                  <label for="inputShortdes">{{ trans('admin.Shortdes') }} - for English</label>
+                  <textarea class="form-control" id="inputShortdes" required="" placeholder="{{ trans('admin.Shortdes') }}" name="de_shortdes_en"></textarea>
+                </div>
+              </div>
+              <!-- vn -->
+              <div class="div_addfor_vn">
+                <div class="form-group">
+                  <label for="inputName">{{ trans('admin.NamePlace') }} - for Tiếng Việt</label>
+                  <input type="text" class="form-control" id="inputName_vn" placeholder="{{ trans('admin.NamePlace') }}" required="" name="de_name_vn">
+                </div>
+                <!-- Des -->
+                <div class="form-group">
+                  <label for="inputDescription">{{ trans('admin.Description') }} - for Tiếng Việt</label>
+                  <textarea class="form-control" id="inputDescription_vn" required="" placeholder="{{ trans('admin.Description') }}" name="de_description_vn"></textarea>
+                </div>
+                <!-- Short -->
+                <div class="form-group">
+                  <label for="inputShortdes">{{ trans('admin.Shortdes') }} - for Tiếng Việt</label>
+                  <textarea class="form-control" id="inputShortdes_vn" required="" placeholder="{{ trans('admin.Shortdes') }}" name="de_shortdes_vn"></textarea>
+                </div>
+              </div>
+
+              <h4 class="font-weight-bold font-italic text-primary text-uppercase">-- information about coordinates and other information</h4>
               <div class="form-group">
                 <label for="inputLongitude">{{ trans('admin.Longitude') }}</label>
                 <input type="text" class="form-control" id="inputLongitude" placeholder="{{ trans('admin.Longitude') }}" required="" readonly="" name="de_lng">
@@ -150,22 +210,10 @@
                 <input type="text" class="form-control" id="inputLatitude" placeholder="{{ trans('admin.Latitude') }}" required="" readonly="" name="de_lat">
               </div>
               <div class="form-group">
-                <label for="inputName">{{ trans('admin.NamePlace') }}</label>
-                <input type="text" class="form-control" id="inputName" placeholder="{{ trans('admin.NamePlace') }}" required="" name="de_name">
-              </div>  
-              <div class="form-group">
-                <label for="inputName">{{ trans('admin.Image') }}</label>
+                <label for="open_inputFile">{{ trans('admin.Image') }}</label>
                 <div class="open_inputFile">{{ trans('admin.Upload') }}</div>
                 <p class="file_name"></p>
                 <input type="file" class="form-control" id="inputImage" name="de_image" accept=".jpg,.png">
-              </div>
-              <div class="form-group">
-                <label for="inputDescription">{{ trans('admin.Description') }}</label>
-                <textarea class="form-control" id="inputDescription" required="" placeholder="{{ trans('admin.Description') }}" name="de_description"></textarea>
-              </div>
-              <div class="form-group">
-                <label for="inputShortdes">{{ trans('admin.Shortdes') }}</label>
-                <input type="text" class="form-control" id="inputShortdes" placeholder="{{ trans('admin.Shortdes') }}" required="" name="de_shortdes">
               </div>
               <div class="form-group">
                 <label for="inputDuration">{{ trans('admin.avgTime') }} ({{ trans('admin.hours') }})</label>
@@ -192,6 +240,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
+        $("#selectLang_add").change(function(){
+          if($("#selectLang_add").val() == "vn")
+          {
+            $(".div_addfor_en").hide();
+            $(".div_addfor_vn").show();
+          }
+          else if($("#selectLang_add").val() == "en")
+          {
+            $(".div_addfor_vn").hide();
+            $(".div_addfor_en").show();
+          }
+        });
         $(".open_inputFile").click(function(){
           $("#inputImage").click();
         });
@@ -236,7 +296,20 @@
               table.column(0, { page: 'current' }).nodes().each( function (cell, i) {
                   cell.innerHTML = i + 1 + PageInfo.start;
               } );
-      } );
+          });
+          $("#selectLang").change(function(){
+            let $url_path = '{!! url('/') !!}';
+            if($("#selectLang").val() == "en")
+            {
+              var routeEN = $url_path+"/showDestination";
+              table.ajax.url( routeEN ).load();
+            }
+            else if($("#selectLang").val() == "vn")
+            {
+              var routeVN = $url_path+"/showDestinationVN";
+              table.ajax.url( routeVN ).load();
+            }
+          });
         });
     </script>
     <!-- detail -->
@@ -246,7 +319,8 @@
         var recipient = button.data('remove') 
         let $url_path = '{!! url('/') !!}';
         let _token = $('meta[name="csrf-token"]').attr('content');
-        let routeShowDetail=$url_path+"/showDetail/"+recipient;
+        let language = $("#selectLang").val();
+        let routeShowDetail=$url_path+"/showDetail/"+recipient+"/"+language;
         $.ajax({
               url:routeShowDetail,
               method:"GET",
@@ -340,7 +414,14 @@
             let link = document.getElementById("inputLink").value;
             if(link != "")
             {
-              getNamePlace(geocoder,map);
+              if(link.lastIndexOf("https://www.google.com/maps/place") == '-1')
+              {
+                alert("The path you entered is not the path of google map");
+              }
+              else
+              {
+                getNamePlace(geocoder,map);
+              }
             }
             else
             {
@@ -562,7 +643,9 @@
               success:function(data){ 
                 $("#inputName").val("");
                 $("#inputName").val(data);
-                $("#inputName").css("readonly","");
+                $("#inputName_vn").val("");
+                $("#inputName_vn").val(data);
+                //$("#inputName").css("readonly","");
              }
           });
         });

@@ -140,9 +140,24 @@
                 <!-- About Section Content-->
                 <div class="row">
                     <div class="col-lg-12 ml-auto"><p class="lead text-center">{{ trans('messages.introduceContent') }}</p>
-                    <h3 class="font-weight-bold text-center">--- TOUR ADVICE ---</h3>
-                    <p class="lead text-center">{{ trans('messages.GiveTheBestAdvice') }}</p>
+                    <h3 class="font-weight-bold text-center text-uppercase">--- highly rated tours ---</h3>
                     </div>
+                </div>
+                <div class="row justify-content-center tourPlace" role="toolbar">
+                    <?php $i=1; ?>
+                    @foreach($des as $value)
+                    <div class="col-md-6 col-lg-4 mb-5 downPlace">
+                        <div class="portfolio-item mx-auto" data-toggle="modal" data-target="#placeModal{{$i}}">
+                            <p class="lead">{{$value->de_name}}</p>
+                            @if($value->de_image != "")
+                            <img class="img-fluid" src="{{asset($value->de_image)}}" alt="" title="location with no photo" />
+                            @else
+                            <img class="img-fluid" src="{{asset('imgPlace/empty.png')}}" alt="" title="location with no photo" />
+                            @endif
+                        </div>
+                    </div>
+                    <?php $i++; ?>
+                    @endforeach
                 </div>
             </div>
         </section>
@@ -319,9 +334,10 @@
                                     <p>
                                         {{ trans('messages.historyTitle') }}</p>
                                     <small>{{ trans('messages.routeDetails') }}</small>
-                                   
+                                    <small>-- (Double click to edit the route) </small>
                                     <p class="mb-5">
                                         <?php use App\Models\Destination;
+                                              use App\Models\Language;
                                               $route = Session::get('route');
                                          ?>
                                         @if ( count($route) > 0 )
@@ -331,11 +347,18 @@
                                                     {
                                                        $des_1 = ""; 
                                                     }
-                                                    else $des_1 = "Start Location--";
+                                                    else $des_1 = trans('messages.startLocation')."--";
                                                     $pieces = explode("-", $value->to_des);
                                                     for ($i=0; $i < count($pieces)-1; $i++) { 
-                                                        $description = Destination::where('de_id',$pieces[$i])->first();
-                                                        $des_1 = $des_1.$description->de_name.'--';
+                                                        if(Session::has('website_language') && Session::get('website_language') == "vi")
+                                                        {
+                                                            $lang = Language::where("language","vn")->where("des_id",$pieces[$i])->first();
+                                                        }
+                                                        else
+                                                        {
+                                                            $lang = Language::where("language","en")->where("des_id",$pieces[$i])->first();
+                                                        }
+                                                        $des_1 = $des_1.$lang->de_name.'--';
                                                     }
                                                  ?>
                                                  <!-- <i class="fas fa-street-view point"></i> -->
@@ -750,6 +773,14 @@
             });
 
         </script>
+        <script type="text/javascript">
+            $(".tour").dblclick(function(){
+                let $url_path = '{!! url('/') !!}';
+                let routeEditTour = $url_path+"/editTourUser/"+$(this).attr("data-id");
+                window.open(routeEditTour, '_blank');
+                
+            });
+        </script>
         <!-- map -->
         <script type="text/javascript">
             var locationsdata = [];
@@ -781,14 +812,17 @@
                           method:"POST",
                           data:{_token:_token,inputLink:inputLink},
                           success:function(data){ 
-                            console.log(data);
+                            //console.log(data);
                             if(data[2] != "")
                             {
                                 data[2].lat = parseFloat(data[2].lat);
                                 data[2].lng = parseFloat(data[2].lng);
                                 data[0].unshift(data[2]);
-                                data[1].unshift('Điểm bắt đầu của bạn');
+                                data[1].unshift("{{ trans('messages.startLocation')}}");
+
                             }
+                            // console.log(data[0]);
+                            // console.log(data[1]);
                             drawRoutes(data[0],data[1]);
                          }
                     });

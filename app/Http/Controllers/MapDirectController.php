@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use Illuminate\Http\Request;
+use App\Models\Language;
+use App\Models\Destination;
+use Session;
 use DB;
 class MapDirectController {
 	public $routresult = array();
@@ -14,9 +17,32 @@ class MapDirectController {
 	public $choosendur;
 	public $dello;
 	public function showmap(){
-		$de = DB::table('destination')
-			->select('de_id','de_name','de_lat','de_lng','de_duration','de_link','de_description')
-			->get();
+		if(Session::has('website_language') && Session::get('website_language') == "vi")
+        {
+            $de = Language::where("language","vn")->get();
+            foreach ($de as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_description')->where("de_remove",$value->des_id)->first();
+                $value["de_id"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_link"] = $des->de_link;
+                $value["de_duration"] = $des->de_duration;
+                $value["de_description"] = $des->de_description;
+            }
+        }
+        else
+        {
+            $de = Language::where("language","en")->get();
+            foreach ($de as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_description')->where("de_remove",$value->des_id)->first();
+                $value["de_id"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_link"] = $des->de_link;
+                $value["de_duration"] = $des->de_duration;
+                $value["de_description"] = $des->de_description;
+            }
+        }
 		$destination  = array();
 		foreach ($de as $value) {
 			$latlng = array('lat' => $value->de_lat, 'lng' => $value->de_lng);

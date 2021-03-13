@@ -55,11 +55,11 @@ Route::group(
 		})->name("user.maps");
 		Route::post("feedback","UserController@feedback")->name("user.feedback");
 		Route::get("saveTour","UserController@saveTour")->name("user.saveTour");
-
 		Route::post("checkTour","UserController@checkTour")->name("user.checkTour");
-
 		Route::post("checkUser","UserController@checkUser")->name("user.checkUser");
 		Route::post("editInfo","UserController@editInfo")->name("user.editInfo");
+		Route::get("editTourUser/{id}","AdminController@editTour")->name('user.editTour');
+		Route::post("shareTour","UserController@shareTour")->name("user.shareTour");
 		
 	}
 );
@@ -75,18 +75,21 @@ Route::group(
 		//place
 		Route::get("addPlace","AdminController@addPlace")->name("admin.addPlace");
 		Route::get("showDestination","AdminController@showDestination")->name("admin.showDestination");
-		Route::post("addPlace","AdminController@postaddPlace")->name("admin.postaddPlace");
+		Route::get("showDestinationVN","AdminController@showDestinationVN")->name("admin.showDestinationVN");
+		Route::post("postaddPlace","AdminController@postaddPlace")->name("admin.postaddPlace");
 		Route::post("checkPlace","AdminController@checkPlace");
 		//edit place
 		Route::get("editPlace","AdminController@editPlace")->name("admin.editPlace");
+		Route::get("showDestinationEditVN","AdminController@showDestinationEditVN")->name("admin.showDestinationEditVN");
 		//remove place
 		Route::get("removePlace","AdminController@removePlace")->name("admin.removePlace");
 		Route::get("showDestinationRemove","AdminController@showDestinationRemove")->name("admin.showDestinationRemove");
-		Route::get("showDetail/{remove}","AdminController@showDetail")->name("admin.showDetail");
+		Route::get("showDestinationRemoveVN","AdminController@showDestinationRemoveVN")->name("admin.showDestinationRemoveVN");
+		Route::get("showDetail/{remove}/{lang}","AdminController@showDetail")->name("admin.showDetail");
 		Route::get("placeDelete/{remove}","AdminController@placeDelete")->name("admin.placeDelete");
 		Route::get("showDestinationEdit","AdminController@showDestinationEdit")->name("admin.showDestinationEdit");
-		Route::get("showDetailEdit/{remove}","AdminController@showDetailEdit")->name("admin.showDetailEdit");
-		Route::post("formEditPlace/{remove}","AdminController@formEditPlace")->name("admin.formEditPlace");
+		Route::get("showDetailEdit/{remove}/{lang}","AdminController@showDetailEdit")->name("admin.showDetailEdit");
+		Route::post("formEditPlace/{remove}/{lang}","AdminController@formEditPlace")->name("admin.formEditPlace");
 		//dash board
 		Route::get("generalInfor","AdminController@generalInfor")->name('admin.generalInfor');
 		Route::post("getLatLng","AdminController@getLatLng")->name("admin.getLatLng");

@@ -34,6 +34,14 @@
           <p class="text-lowercase">{{ trans('admin.titlePageRemove') }}</p>
         </div>
         <div class="AllClass_Table_content">
+            <div style="display: flex;">
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Language shown</span> 
+              <select id="selectLang" class="form-control" style="width: 40%">
+                <option hidden="">--Your choice--</option>
+                <option selected="" value="en">English</option>
+                <option value="vn">Tiếng việt</option>
+              </select>
+            </div>
             <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
                   <thead>
                   <tr>
@@ -157,16 +165,16 @@
     <script>
     $(function() {
         var table = $('#Table_AllClass').DataTable({
-          "language": {
-          "emptyTable": "{{trans('admin.emptyTable')}}",
-          "sLengthMenu": "{{ trans('admin.showEntries') }}",
-          "search": "{{ trans('admin.search') }}",
-          "info": "{{ trans('admin.showingToOf') }}",
-          "paginate": {
-            "previous": "{{ trans('admin.previous') }}",
-            "next": "{{ trans('admin.next') }}"
-          }
-        },
+            "language": {
+            "emptyTable": "{{trans('admin.emptyTable')}}",
+            "sLengthMenu": "{{ trans('admin.showEntries') }}",
+            "search": "{{ trans('admin.search') }}",
+            "info": "{{ trans('admin.showingToOf') }}",
+            "paginate": {
+              "previous": "{{ trans('admin.previous') }}",
+              "next": "{{ trans('admin.next') }}"
+            }
+          },
           "lengthMenu": [[5, 10, -1], [5, 10,"All"]],
           "order": [[ 1, 'asc' ]],
             processing: true,
@@ -183,11 +191,24 @@
                 ]
             });
             table.on( 'draw.dt', function () {
-          var PageInfo = $('#Table_AllClass').DataTable().page.info();
+              var PageInfo = $('#Table_AllClass').DataTable().page.info();
               table.column(0, { page: 'current' }).nodes().each( function (cell, i) {
                   cell.innerHTML = i + 1 + PageInfo.start;
-              } );
-      } );
+              });
+            });
+            $("#selectLang").change(function(){
+              let $url_path = '{!! url('/') !!}';
+              if($("#selectLang").val() == "en")
+              {
+                var routeEN = $url_path+"/showDestinationRemove";
+                table.ajax.url( routeEN ).load();
+              }
+              else if($("#selectLang").val() == "vn")
+              {
+                var routeVN = $url_path+"/showDestinationRemoveVN";
+                table.ajax.url( routeVN ).load();
+              }
+            });
         });
     </script>
     <script type="text/javascript">
@@ -195,8 +216,9 @@
         var button = $(event.relatedTarget)
         var recipient = button.data('remove') 
         let $url_path = '{!! url('/') !!}';
+        let language = $("#selectLang").val();
         let _token = $('meta[name="csrf-token"]').attr('content');
-        let routeShowDetail=$url_path+"/showDetail/"+recipient;
+        let routeShowDetail=$url_path+"/showDetail/"+recipient+"/"+language;
         $.ajax({
               url:routeShowDetail,
               method:"GET",

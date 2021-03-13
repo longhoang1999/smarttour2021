@@ -105,4 +105,5 @@ return [
     'Arr'=>'Arrive',
     'CmBck'=>'Come back to',
     'EditTour' => 'Edit Tour',
+    'startLocation' => 'Your start location',
 ];

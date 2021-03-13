@@ -105,4 +105,5 @@ return [
     'Arr'=>'Đến',
     'CmBck'=>'Quay trở lại',
     'EditTour' => 'Sửa Tour',
+    'startLocation' => 'Điểm bắt đầu của bạn',
 ];
