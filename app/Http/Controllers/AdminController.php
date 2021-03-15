@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Auth;
@@ -13,8 +12,10 @@ use App\Models\Feedback;
 use App\Models\Destination;
 use App\Models\Language;
 use App\Models\Path;
-use PHPMailer;
+use App\Models\ShareTour;
 
+use PHPMailer;
+use Session;
 use Illuminate\Support\Arr;
 use Carbon\Carbon;
 use View;
@@ -860,23 +861,41 @@ class AdminController extends Controller
                     }
                     else
                     {
-                        $startLocat = $route->to_startLocat;
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = $des->de_name;
                     }
                     return $startLocat;
                 }
             )
+
             ->addColumn(
                 'Detail',
                 function ($route) {
-                    $pieces = explode("-", $route->to_des);
+                    $pieces = explode("|", $route->to_des);
                     $array = array();
                     for ($i=0; $i < count($pieces)-1; $i++) {
                         $array = Arr::add($array, $i ,$pieces[$i]);
                     }
                     $Detail = "";
                     foreach ($array as $value) {
-                        $desName = Destination::select('de_name')->where("de_remove",$value)->first();
-                        $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name;
+                        }
                     }
                     return $Detail;
                 }
@@ -917,8 +936,86 @@ class AdminController extends Controller
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','fullName','startLocat','Detail','startTime','endTime','actions'])
+            ->rawColumns(['stt','startLocat','Detail','startTime','endTime','actions'])
             ->make(true);
+    }
+    public function showAllRouteRating()
+    {
+        $share = ShareTour::get();
+        return DataTables::of($share)
+            ->addColumn(
+                'stt',
+                function ($share) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'tourName',
+                function ($share) {
+                    $tour = Route::where("to_id",$share->sh_to_id)->first();
+                    $tourName = $tour->to_name;
+                    return $tourName;
+                }
+            )
+            ->addColumn(
+                'Detail',
+                function ($share) {
+                    $route = Route::where("to_id",$share->sh_to_id)->first();
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name;
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->addColumn(
+                'avg',
+                function ($share) {
+                    $avg = $share->number_star.' <i class="fas fa-star text-warning"></i>';
+                    return $avg;
+                }
+            )
+            ->addColumn(
+                'actions',
+                function ($share) {
+                    $route = Route::where("to_id",$share->sh_to_id)->first();
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-id="'.$route->to_id.'" data-toggle="modal" data-target="#modalDetail2">'.trans("admin.Detail").'</button>';
+                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-id="'.$share->sh_id.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','tourName','Detail','avg','actions'])
+            ->make(true);
+    }
+    public function sharetourDelete($id)
+    {
+        $shareTour = ShareTour::where("sh_id",$id)->first();
+        File::delete(public_path($shareTour->image));
+        $shareTour->delete();
+        return back()->with("success","you have successfully deleted");
     }
     public function routeDetail(Request $req)
     {
@@ -929,21 +1026,39 @@ class AdminController extends Controller
         $tourName = $route->to_name;
         if($route->to_startLocat != "")
         {
-            $pieces = explode("-", $route->to_startLocat);
-            $startLocat = "Coordinates: {lat:".$pieces[0]." , lng:".$pieces[1]."}";
+            $des = Destination::where("de_remove",$route->to_startLocat)->first();
+            $startLocat = $des->de_name;
         }
         else $startLocat = '<span class="badge badge-warning">'.trans("admin.Notavailable").'</span>';
 
-        $pieces_2 = explode("-", $route->to_des);
+        $pieces_2 = explode("|", $route->to_des);
         $array = array();
         for ($i=0; $i < count($pieces_2)-1; $i++) {
             $array = Arr::add($array, $i ,$pieces_2[$i]);
         }
         $Detail = "";
+
         foreach ($array as $value) {
-            $desName = Destination::select('de_name')->where("de_remove",$value)->first();
-            $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+            $desCheck = Destination::where("de_remove",$value)->first();
+            if($desCheck->de_default == "0")
+            {
+                if(Session::has('website_language') && Session::get('website_language') == "vi")
+                {
+                    $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                    $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                }
+                else
+                {
+                    $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                    $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                }
+            }
+            else if($desCheck->de_default == "1")
+            {
+                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desCheck->de_name.'<br>';
+            }
         }
+        
         if($route->to_comback == "0")
         {
             $comeBack = '<span class="badge badge-warning">'.trans("admin.Noreturn").'</span>';
@@ -971,36 +1086,221 @@ class AdminController extends Controller
             $endtime = '<span class="badge badge-success">'.trans("admin.Thereisnoendtime").'</span>';
         return [$creator,$tourName,$startLocat,$Detail,$starttime,$endtime,$comeBack,$Optimized];
     }
+    public function routeDetail2(Request $req)
+    {
+        $route = Route::where("to_id",$req->recipient)->first();
+        $user = User::where("us_id",$route->to_id_user)->first();
+
+        $creator = $user->us_fullName;
+        $tourName = $route->to_name;
+        if($route->to_startLocat != "")
+        {
+            $des = Destination::where("de_remove",$route->to_startLocat)->first();
+            $startLocat = $des->de_name;
+        }
+        else $startLocat = '<span class="badge badge-warning">'.trans("admin.Notavailable").'</span>';
+
+        $pieces_2 = explode("|", $route->to_des);
+        $array = array();
+        for ($i=0; $i < count($pieces_2)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces_2[$i]);
+        }
+        $Detail = "";
+
+        foreach ($array as $value) {
+            $desCheck = Destination::where("de_remove",$value)->first();
+            if($desCheck->de_default == "0")
+            {
+                if(Session::has('website_language') && Session::get('website_language') == "vi")
+                {
+                    $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                    $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                }
+                else
+                {
+                    $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                    $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                }
+            }
+            else if($desCheck->de_default == "1")
+            {
+                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desCheck->de_name.'<br>';
+            }
+        }
+        
+        if($route->to_comback == "0")
+        {
+            $comeBack = '<span class="badge badge-warning">'.trans("admin.Noreturn").'</span>';
+        }
+        else if($route->to_comback == "1")
+        {
+            $comeBack = '<span class="badge badge-success">'.trans("admin.Havecomeback").'</span>';
+        }
+        if($route->to_optimized == "0")
+        {
+            $Optimized = '<span class="badge badge-warning">'.trans("admin.Notoptimal").'</span>';
+        }
+        else if($route->to_optimized == "1")
+        {
+            $Optimized = '<span class="badge badge-success">'.trans("admin.Optimizedforduration").'</span>';
+        }
+        else if($route->to_optimized == "2")
+        {
+            $Optimized = '<span class="badge badge-success">'.trans("admin.Optimizedforcost").'</span>';
+        }
+        $starttime = date('h:i:s a', strtotime($route->to_starttime));
+        if($route->to_endtime != "")
+            $endtime = date('h:i:s a', strtotime($route->to_endtime));
+        else
+            $endtime = '<span class="badge badge-success">'.trans("admin.Thereisnoendtime").'</span>';
+
+        $share = ShareTour::where("sh_to_id",$route->to_id)->first();
+        if($share->image == "")
+        {
+            $imageShare = "";
+        }
+        else  $imageShare = asset($share->image);
+        return [$creator,$tourName,$startLocat,$Detail,$starttime,$endtime,$comeBack,$Optimized,$share->content,$share->number_star,$imageShare];
+    }
     public function editTour($id)
     {
         $route = Route::where("to_id",$id)->first();
-        //echo $route->startLocat;
+        // treo
+        $pieces_2 = explode("|", $route->to_des);
+        $array = array();
+        for ($i=0; $i < count($pieces_2)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces_2[$i]);
+        }
+        $latlng_new = array();
+        $dename_new = array();
+        $placeId_new = array();
+        $duration_new = array();
+        $j = 0;
+        foreach ($array as $value) {
+            $desCheck = Destination::where("de_remove",$value)->first();
+            if($desCheck->de_default == "1")
+            {
+                $latlng = (object)array('lat' => $desCheck->de_lat, 'lng' => $desCheck->de_lng);
+                $latlng_new = Arr::add($latlng_new, $j ,$latlng);
+                $dename_new = Arr::add($dename_new, $j ,$desCheck->de_name);
+                $placeId_new = Arr::add($placeId_new, $j ,$desCheck->de_remove);
+                $duration_new = Arr::add($duration_new, $j ,$desCheck->de_duration);
+                $j++;
+            }
+        }
+        if($route->to_startLocat != "")        
+        {
+            $des = Destination::where("de_remove",$route->to_startLocat)->first();
+            $latlng_start = (object)array('lat' => $des->de_lat, 'lng' => $des->de_lng);
+            $dename_start = $des->de_name;
+            $placeId_start =  $des->de_remove;
+            $duration_start = $des->de_duration;
+        }
+        else
+        {
+            $latlng_start = "";
+            $dename_start = "";
+            $placeId_start =  "";
+            $duration_start = "";
+        }
         $user = Auth::user();
-        return view('admin.edittour',['us_fullName'=>$user->us_fullName,'startLocat'=>$route->to_startLocat,'to_des'=>$route->to_des,'to_starttime'=>$route->to_starttime,'to_endtime'=>$route->to_endtime,'to_comback'=>$route->to_comback,'to_optimized'=>$route->to_optimized,'id'=>$id]);
+        return view('admin.edittour',['us_fullName'=>$user->us_fullName,
+            'startLocat'=>$route->to_startLocat,
+            'to_des'=>$route->to_des,
+            'to_starttime'=>$route->to_starttime,
+            'to_endtime'=>$route->to_endtime,
+            'to_comback'=>$route->to_comback,
+            'to_optimized'=>$route->to_optimized,
+            'id'=>$id,
+            'latlng_new' => $latlng_new,
+            'dename_new' => $dename_new,
+            'placeId_new' => $placeId_new,
+            'duration_new' => $duration_new,
+            'latlng_start' => $latlng_start,
+            'dename_start' => $dename_start,
+            'placeId_start' => $placeId_start,
+            'duration_start' => $duration_start,
+        ]);
     }
     public function editRoute(Request $req,$id)
     {
-        $user = Auth::user();
+        // xóa cũ
+        $idRoute = $id;
         $route = Route::where("to_id",$id)->first();
-        $route->to_id_user = $user->us_id;
-        $i=0;
-        $des = "";
-        foreach ($req->locatsList as  $value) {
-            $des = $des.$req->locatsList[$i]."-";
-            $i++;
-        }
-        $route->to_des = $des;
-        $route->to_starttime = $req->timeStart;
-        $route->to_endtime = $req->timeEnd;
-        $route->to_comback = $req->to_comback;
-        $route->to_optimized = $req->to_optimized;
-        $route->to_name = $req->nameTour;
-
-        if($req->coordinates != "")
+        if($route->to_startLocat != "")
         {
-            $route->to_startLocat = $req->coordinates;
+            $des = Destination::where("de_remove",$route->to_startLocat)->first();
+            $des->delete();
         }
-        $route->to_startDay = date('Y-m-d', strtotime(Carbon::now()));
-        $route->save();
+        $pieces = explode("|", $route->to_des);
+        $array = array();
+        for ($i=0; $i < count($pieces)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces[$i]);
+        }
+        foreach ($array as $value) {
+            $checkDes = Destination::where("de_remove",$value)->first();
+            if($checkDes->de_default == "1")
+            {
+                $checkDes->delete();
+            }
+        }
+        $route->delete();
+        // thêm mới
+        $user = Auth::user();
+        if(!empty($req->val))
+        {
+            $des = new Destination();
+            $des->de_id = $req->val['de_id'];
+            $des->de_remove = $req->val['de_id'];
+            $latlng = explode("|", $req->val['location']);
+            $des->de_lat = $latlng[0];
+            $des->de_lng = $latlng[1];
+            $des->de_name = $req->val['de_name'];
+            $des->de_duration = $req->val['de_duration'];
+            $des->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
+            $des->de_default = "1";
+            $des->save();
+        }
+
+        $user = Auth::user();
+        $new_route = new Route();
+        $new_route->to_id_user = $user->us_id;
+        $new_route->to_starttime = $req->timeStart;
+        $new_route->to_endtime = $req->timeEnd;
+        $new_route->to_comback = $req->to_comback;
+        $new_route->to_optimized = $req->to_optimized;
+        $new_route->to_name = $req->nameTour;
+        $new_route->to_startDay = date('Y-m-d', strtotime(Carbon::now()));
+        $i=0;
+        $desId = "";
+        foreach ($req->tmparr as  $value) {
+            if(empty($value['de_default']))
+            {
+                $desId = $desId.$value['de_id']."|";
+                $i++;
+            }
+            else if($value['de_default'] == "1")
+            {
+                $desNewPlace = new Destination();
+                $desNewPlace->de_id = $value['de_id'];
+                $desNewPlace->de_remove = $value['de_id'];
+                $latlng = explode("|", $value['location']);
+                $desNewPlace->de_lat = $latlng[0];
+                $desNewPlace->de_lng = $latlng[1];
+                $desNewPlace->de_name = $value['de_name'];
+                $desNewPlace->de_duration = $value['de_duration'];
+                $desNewPlace->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
+                $desNewPlace->de_default = "1";
+                $desNewPlace->save();
+                $desId = $desId.$value['de_id']."|";
+                $i++;
+            }
+        }
+        $new_route->to_des = $desId;
+        if(!empty($req->val))
+        {
+            $new_route->to_startLocat = $req->val['de_id'];
+        }
+        $new_route->save();
     }
 }

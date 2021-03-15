@@ -22,10 +22,10 @@ var locationsdata = [],// All data of location
     isopt = 1, //optimize
     isclick = 1,
     allRoutePosible = [],
-    routeOptimized = {
-      route: [],
-      value: 0
-    },
+    // routeOptimized = {
+    //   route: [],
+    //   value: 0
+    // },
     resmarkers= [],
     polylines = [],
     dello = 0,
@@ -124,7 +124,8 @@ function showMap(){
       de_name: response[0].formatted_address,
       location: response[0].geometry.location.toJSON(),
       place_id: response[0].place_id,
-      de_duration: 3600 
+      de_duration: 3600,
+      de_default: 1
     })
     customLabel(clickMarker,response[0].place_id);
     // document.getElementById('your-start').innerHTML= response[0].formatted_address+
@@ -243,10 +244,10 @@ function showMap(){
     isopt = 1;
     isclick = 1;
     allRoutePosible = [];
-    routeOptimized = {
-      route: [],
-      value: 0
-    }; 
+    // routeOptimized = {
+    //   route: [],
+    //   value: 0
+    // }; 
     resmarkers = [];
     polylines = [];
     dello = 0;
@@ -446,6 +447,11 @@ function showMap(){
       for(var i=0; i<locationsdata.length; i++)
         if (id == locationsdata[i].place_id)
           return locationsdata[i].de_name;
+    }
+     if(type == 'default'){
+      for(var i=0; i<locationsdata.length; i++)
+        if (id == locationsdata[i].place_id)
+          return locationsdata[i].de_default;
     }
     if(type == 'LatLng'){
       for(var i=0; i<locationsdata.length; i++)
@@ -947,7 +953,6 @@ function showMap(){
 
   function distanceResponse(response,status){
     disresponse = response;
-    console.log('Responsed');
     timealert();
   }
 
@@ -977,6 +982,7 @@ function showMap(){
           }
         });
         $("#timeAlert-close").click(()=>{
+          $('#overlay').hide();
           $("#timeAlert").modal("hide");
           $('.options-list').hide();
           $(document.getElementById('time-end').parentElement).show();        
@@ -1006,7 +1012,7 @@ function showMap(){
 
 
   function bestWay(){
-    routeOptimized = {
+    let routeOptimized = {
       route: [],
       value: 0
     }
@@ -1115,14 +1121,15 @@ function showMap(){
       }
     }
 
-    // Auto delete the location exceeded time
-    if(dello){
+    if(dello && startlocat != undefined){
+      let allRouteOptimize =[];
       for(var i = 0 ;i<allRoutePosible.length; i++){
           var A = allRoutePosible[i];
-          var j = 0;
-          var tmparr=[];
-          while(j!=-1&&j<A.length){
-            tmparr.push(A[j]);
+          let tmpRouteOpt = {
+            route: [],
+            value: 0
+          }
+          for(var j =0;j<A.length;j++){
             if(j==0){
               total += disresponse.rows[0].elements[A[0]].duration.value;
             } else {
@@ -1133,25 +1140,83 @@ function showMap(){
             if($('#is-back').is(':checked')){
               total+= disresponse.rows[A[j]].elements[0].duration.value;
             }
-            j++;
             if(total<=choosendur){
-              if (routeOptimized.value == 0){ 
-                routeOptimized.route = tmparr;
-                routeOptimized.value = tmptotal;
-              }else if(tmparr.length >= routeOptimized.route.length){
-                if(tmparr.length > routeOptimized.route.length){
-                  routeOptimized.route = tmparr;
-                  routeOptimized.value = tmptotal;
-                }else if(tmptotal <= routeOptimized.value){
-                  routeOptimized.route = tmparr;
-                }
+              if (tmpRouteOpt.value == 0){ 
+                tmpRouteOpt.route.push(A[j]);
+                tmpRouteOpt.value = tmptotal;
+              }else {
+                tmpRouteOpt.route.push(A[j]);
+                tmpRouteOpt.value = tmptotal;
               }
             } else {
-              j = -1;
+              allRouteOptimize.push(tmpRouteOpt);
+              break;
             }
-          }
+          } 
           total = 0;
       }
+      let min = allRouteOptimize[0];
+      for(let k = 1; k < allRouteOptimize.length; k++){
+        if(allRouteOptimize[k].route.length >= min.route.length){
+          if(allRouteOptimize[k].route.length > min.route.length){
+            min = allRouteOptimize[k];
+          }else if(allRouteOptimize[k].value <= min.value){
+            min = allRouteOptimize[k]
+          }
+        }
+        console.log(min);
+      }
+
+      routeOptimized = min;
+      console.log(routeOptimized);
+    }
+
+    if(dello && startlocat == undefined){
+      let allRouteOptimize =[];
+      for(var i = 0 ;i<allRoutePosible.length; i++){
+          var A = allRoutePosible[i];
+          let tmpRouteOpt = {
+            route: [],
+            value: 0
+          }
+          for(var j =0;j<A.length;j++){
+            if(j!=0){
+               total += disresponse.rows[A[j-1]-1].elements[A[j]-1].duration.value;
+            }
+            total+= idToData(locatsList[A[j]-1],'duration');
+            var tmptotal = total;
+            if($('#is-back').is(':checked')){
+              total+= disresponse.rows[A[j]].elements[0].duration.value;
+            }
+            if(total<=choosendur){
+              if (tmpRouteOpt.value == 0){ 
+                tmpRouteOpt.route.push(A[j]);
+                tmpRouteOpt.value = tmptotal;
+              }else {
+                tmpRouteOpt.route.push(A[j]);
+                tmpRouteOpt.value = tmptotal;
+              }
+            } else {
+              allRouteOptimize.push(tmpRouteOpt);
+              break;
+            }
+          } 
+          total = 0;
+      }
+      let min = allRouteOptimize[0];
+      for(let k = 1; k < allRouteOptimize.length; k++){
+        if(allRouteOptimize[k].route.length >= min.route.length){
+          if(allRouteOptimize[k].route.length > min.route.length){
+            min = allRouteOptimize[k];
+          }else if(allRouteOptimize[k].value <= min.value){
+            min = allRouteOptimize[k]
+          }
+        }
+        console.log(min);
+      }
+
+      routeOptimized = min;
+      console.log(routeOptimized);
     }
 
 
@@ -1377,14 +1442,137 @@ function showMap(){
       this.span.style.top = (position.y)  -15+ 'px';
     }
   });
-  
+  $("#btnSaveNameTour").click(function(){
+        let nameTour = $('input[name="nameTour"]').val();
+        if(nameTour == "")
+        {
+          alert("Please enter the tour name first");
+        }
+        else
+        {
+          let $url_path = '{!! url('/') !!}';
+          let _token = $('meta[name="csrf-token"]').attr('content');
+          let routeDetail=$url_path+"/saveTour";
+          let timeStart = $('#time').val();
+          let timeEnd = $('#time-end').val();
+          let to_comback;
+          if ($('#is-back').is(':checked'))
+          {
+              to_comback = "1";
+          }
+          else to_comback = "0";
+          let to_optimized;
+          if ($('#is-opt').is(':checked') == false)
+          {
+            to_optimized="0";
+          }
+          else{
+            to_optimized = $('input[name="durdis"]').val();
+          }
+          let tmparr = [];
+          let val = {};
+          if(startlocat != undefined){
+            val.de_id = startlocat;
+            let coor = idToData(startlocat,'LatLng');
+            val.location = coor.lat+"|"+coor.lng;
+            val.de_name = idToData(startlocat,'text');
+            val.de_duration = idToData(startlocat,'duration');
+            val.de_default = idToData(startlocat,'default');
+          }
 
+          locatsList.forEach(ele=>{
+            let coor = idToData(ele,'LatLng');
+            let tmp = ele+'';
+            tmparr.push({
+              de_id: tmp,
+              location: coor.lat+"|"+coor.lng,
+              de_name: idToData(ele,'text'),
+              de_duration: idToData(ele,'duration'),
+              de_default: idToData(ele,'default')
+            })
+          })
+          console.log(val);
+          console.log(tmparr);
+
+          $.ajax({
+                url:routeDetail,
+                method:"get",
+                data:{_token:_token,tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,nameTour:nameTour,val:val},
+                success:function(data){ 
+                  alert("Your tour has been saved");
+                  $("#saveTour").css("display","none");
+                  $("#enterNameTour").modal("hide");
+                }
+          });
+        }
+  });
+  $("#btnSaveShareTour").click(function(){
+        let nameTour = $('input[name="nameTour"]').val();
+        if(nameTour == "")
+        {
+          alert("Please enter the tour name first");
+        }
+        else
+        {
+          let $url_path = '{!! url('/') !!}';
+          let _token = $('meta[name="csrf-token"]').attr('content');
+          let routeDetail=$url_path+"/saveTour";
+          let timeStart = $('#time').val();
+          let timeEnd = $('#time-end').val();
+          let to_comback;
+          if ($('#is-back').is(':checked'))
+          {
+              to_comback = "1";
+          }
+          else to_comback = "0";
+          let to_optimized;
+          if ($('#is-opt').is(':checked') == false)
+          {
+            to_optimized="0";
+          }
+          else{
+            to_optimized = $('input[name="durdis"]').val();
+          }
+          let tmparr = [];
+          let val = {};
+          if(startlocat != undefined){
+            val.de_id = startlocat;
+            let coor = idToData(startlocat,'LatLng');
+            val.location = coor.lat+"|"+coor.lng;
+            val.de_name = idToData(startlocat,'text');
+            val.de_duration = idToData(startlocat,'duration');
+            val.de_default = idToData(startlocat,'default');
+          }
+
+          locatsList.forEach(ele=>{
+            let coor = idToData(ele,'LatLng');
+            let tmp = ele+'';
+            tmparr.push({
+              de_id: tmp,
+              location: coor.lat+"|"+coor.lng,
+              de_name: idToData(ele,'text'),
+              de_duration: idToData(ele,'duration'),
+              de_default: idToData(ele,'default')
+            })
+          })
+          $.ajax({
+                url:routeDetail,
+                method:"get",
+                data:{_token:_token,tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,nameTour:nameTour,val:val},
+                success:function(data){ 
+                  $("#rankModal").modal("show");
+                  $("#route_ID").val(data);
+                }
+          });
+        }
+  });
 };
 </script> 
   <link href="{{asset('css/styles.css')}}" rel="stylesheet" />
   <link rel="icon" type="image/x-icon" href="{{asset('assets/img/favicon.ico')}}" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <link rel="stylesheet" href="{{asset('css/retour.css')}}">
+  <link rel="stylesheet" href="{{asset('css/notlogin.css')}}">
   <script src="https://use.fontawesome.com/releases/v5.15.1/js/all.js" crossorigin="anonymous"></script>
   </head>
   <body>
@@ -1406,13 +1594,14 @@ function showMap(){
           <li class="li_menu_start">
             <p class="menu_title_start text-uppercase">{{ trans('messages.StartTour') }}</p>
           </li>
+          <?php 
+              use Illuminate\Support\Facades\Auth;
+              $user = Auth::user();
+          ?>
+          @if(Auth::check())
           <li class="li_menu_acc">
             <p class="menu_title_acc text-uppercase" id="your_account">{{ trans('messages.Youraccount') }} <i class="fas fa-sort-down"></i></p>
             <div class="menu_content">
-              <?php 
-                  use Illuminate\Support\Facades\Auth;
-                  $user = Auth::user();
-              ?>
               @if($user->us_type == "1")
                   <p id="comback_admin">{{ trans('messages.adminPage') }}</p>
               @endif
@@ -1420,9 +1609,91 @@ function showMap(){
               <p id="p_logout">{{ trans('messages.Logout') }}</p>
             </div>
           </li>
+          @else
+          <li class="li_menu_acc">
+            <p class="menu_title_acc text-uppercase" id="your_account" data-toggle="modal" data-target="#modalLogin">Login</p>
+          </li>
+          @endif
         </ul>
       </div>
     </div>
+    <!-- Login modal 1-->
+    <div class="portfolio-modal modal fade" id="modalLogin" tabindex="-1" role="dialog" aria-labelledby="portfolioModal1Label" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fas fa-times"></i></span>
+                    </button>
+                    <div class="modal-body text-center">
+                        <div class="container-fuild">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <!-- Portfolio Modal - Title-->
+                                    <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0" id="portfolioModal1Label">{{ trans('messages.Login') }}</h2>
+                                    <!-- Icon Divider-->
+                                    <div class="divider-custom">
+                                        <div class="divider-custom-line"></div>
+                                        <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                        <div class="divider-custom-line"></div>
+                                    </div>
+                                    <p class="mb-5">{{ trans('messages.pleaseLogin') }}</p>
+                                    <!-- Form login -->
+                                    <form class="loginForm mb-4 pt-3 pb-3" method="post" action="{{route('postLogin')}}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                                        @if ($message = Session::get('error'))
+                                            <div class="alert alert-danger alert-block">
+                                                <button type="button" class="close" data-dismiss="alert">x</button>
+                                                <strong>{{$message}}</strong>
+                                            </div>
+                                        @endif
+                                        @if ($message = Session::get('success'))
+                                            <div class="alert alert-success alert-block">
+                                                <button type="button" class="close" data-dismiss="alert">x</button>
+                                                <strong>{{$message}}</strong>
+                                            </div>
+                                        @endif
+                                        @if (count($errors) > 0)
+                                            <div class="alert alert-danger">
+                                                <ul>
+                                                    @foreach ($errors->all() as $error)
+                                                        <li>{{ $error }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        @endif
+                                        <div class="txt_field">
+                                            <input type="email" name="us_email" required="">
+                                            <span></span>
+                                            <label>Email</label>
+                                        </div>
+                                        <div class="txt_field">
+                                            <input type="password" name="us_password" required="">
+                                            <span></span>
+                                            <label>Password</label>
+                                        </div>
+
+                                        <div class="div_submit">
+                                            <input type="submit" value="{{ trans('messages.Login') }}"> 
+                                            <input type="button" id="btn_register" data-toggle="modal" data-target="#modalRegis" value="{{ trans('messages.Registration') }}">
+                                        </div>
+
+                                        <div class="pass">
+                                            {{ trans('messages.forgotPassword') }}
+                                        </div>
+                                    </form>
+                                    <!-- Form login -->
+                                    <button class="btn btn-primary" data-dismiss="modal">
+                                        <i class="fas fa-times fa-fw"></i>
+                                        {{ trans('messages.CloseWindow') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- /Model -->
     <!-- Masthead-->
     <div id="overlay">
       <div class="loader"></div>
@@ -1826,34 +2097,6 @@ function showMap(){
   </div>
 </div>
 <!-- /modal -->
-<!-- Modal -->
-<!-- <div class="modal fade" id="enterNameTour" tabindex="-1" role="dialog" aria-labelledby="enterNameTourLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="enterNameTourLabel">{{ trans('messages.Enternametour') }}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-md-4 col-sm-6 col-6">{{ trans('messages.NameTour') }}</div>
-            <div class="col-md-8 col-sm-6 col-6">
-              <input type="text" class="form-control" placeholder="{{ trans('messages.NameTour') }}" name="nameTour">
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('messages.CloseWindow') }}</button>
-        <button type="button" class="btn btn-primary" id="btnSaveNameTour">{{ trans('messages.SaveTour') }}</button>
-      </div>
-    </div>
-  </div>
-</div> -->
-<!-- /Modal -->
 <!-- Modal alert click -->
 <div class="modal fade" id="clickWarning" tabindex="-1" role="dialog" aria-labelledby="clickWarningLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -2005,6 +2248,8 @@ function showMap(){
     <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
 
+
+
 <script type="text/javascript">
   $(document).ready(function(){
     
@@ -2038,97 +2283,19 @@ function showMap(){
       $('button').css('border','none');
       $('button').css('outline','none');
     });
-    $("#saveTour").click(function(){
-        $("#enterNameTour").modal("show");
-    });
+    @if(Auth::check())
+      $("#saveTour").click(function(){
+          $("#enterNameTour").modal("show");
+      });
+    @else
+      $("#saveTour").click(function(){
+          $("#modalLogin").modal("show");
+      });
+    @endif
     
-    $("#btnSaveShareTour").click(function(){
-        let nameTour = $('input[name="nameTour"]').val();
-        if(nameTour == "")
-        {
-          alert("Please enter the tour name first");
-        }
-        else
-        {
-          let coordinates = "";
-          if(startlocat != undefined)
-          {
-            coordinates = startlocat.lat+"-"+startlocat.lng;
-          }
-          let $url_path = '{!! url('/') !!}';
-          let _token = $('meta[name="csrf-token"]').attr('content');
-          let routeDetail=$url_path+"/saveTour";
-          let timeStart = $('#time').val();
-          let timeEnd = $('#time-end').val();
-          let to_comback;
-          if ($('#is-back').is(':checked'))
-          {
-              to_comback = "1";
-          }
-          else to_comback = "0";
-          let to_optimized;
-          if ($('#is-opt').is(':checked') == false)
-          {
-            to_optimized="0";
-          }
-          else{
-            to_optimized = $('input[name="durdis"]').val();
-          }
-          $.ajax({
-                url:routeDetail,
-                method:"get",
-                data:{_token:_token,locatsList:locatsList,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,nameTour:nameTour,coordinates:coordinates},
-                success:function(data){ 
-                  $("#rankModal").modal("show");
-                    $("#route_ID").val(data);
-                }
-          });
-        }
-    });
-    $("#btnSaveNameTour").click(function(){
-        let nameTour = $('input[name="nameTour"]').val();
-        if(nameTour == "")
-        {
-          alert("Please enter the tour name first");
-        }
-        else
-        {
-          let coordinates = "";
-          if(startlocat != undefined)
-          {
-            coordinates = startlocat.lat+"-"+startlocat.lng;
-          }
-          let $url_path = '{!! url('/') !!}';
-          let _token = $('meta[name="csrf-token"]').attr('content');
-          let routeDetail=$url_path+"/saveTour";
-          let timeStart = $('#time').val();
-          let timeEnd = $('#time-end').val();
-          let to_comback;
-          if ($('#is-back').is(':checked'))
-          {
-              to_comback = "1";
-          }
-          else to_comback = "0";
-          let to_optimized;
-          if ($('#is-opt').is(':checked') == false)
-          {
-            to_optimized="0";
-          }
-          else{
-            to_optimized = $('input[name="durdis"]').val();
-          }
-          $.ajax({
-                url:routeDetail,
-                method:"get",
-                data:{_token:_token,locatsList:locatsList,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,nameTour:nameTour,coordinates:coordinates},
-                success:function(data){ 
-                  alert("Your tour has been saved");
-                  $("#saveTour").css("display","none");
-                  $("#enterNameTour").modal("hide");
-                }
-          });
-        }
-    });
+    
+    
+    
     $(".menu_title_start").click(function(){
       location.reload();
     });

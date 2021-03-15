@@ -38,7 +38,9 @@ Route::group(
 		Route::get('maps/processroute','MapDirectController@processroute')->name('processroute');
 		Route::get('maps/updpath','MapDirectController@updpath')->name('updpath');
 		Route::get('maps.gettimeline','MapDirectController@gettimeline')->name('gettimeline');
-		
+		Route::get('maps',function(){
+		    return view('recommend_tour');
+		})->name("user.maps");
 	}
 );
 
@@ -50,9 +52,7 @@ Route::group(
 	function(){
 		//user
 		Route::get("dashboard","UserController@dashboard")->name("user.dashboard");
-		Route::get('maps',function(){
-		    return view('recommend_tour');
-		})->name("user.maps");
+		
 		Route::post("feedback","UserController@feedback")->name("user.feedback");
 		Route::get("saveTour","UserController@saveTour")->name("user.saveTour");
 		Route::post("checkTour","UserController@checkTour")->name("user.checkTour");
@@ -102,11 +102,16 @@ Route::group(
 		Route::post("changeLanguage","AdminController@changeLanguage")->name('admin.changeLanguage');
 		Route::get("history","AdminController@history")->name("admin.history");
 		Route::get("showAllRoute","AdminController@showAllRoute")->name("admin.showAllRoute");
+		Route::get("showAllRouteRating","AdminController@showAllRouteRating")->name("admin.showAllRouteRating");
+		
 		Route::get("editTour/{id}","AdminController@editTour")->name('admin.editTour');
 		Route::get("editRoute/{id}","AdminController@editRoute")->name("user.editRoute");
 		Route::post("routeDetail","AdminController@routeDetail")->name("admin.routeDetail");
+		Route::post("routeDetail2","AdminController@routeDetail2")->name("admin.routeDetail2");
+
 		Route::post("getEmail","AdminController@getEmail")->name("admin.getEmail");
 		Route::post("sendFeedback","AdminController@sendFeedback")->name("admin.sendFeedback");
+		Route::get("sharetourDelete/{id}","AdminController@sharetourDelete")->name("admin.sharetourDelete");
 	}
 );
 

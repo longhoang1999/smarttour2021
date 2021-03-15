@@ -51,7 +51,8 @@ class UserController extends Controller
                     $value["de_link"] = $des->de_link;
                     $value["de_map"] = $des->de_map;
                 }
-                return view("generalinterface",['des'=>$lang]);
+                $shareTour = ShareTour::orderBy('numberReviews', 'DESC')->limit(9)->get();
+                return view("generalinterface",['des'=>$lang,'shareTour'=>$shareTour]);
             }
             else
             {
@@ -63,7 +64,8 @@ class UserController extends Controller
                     $value["de_link"] = $des->de_link;
                     $value["de_map"] = $des->de_map;
                 }
-                return view("generalinterface",['des'=>$lang]);
+                $shareTour = ShareTour::orderBy('numberReviews', 'DESC')->limit(9)->get();
+                return view("generalinterface",['des'=>$lang,'shareTour'=>$shareTour]);
             }
         }
     }
@@ -84,8 +86,8 @@ class UserController extends Controller
             $user = Auth::user();
             if($user->us_type == "0")
             {
-                $route = Route::where('to_id_user',$user->us_id)->get();
-                return redirect()->route('user.dashboard')->with("route",$route);
+                //$route = Route::where('to_id_user',$user->us_id)->get();
+                return redirect()->route('user.dashboard');
             }
             else
             {
@@ -113,7 +115,8 @@ class UserController extends Controller
                 $value["de_link"] = $des->de_link;
                 $value["de_map"] = $des->de_map;
             }
-            return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang]);
+            $shareTour = ShareTour::orderBy('numberReviews', 'DESC')->limit(9)->get();
+            return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang,'shareTour'=>$shareTour]);
         }
         else
         {
@@ -128,7 +131,8 @@ class UserController extends Controller
                 $value["de_link"] = $des->de_link;
                 $value["de_map"] = $des->de_map;
             }
-            return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang]);
+            $shareTour = ShareTour::orderBy('number_star', 'DESC')->limit(9)->get();
+            return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang,'shareTour'=>$shareTour]);
         }
     }
     public function logout(){
@@ -149,27 +153,59 @@ class UserController extends Controller
     }
     public function saveTour(Request $req)
     {
+        if(!empty($req->val))
+        {
+            $des = new Destination();
+            $des->de_id = $req->val['de_id'];
+            $des->de_remove = $req->val['de_id'];
+            $latlng = explode("|", $req->val['location']);
+            $des->de_lat = $latlng[0];
+            $des->de_lng = $latlng[1];
+            $des->de_name = $req->val['de_name'];
+            $des->de_duration = $req->val['de_duration'];
+            $des->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
+            $des->de_default = "1";
+            $des->save();
+        }
         $user = Auth::user();
         $route = new Route();
         $route->to_id_user = $user->us_id;
-        $i=0;
-        $des = "";
-        foreach ($req->locatsList as  $value) {
-            $des = $des.$req->locatsList[$i]."-";
-            $i++;
-        }
-        $route->to_des = $des;
         $route->to_starttime = $req->timeStart;
         $route->to_endtime = $req->timeEnd;
         $route->to_comback = $req->to_comback;
         $route->to_optimized = $req->to_optimized;
         $route->to_name = $req->nameTour;
-
-        if($req->coordinates != "")
-        {
-            $route->to_startLocat = $req->coordinates;
-        }
         $route->to_startDay = date('Y-m-d', strtotime(Carbon::now()));
+        $i=0;
+        $desId = "";
+        foreach ($req->tmparr as  $value) {
+            if(empty($value['de_default']))
+            {
+                $desId = $desId.$value['de_id']."|";
+                $i++;
+            }
+            else if($value['de_default'] == "1")
+            {
+                $desNewPlace = new Destination();
+                $desNewPlace->de_id = $value['de_id'];
+                $desNewPlace->de_remove = $value['de_id'];
+                $latlng = explode("|", $value['location']);
+                $desNewPlace->de_lat = $latlng[0];
+                $desNewPlace->de_lng = $latlng[1];
+                $desNewPlace->de_name = $value['de_name'];
+                $desNewPlace->de_duration = $value['de_duration'];
+                $desNewPlace->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
+                $desNewPlace->de_default = "1";
+                $desNewPlace->save();
+                $desId = $desId.$value['de_id']."|";
+                $i++;
+            }
+        }
+        $route->to_des = $desId;
+        if(!empty($req->val))
+        {
+            $route->to_startLocat = $req->val['de_id'];
+        }
         $route->save();
         return $route->to_id;
     }
@@ -179,6 +215,7 @@ class UserController extends Controller
         $share->sh_to_id = $req->ro_id;
         $share->number_star = $req->star;
         $share->content = $req->content;
+        $share->numberReviews = "1";
         if($req->file('image_tour'))
         {
             $image = $req->file('image_tour');
@@ -463,35 +500,43 @@ class UserController extends Controller
     {
         $route = Route::where('to_id',$req->inputLink)->first();
         $array = array();
-        $pieces = explode("-", $route->to_des);
+        $pieces = explode("|", $route->to_des);
         for ($i=0; $i < count($pieces)-1; $i++) {
             $array = Arr::add($array, $i ,$pieces[$i]);
         }
         $array_2 = array();$label = array();
         foreach ($array as $value) {
-            if(Session::has('website_language') && Session::get('website_language') == "vi")
+            $desCheck = Destination::where("de_remove",$value)->first();
+            if($desCheck->de_default == "1")
             {
-                $lang = Language::where("language","vn")->where("des_id",$value)->first();
-                $de = Destination::
-                select('de_id','de_lat','de_lng','de_duration','de_link')
-                ->where('de_remove',$value)
-                ->first();
-                $lang["de_lat"] = $de->de_lat;
-                $lang["de_lng"] = $de->de_lng;
-                $lang["de_link"] = $de->de_link;
-                $lang["de_duration"] = $de->de_duration;
+                $lang = $desCheck;
             }
             else
             {
-                $lang = Language::where("language","en")->where("des_id",$value)->first();
-                $de = Destination::
-                select('de_id','de_lat','de_lng','de_duration','de_link')
-                ->where('de_remove',$value)
-                ->first();
-                $lang["de_lat"] = $de->de_lat;
-                $lang["de_lng"] = $de->de_lng;
-                $lang["de_link"] = $de->de_link;
-                $lang["de_duration"] = $de->de_duration;
+                if(Session::has('website_language') && Session::get('website_language') == "vi")
+                {
+                    $lang = Language::where("language","vn")->where("des_id",$value)->first();
+                    $de = Destination::
+                    select('de_id','de_lat','de_lng','de_duration','de_link')
+                    ->where('de_remove',$value)
+                    ->first();
+                    $lang["de_lat"] = $de->de_lat;
+                    $lang["de_lng"] = $de->de_lng;
+                    $lang["de_link"] = $de->de_link;
+                    $lang["de_duration"] = $de->de_duration;
+                }
+                else
+                {
+                    $lang = Language::where("language","en")->where("des_id",$value)->first();
+                    $de = Destination::
+                    select('de_id','de_lat','de_lng','de_duration','de_link')
+                    ->where('de_remove',$value)
+                    ->first();
+                    $lang["de_lat"] = $de->de_lat;
+                    $lang["de_lng"] = $de->de_lng;
+                    $lang["de_link"] = $de->de_link;
+                    $lang["de_duration"] = $de->de_duration;
+                }
             }
             $latlng = (object)array('lat' => $lang->de_lat, 'lng' => $lang->de_lng);
             array_push($array_2,$latlng);
@@ -499,23 +544,22 @@ class UserController extends Controller
             array_push($label,$labelName);
         }
         //start locat
+        $nameStartLocat ="";
         if($route->to_startLocat != "")
         {
-            $array_3 = array();
-            $startLocat = explode("-", $route->to_startLocat);
-            $objStartLocat = (object)array('lat' => $startLocat[0], 'lng' => $startLocat[1]);
+            $start = Destination::where("de_remove",$route->to_startLocat)->first();
+            $objStartLocat = (object)array('lat' => $start->de_lat, 'lng' => $start->de_lng);
+            $nameStartLocat = $start->de_name;
         }
         else $objStartLocat = "";
-
+        //name start locat
         if($route->to_comback == 1)
         {
             if($route->to_startLocat != "")
             {
-                $startLocat_2 = explode("-", $route->to_startLocat);
-                $startLocat_2[0] = floatval($startLocat_2[0]);
-                $startLocat_2[1] = floatval($startLocat_2[1]);
-                $objStartLocat_2 = (object)array('lat' => $startLocat_2[0], 'lng' => $startLocat_2[1]);
-                array_push($label,trans('messages.startLocation'));
+                $start_2 = Destination::where("de_remove",$route->to_startLocat)->first();
+                $objStartLocat_2 = (object)array('lat' => $start_2->de_lat, 'lng' => $start_2->de_lng);
+                array_push($label,$start_2->de_name);
                 array_push($array_2,$objStartLocat_2);
             }
             else
@@ -524,6 +568,6 @@ class UserController extends Controller
                 array_push($array_2,$array_2[0]);
             }
         }
-        return [$array_2,$label,$objStartLocat];
+        return [$array_2,$label,$objStartLocat,$nameStartLocat];
     }
 }

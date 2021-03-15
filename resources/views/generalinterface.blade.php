@@ -22,6 +22,25 @@
         <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
         <!-- css notlogin -->
         <link rel="stylesheet" href="{{asset('css/notlogin.css')}}">
+        <style>
+            .hightly_div_child{width: 90%; margin: auto;position: relative; cursor: pointer;}
+            .hightly_div_child img{width: 100%;height: 12rem;}
+            .hightly_div_child .tourContent{
+                position: absolute;
+                bottom: -16px;
+                background: rgba(0,0,0,.6);
+                width: 100%;
+                text-align: center;
+                line-height: 3em;
+                font-weight: 700;
+            }
+            p.tourName {
+                font-size: 19px;
+                font-weight: bold;
+                padding-left: 1rem;
+            }
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
     <body id="page-top">
         <!-- Navigation-->
@@ -99,7 +118,7 @@
                 <div class="row justify-content-center">
                     <!-- Portfolio Item 1-->
                     <div class="col-md-6 col-lg-4 mb-5">
-                        <div class="portfolio-item mx-auto" data-toggle="modal" data-target="#modalLogin">
+                        <div class="portfolio-item mx-auto" id="StarttourNow">
                             <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
                                 <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
                             </div>
@@ -132,12 +151,137 @@
                 <!-- About Section Content-->
                 <div class="row">
                     <div class="col-lg-12 ml-auto"><p class="lead text-center">{{ trans('messages.introduceContent') }}</p>
-                    <h3 class="font-weight-bold text-center">--- TOUR ADVICE ---</h3>
-                    <p class="lead text-center">{{ trans('messages.GiveTheBestAdvice') }}</p>
+                    <h3 class="font-weight-bold text-center text-uppercase" style="margin: 6rem 0;">--- highly rated tours ---</h3>
                     </div>
+                </div>
+                <?php use App\Models\Route; ?>
+                <div class="row justify-content-center">
+                    @foreach($shareTour as $value)
+                        <div class="col-md-4 col-sm-6 col-12 hightly_div mb-5">
+                            <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
+                            <p class="tourName">{{$route->to_name}}</p>
+                            <div class="hightly_div_child">
+                                <p class="tourContent">{{$value->number_star}} <i class="fas fa-star text-warning"></i> - {{$value->numberReviews}} votes</p>
+                                @if($value->image != "")
+                                    <img src="{{asset($value->image)}}" alt="" class="img_open_model{{$value->sh_id}}">
+                                @else
+                                    <img src="{{asset('imgPlace/empty.png')}}" alt="" title="location with no photo" class="img_open_model{{$value->sh_id}}"/>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </section>
+        <!-- Modal -->
+        <?php use App\Models\Destination; use Illuminate\Support\Arr; use App\Models\Language;?>
+        @foreach($shareTour as $value)
+            <div class="modal fade" id="modal_{{$value->sh_id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Tour name: {{$route->to_name}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
+                  <?php 
+                        if($route->to_startLocat != "")
+                        {
+                            $des_start = Destination::where("de_remove",$route->to_startLocat)->first();
+                            $start = $des_start->de_name;
+                        }
+                        else
+                        {
+                            $start = "Not available";
+                        }
+
+                        $pieces = explode("|", $route->to_des);
+                        $array = array();
+                        for ($i=0; $i < count($pieces)-1; $i++) {
+                            $array = Arr::add($array, $i ,$pieces[$i]);
+                        }
+                        $detailLocation = "";
+                        foreach ($array as  $ar) {
+                            $checkDes = Destination::where("de_remove",$ar)->first();
+                            if($checkDes->de_default == "0")
+                            {
+                                if(Session::has('website_language') && Session::get('website_language') == "vi")
+                                {
+                                    $desName = Language::select('de_name')->where("language","vn")->where("des_id",$ar)->first();
+                                    $detailLocation=$detailLocation.'--'.$desName->de_name;
+                                }
+                                else
+                                {
+                                    $desName = Language::select('de_name')->where("language","en")->where("des_id",$ar)->first();
+                                    $detailLocation=$detailLocation.'--'.$desName->de_name;
+                                }
+                            }
+                            else if($checkDes->de_default == "1")
+                            {
+                                $detailLocation= $detailLocation.'--'.$checkDes->de_name;
+                            }
+                        }
+                   ?>
+                  <div class="modal-body">
+                    <div class="container-fuild">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Start Location</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                <p>{{$start}}</p>
+                            </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Location</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                <p>{{$detailLocation}}</p>
+                            </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Time start</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                <p>{{date('h:i a', strtotime($route->to_starttime))}}</p>
+                            </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Time end</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                @if($route->to_endtime != "")
+                                    <p>{{date('h:i a', strtotime($route->to_endtime))}}</p>
+                                @else
+                                    <span class="badge badge-warning">Not available</span>
+                                @endif
+                            </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Comeback</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                @if($route->to_comback == "0")
+                                    <span class="badge badge-warning">No</span>
+                                @else
+                                    <span class="badge badge-success">Yes</span>
+                                @endif
+                            </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Date created</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                <p>{{date('d/m/Y', strtotime($route->to_startDay))}}</p>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-warning">Rating</button>
+                    <a href="#" class="btn btn-success" target="_blank">View tour</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+        @endforeach
         <!-- introduce Section-->
         <!-- place Section-->
         <section class="page-section" id="place">
@@ -562,7 +706,7 @@
       </div>
     </div>  
         <!-- Bootstrap core JS-->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Third party plugin JS-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
@@ -579,6 +723,22 @@
         <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
         <script type="text/javascript">
             $(document).ready(function(){
+                @foreach($shareTour as $value)
+                    $(".img_open_model{{$value->sh_id}}").click(function(){
+                        $("#modal_{{$value->sh_id}}").modal("show");
+                    });
+                @endforeach
+
+
+                $(".hightly_div_child").hover(function(){
+                    $(this).css("box-shadow","0px 1px 20px 11px white");
+                }); 
+                $(".hightly_div_child").mouseleave(function(){
+                    $(this).css("box-shadow","none");
+                }); 
+                $("#StarttourNow").click(function(){
+                    location.replace("{{route('user.maps')}}");
+                });
                 //quên pass
                 $(".pass").click(function(){
                     $("#modalForgotPass").modal("show");
@@ -887,6 +1047,5 @@
         <script src="{{asset('vendor/daterangepicker/moment.min.js')}}"></script>
         <script src="{{asset('vendor/daterangepicker/daterangepicker.js')}}"></script>
         <script src="{{asset('vendor/countdowntime/countdowntime.js')}}"></script>
-         <script src="https://use.fontawesome.com/releases/v5.15.1/js/all.js" crossorigin="anonymous"></script>
     </body>
 </html>
