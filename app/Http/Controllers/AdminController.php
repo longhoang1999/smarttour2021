@@ -1203,8 +1203,8 @@ class AdminController extends Controller
             $placeId_start =  "";
             $duration_start = "";
         }
-        $user = Auth::user();
-        return view('admin.edittour',['us_fullName'=>$user->us_fullName,
+        //$user = Auth::user();
+        return view('admin.edittour',[
             'startLocat'=>$route->to_startLocat,
             'to_des'=>$route->to_des,
             'to_starttime'=>$route->to_starttime,

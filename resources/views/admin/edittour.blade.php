@@ -1575,6 +1575,9 @@ function showMap(){
   @if($to_des != "")
     idToData(null,'LatLngArr');
     drawRoutes();
+    // setTimeout(function(){ 
+    //   $("#get-route").click();
+    // }, 200);
     let height = ($('.list-item').length+1) * 45 +5;
     $('#container-height').css('height',height+'px');
   @endif
@@ -1590,7 +1593,7 @@ function showMap(){
   <body>
     <div class="menu_siteBar">
       <div class="logoDashboard">
-        <a href="{{route('user.dashboard')}}">TOUR ADVICE</a>
+        <a href="{{url('/#page-top')}}">TOUR ADVICE</a>
       </div>
       <div class="Language">
           <div class="lan_title">
@@ -1945,6 +1948,11 @@ function showMap(){
         </div>
         <div id="switch-tab" class="control-panel">
           <button class="tablinks" onclick=""  id="saveTour">{{ trans('messages.EditTour') }}</button>
+          <style type="text/css">
+            #btn-rating{display: none;}
+          </style>
+          <button class="tablinks" onclick=""  id="btn-rating">Rating</button>
+
           <button class="tablinks reset-all"  onclick="">{{ trans('messages.Reset') }}</button>
         </div>
         <div id="options-control" class="control-panel">
@@ -2493,7 +2501,308 @@ function openTab(evt, tabName) {
 //End switch tab
 
 </script>
-
+@if(!Auth::check())
+  <!-- modal dashboard -->
+  <!-- Modal reggis -->
+  <div class="modal fade" id="modalRegis" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">{{ trans('messages.userRegistration') }}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="{{route('register')}}" method="post">
+              <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+              <div class="container-fluid">
+                  <div class="row">
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">Email</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <input type="email" class="form-control" placeholder="Enter Email" required="" name="email">
+                      </div>
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">Password</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <input type="password" class="form-control" placeholder="Enter password" name="password" required="">
+                      </div>
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">{{ trans('messages.confirmPassword') }}</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <input type="password" class="form-control" placeholder="{{ trans('messages.confirmPassword') }}" name="confirm" required="">
+                      </div>
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">{{ trans('messages.FullName') }}</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <input type="text" class="form-control" placeholder="{{ trans('messages.FullName') }}" name="fullname" required="">
+                      </div>
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">{{ trans('messages.Gender') }}</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <select class="form-control" name="gender">
+                              <option value="Male">Male</option>
+                              <option value="Female">Female</option>
+                          </select>
+                      </div>
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">{{ trans('messages.Age') }}</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <input type="number" class="form-control" placeholder="{{ trans('messages.Age') }}" name="age" required="">
+                      </div>
+                  </div>
+              </div>
+              <hr>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('messages.CloseWindow') }}</button>
+              <input type="submit" class="btn btn-primary" value="{{ trans('messages.Registration') }}">
+              <p id="p_backLogin">{{ trans('messages.youHaveAcc') }} <span class="backFormLogin">{{ trans('messages.Login') }}</span></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal forgotpass -->
+  <div class="modal fade" id="modalForgotPass" tabindex="-1" role="dialog" aria-labelledby="modalForgotPassLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalForgotPassLabel">{{trans('messages.forgotPassword')}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+              <div class="row">
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                      <p class="pt-2 font-weight-bold">{{trans('messages.enterEmail')}} </p>
+                  </div>
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                      <p id="icon_correct" class="text-success"><i class="fas fa-check"></i> {{trans('messages.correctEmail')}}</p>
+                      <p id="icon_incorrect" class="text-danger"><i class="fas fa-check"></i> {{trans('messages.incorrectEmail')}}</p>
+                      <input type="text" class="form-control" placeholder="Enter your email" id="inputEmail">
+                  </div>
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                  </div>
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                      <button type="button" class="btn btn-info" id="btn_senKey">{{trans('messages.sendKey')}}</button>
+                  </div>
+              </div>
+              <div class="row" id="formCheckKey">
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                      <p class="pt-2 font-weight-bold">{{trans('messages.enterKey')}} </p>
+                  </div>
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                      <p id="key_incorrect" class="text-danger"><i class="fas fa-check"></i> {{trans('messages.incorrectKey')}} </p>
+                      <input type="text" class="form-control text-uppercase" placeholder="{{trans('messages.enterKey')}}" id="inputKey">
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- hết modal dashboard -->
+  <script type="text/javascript">
+    $(document).ready(function(){
+      //trang dashboard
+      $('#modalRegis').on('shown.bs.modal', function () {
+        $('#modalLogin').modal("hide");
+      });
+      $('#modalLogin').on('shown.bs.modal', function () {
+        $('#modalRegis').modal("hide");
+      });
+      $(".pass").click(function(){
+          $("#modalForgotPass").modal("show");
+      });
+      $('#modalForgotPass').on('shown.bs.modal', function () {
+        $('#modalLogin').modal("hide");
+      });
+      $(".backFormLogin").click(function(){
+          $("#modalLogin").modal("show");
+      });
+      $("#inputEmail").keyup(function(){
+          let _token = $('meta[name="csrf-token"]').attr('content');
+          let $url_path = '{!! url('/') !!}';
+          let routeCheckForgot=$url_path+"/checkForgot";
+          let input = $("#inputEmail").val();
+          $.ajax({
+                url:routeCheckForgot,
+                method:"POST",
+                data:{_token:_token,input:input},
+                success:function(data){ 
+                  if(input == "")
+                  {
+                      $("#icon_correct").css("display","none");
+                      $("#icon_incorrect").css("display","none");
+                      $("#btn_senKey").css("display","none");
+                  }
+                  else
+                  {
+                      if(data=="true")
+                      {
+                          $("#icon_correct").css("display","block");
+                          $("#btn_senKey").css("display","block");
+                          $("#icon_incorrect").css("display","none");
+                      }
+                      else if(data="false")
+                      {
+                          $("#icon_correct").css("display","none");
+                          $("#btn_senKey").css("display","none");
+                          $("#icon_incorrect").css("display","block");
+                      }
+                  }
+               }
+          });
+      });
+      $("#btn_senKey").click(function(){
+          let _token = $('meta[name="csrf-token"]').attr('content');
+          let $url_path = '{!! url('/') !!}';
+          let routeSendKey=$url_path+"/senkey";
+          let input = $("#inputEmail").val();
+          $.ajax({
+                url:routeSendKey,
+                method:"POST",
+                data:{_token:_token,input:input},
+                success:function(data){ 
+                  if(data=="true")
+                  {
+                      $("#inputEmail").attr("readonly","");
+                      $("#formCheckKey").css("display","flex");
+                  }
+                  if(data == "false")
+                  {
+                      alert("Cannot send email");
+                  }
+               }
+          });
+      });
+      $("#inputKey").keyup(function(){
+          let _token = $('meta[name="csrf-token"]').attr('content');
+          let $url_path = '{!! url('/') !!}';
+          let routeCheckKey=$url_path+"/checkkey";
+          let email = $("#inputEmail").val();
+          let input = $("#inputKey").val();
+          $.ajax({
+                url:routeCheckKey,
+                method:"POST",
+                data:{_token:_token,input:input,email:email},
+                success:function(data){
+                  if(input == "")
+                  {
+                      $("#key_incorrect").css("display","none");
+                  }
+                  else
+                  {
+                      if(data=="true")
+                      {
+                          $("#changePass").modal("show");
+                          $("#modalForgotPass").modal("hide");
+                      }
+                      if(data == "false")
+                      {
+                          $("#key_incorrect").css("display","block");
+                      }
+                  }
+               }
+          });
+      });
+      //hết trang dashboard
+    })
+  </script>
+@endif
+@if(isset($justview) && Auth::check())
+<!-- Modal -->
+<div class="modal fade" id="modalRating" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Rating</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fuild">
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-12">
+                <p class="font-weight-bold font-italic">Rating for your tour</p>
+              </div>
+              <div class="col-md-12 col-sm-12 col-12 mb-3" id="div_Starrank_tour">
+                <i class="fas fa-star star_1 fa-2x"  data-value="1" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_2 fa-2x" data-value="2" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_3 fa-2x" data-value="3" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_4 fa-2x"  data-value="4" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_5 fa-2x" data-value="5" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_6 fa-2x" data-value="6" style="cursor: pointer;"></i> 
+                <i class="fas fa-star star_7 fa-2x" data-value="7" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_8 fa-2x" data-value="8" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_9 fa-2x" data-value="9" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_10 fa-2x" data-value="10" style="cursor: pointer;"></i>
+              </div>
+              <input type="hidden" id="star_Share" name="numberStar">
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn_Rating">Rating</button>
+      </div>
+    </div>
+  </div>
+</div>
+@endif
+@if(isset($justview))
+  <style>
+    #saveTour{display: none;}
+    #btn-rating{display: block;}
+  </style>
+  <script type="text/javascript">
+    @if(!Auth::check())
+      $("#btn-rating").click(function(){
+        $("#modalLogin").modal("show");
+      });
+    @else
+      $("#btn-rating").click(function(){
+        $("#modalRating").modal("show");
+      });
+      // votess star
+      @for($i = 1; $i<= 10; $i++)
+        $("#div_Starrank_tour .star_{{$i}}").click(function(){
+            @for($j = 1 ; $j <= 10; $j++)
+                $("#div_Starrank_tour .star_{{$j}}").css("color","#212529");
+            @endfor
+            @for($j = 1 ; $j <= $i; $j++)
+                $("#div_Starrank_tour .star_{{$j}}").css("color","#ff9700");
+            @endfor
+            //console.log($(this).attr("data-value"));
+            $("#star_Share").val($(this).attr("data-value"));
+        });
+      @endfor
+      $("#btn_Rating").click(function(){
+          let _token = $('meta[name="csrf-token"]').attr('content');
+          let $url_path = '{!! url('/') !!}';
+          let routeRating=$url_path+"/rating";
+          let numberStar = $("#star_Share").val();
+          $.ajax({
+                url:routeRating,
+                method:"POST",
+                data:{_token:_token,numberStar:numberStar,shareId:{{$shareId}}},
+                success:function(data){ 
+                  alert("You have successfully evaluated");
+                  location.reload();
+               }
+          });
+      });
+    @endif
+  </script>
+@endif
   </body>
 </html>
 

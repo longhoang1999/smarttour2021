@@ -30,6 +30,7 @@ Route::post("checkkey","UserController@checkkey")->name('checkkey');
 Route::post("postLogin","UserController@postLogin")->name("postLogin");
 Route::post("register","UserController@register")->name("register");
 
+
 //Auth::routes();
 Route::group(
 	['middleware' => ['locale'] ],
@@ -41,6 +42,12 @@ Route::group(
 		Route::get('maps',function(){
 		    return view('recommend_tour');
 		})->name("user.maps");
+
+		Route::get("viewtour/{id}","ShareTourController@viewtour")->name('viewtour');
+		Route::post("takeInforPlace","ShareTourController@takeInforPlace")->name('takeInforPlace');
+		Route::get("loadmore/{type}","ShareTourController@loadmore")->name('share.loadmore');
+		Route::get("viewSharetour/{routeid}/{shareId}","ShareTourController@viewSharetour")->name('share.viewSharetour');
+		Route::get("editTour/{id}","AdminController@editTour")->name('admin.editTour');
 	}
 );
 
@@ -60,6 +67,7 @@ Route::group(
 		Route::post("editInfo","UserController@editInfo")->name("user.editInfo");
 		Route::get("editTourUser/{id}","AdminController@editTour")->name('user.editTour');
 		Route::post("shareTour","UserController@shareTour")->name("user.shareTour");
+		Route::post("rating","ShareTourController@rating")->name("user.rating");
 		
 	}
 );
@@ -103,8 +111,6 @@ Route::group(
 		Route::get("history","AdminController@history")->name("admin.history");
 		Route::get("showAllRoute","AdminController@showAllRoute")->name("admin.showAllRoute");
 		Route::get("showAllRouteRating","AdminController@showAllRouteRating")->name("admin.showAllRouteRating");
-		
-		Route::get("editTour/{id}","AdminController@editTour")->name('admin.editTour');
 		Route::get("editRoute/{id}","AdminController@editRoute")->name("user.editRoute");
 		Route::post("routeDetail","AdminController@routeDetail")->name("admin.routeDetail");
 		Route::post("routeDetail2","AdminController@routeDetail2")->name("admin.routeDetail2");

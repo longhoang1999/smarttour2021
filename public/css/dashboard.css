@@ -112,3 +112,106 @@ header .slider div{width: 100%;min-height:40rem; }
     display: none;
     margin: 0 auto;
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+.openScroll {
+    overflow-y: auto;
+    max-height: 20rem;
+    padding: 0 2rem;
+    margin-bottom: 2rem;
+}
+.hightly_div_child {
+    overflow: hidden;
+    border-radius: 15px;
+}
+.hightly_div_child {
+    width: 100%;
+    margin: auto;
+    position: relative;
+    cursor: pointer;
+}
+.hightly_div_child:hover:before {
+    background: rgba(0,0,0,0.4);
+}
+.hightly_div_child:before {
+    position: absolute;
+    content: "";
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0);
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+    z-index: 15;
+}
+.tourContent{z-index: 10;}
+.hightly_div_child:hover .tourContent {
+    line-height: 4em;
+}
+.hightly_div_child:hover img{
+    transform: scale(1.2);
+}
+.hightly_div_child .tourContent {
+    position: absolute;
+    bottom: 0;
+    background: rgba(0,0,0,.6);
+    width: 100%;
+    text-align: center;
+    line-height: 3em;
+    font-weight: 700;
+    margin: 0;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+.hightly_div_child img {
+    width: 100%;
+    height: 12rem;
+    object-fit: cover;
+    transition: transform 2s;
+}
+#div_loadMore{margin:2rem auto;text-align: center;}
+#loadMoreTour{
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: auto;
+    font-style: italic;
+
+}
+#loadMoreTour:hover{
+    text-decoration: none;
+    color: #1f0495;
+    font-style: inherit;
+}
+p.tourName {
+    font-size: 19px;
+    font-weight: bold;
+    padding-left: 1rem;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+}
+.hightly_div_child:hover svg {
+    transform: rotate(180deg);
+}

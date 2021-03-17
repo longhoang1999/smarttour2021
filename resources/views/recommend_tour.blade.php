@@ -1578,7 +1578,7 @@ function showMap(){
   <body>
     <div class="menu_siteBar">
       <div class="logoDashboard">
-        <a href="{{route('user.dashboard')}}">TOUR ADVICE</a>
+        <a href="{{route('login')}}">TOUR ADVICE</a>
       </div>
       <div class="Language">
           <div class="lan_title">
@@ -2481,7 +2481,223 @@ function openTab(evt, tabName) {
 //End switch tab
 
 </script>
-
+@if(!Auth::check())
+  <!-- modal dashboard -->
+  <!-- Modal reggis -->
+  <div class="modal fade" id="modalRegis" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">{{ trans('messages.userRegistration') }}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="{{route('register')}}" method="post">
+              <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+              <div class="container-fluid">
+                  <div class="row">
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">Email</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <input type="email" class="form-control" placeholder="Enter Email" required="" name="email">
+                      </div>
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">Password</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <input type="password" class="form-control" placeholder="Enter password" name="password" required="">
+                      </div>
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">{{ trans('messages.confirmPassword') }}</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <input type="password" class="form-control" placeholder="{{ trans('messages.confirmPassword') }}" name="confirm" required="">
+                      </div>
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">{{ trans('messages.FullName') }}</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <input type="text" class="form-control" placeholder="{{ trans('messages.FullName') }}" name="fullname" required="">
+                      </div>
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">{{ trans('messages.Gender') }}</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <select class="form-control" name="gender">
+                              <option value="Male">Male</option>
+                              <option value="Female">Female</option>
+                          </select>
+                      </div>
+                      <div class="col-md-3 col-sm-6 col-6 mb-3">
+                          <p class="text-left font-weight-bold">{{ trans('messages.Age') }}</p>
+                      </div>
+                      <div class="col-md-9 col-sm-6 col-6 mb-3">
+                          <input type="number" class="form-control" placeholder="{{ trans('messages.Age') }}" name="age" required="">
+                      </div>
+                  </div>
+              </div>
+              <hr>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('messages.CloseWindow') }}</button>
+              <input type="submit" class="btn btn-primary" value="{{ trans('messages.Registration') }}">
+              <p id="p_backLogin">{{ trans('messages.youHaveAcc') }} <span class="backFormLogin">{{ trans('messages.Login') }}</span></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal forgotpass -->
+  <div class="modal fade" id="modalForgotPass" tabindex="-1" role="dialog" aria-labelledby="modalForgotPassLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalForgotPassLabel">{{trans('messages.forgotPassword')}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+              <div class="row">
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                      <p class="pt-2 font-weight-bold">{{trans('messages.enterEmail')}} </p>
+                  </div>
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                      <p id="icon_correct" class="text-success"><i class="fas fa-check"></i> {{trans('messages.correctEmail')}}</p>
+                      <p id="icon_incorrect" class="text-danger"><i class="fas fa-check"></i> {{trans('messages.incorrectEmail')}}</p>
+                      <input type="text" class="form-control" placeholder="Enter your email" id="inputEmail">
+                  </div>
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                  </div>
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                      <button type="button" class="btn btn-info" id="btn_senKey">{{trans('messages.sendKey')}}</button>
+                  </div>
+              </div>
+              <div class="row" id="formCheckKey">
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                      <p class="pt-2 font-weight-bold">{{trans('messages.enterKey')}} </p>
+                  </div>
+                  <div class="col-md-6 col-sm-12 col-12 mb-2">
+                      <p id="key_incorrect" class="text-danger"><i class="fas fa-check"></i> {{trans('messages.incorrectKey')}} </p>
+                      <input type="text" class="form-control text-uppercase" placeholder="{{trans('messages.enterKey')}}" id="inputKey">
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- hết modal dashboard -->
+  <script type="text/javascript">
+    $(document).ready(function(){
+      //trang dashboard
+      $('#modalRegis').on('shown.bs.modal', function () {
+        $('#modalLogin').modal("hide");
+      });
+      $('#modalLogin').on('shown.bs.modal', function () {
+        $('#modalRegis').modal("hide");
+      });
+      $(".pass").click(function(){
+          $("#modalForgotPass").modal("show");
+      });
+      $('#modalForgotPass').on('shown.bs.modal', function () {
+        $('#modalLogin').modal("hide");
+      });
+      $(".backFormLogin").click(function(){
+          $("#modalLogin").modal("show");
+      });
+      $("#inputEmail").keyup(function(){
+          let _token = $('meta[name="csrf-token"]').attr('content');
+          let $url_path = '{!! url('/') !!}';
+          let routeCheckForgot=$url_path+"/checkForgot";
+          let input = $("#inputEmail").val();
+          $.ajax({
+                url:routeCheckForgot,
+                method:"POST",
+                data:{_token:_token,input:input},
+                success:function(data){ 
+                  if(input == "")
+                  {
+                      $("#icon_correct").css("display","none");
+                      $("#icon_incorrect").css("display","none");
+                      $("#btn_senKey").css("display","none");
+                  }
+                  else
+                  {
+                      if(data=="true")
+                      {
+                          $("#icon_correct").css("display","block");
+                          $("#btn_senKey").css("display","block");
+                          $("#icon_incorrect").css("display","none");
+                      }
+                      else if(data="false")
+                      {
+                          $("#icon_correct").css("display","none");
+                          $("#btn_senKey").css("display","none");
+                          $("#icon_incorrect").css("display","block");
+                      }
+                  }
+               }
+          });
+      });
+      $("#btn_senKey").click(function(){
+          let _token = $('meta[name="csrf-token"]').attr('content');
+          let $url_path = '{!! url('/') !!}';
+          let routeSendKey=$url_path+"/senkey";
+          let input = $("#inputEmail").val();
+          $.ajax({
+                url:routeSendKey,
+                method:"POST",
+                data:{_token:_token,input:input},
+                success:function(data){ 
+                  if(data=="true")
+                  {
+                      $("#inputEmail").attr("readonly","");
+                      $("#formCheckKey").css("display","flex");
+                  }
+                  if(data == "false")
+                  {
+                      alert("Cannot send email");
+                  }
+               }
+          });
+      });
+      $("#inputKey").keyup(function(){
+          let _token = $('meta[name="csrf-token"]').attr('content');
+          let $url_path = '{!! url('/') !!}';
+          let routeCheckKey=$url_path+"/checkkey";
+          let email = $("#inputEmail").val();
+          let input = $("#inputKey").val();
+          $.ajax({
+                url:routeCheckKey,
+                method:"POST",
+                data:{_token:_token,input:input,email:email},
+                success:function(data){
+                  if(input == "")
+                  {
+                      $("#key_incorrect").css("display","none");
+                  }
+                  else
+                  {
+                      if(data=="true")
+                      {
+                          $("#changePass").modal("show");
+                          $("#modalForgotPass").modal("hide");
+                      }
+                      if(data == "false")
+                      {
+                          $("#key_incorrect").css("display","block");
+                      }
+                  }
+               }
+          });
+      });
+      //hết trang dashboard
+    })
+  </script>
+@endif
   </body>
 </html>
 

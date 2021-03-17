@@ -21,26 +21,24 @@ class MapDirectController {
         {
             $de = Language::where("language","vn")->get();
             foreach ($de as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_description')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration')->where("de_remove",$value->des_id)->first();
                 $value["de_id"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_link"] = $des->de_link;
                 $value["de_duration"] = $des->de_duration;
-                $value["de_description"] = $des->de_description;
             }
         }
         else
         {
             $de = Language::where("language","en")->get();
             foreach ($de as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_description')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration')->where("de_remove",$value->des_id)->first();
                 $value["de_id"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_link"] = $des->de_link;
                 $value["de_duration"] = $des->de_duration;
-                $value["de_description"] = $des->de_description;
             }
         }
 		$destination  = array();

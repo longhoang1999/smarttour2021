@@ -12,14 +12,12 @@ use App\Models\User;
 use App\Models\Destination;
 use App\Models\ShareTour;
 use App\Models\Language;
+use App\Models\Uservotes;
 use Session;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use PHPMailer;
-
-
-
 
 class UserController extends Controller
 {
@@ -224,6 +222,12 @@ class UserController extends Controller
             $share->image='img_ShareTour/'.$picName;
         }
         $share->save();
+
+        $uservotes = new Uservotes();
+        $uservotes->sh_id = $share->sh_id;
+        $uservotes->us_id = Auth::user()->us_id;
+        $uservotes->vote_number = $req->star;
+        $uservotes->save();
         return redirect()->route('user.editTour',$req->ro_id);
     }
     public function register(Request $req)

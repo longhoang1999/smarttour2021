@@ -22,24 +22,6 @@
         <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
         <!-- css notlogin -->
         <link rel="stylesheet" href="{{asset('css/notlogin.css')}}">
-        <style>
-            .hightly_div_child{width: 90%; margin: auto;position: relative; cursor: pointer;}
-            .hightly_div_child img{width: 100%;height: 12rem;}
-            .hightly_div_child .tourContent{
-                position: absolute;
-                bottom: -16px;
-                background: rgba(0,0,0,.6);
-                width: 100%;
-                text-align: center;
-                line-height: 3em;
-                font-weight: 700;
-            }
-            p.tourName {
-                font-size: 19px;
-                font-weight: bold;
-                padding-left: 1rem;
-            }
-        </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
     <body id="page-top">
@@ -151,13 +133,13 @@
                 <!-- About Section Content-->
                 <div class="row">
                     <div class="col-lg-12 ml-auto"><p class="lead text-center">{{ trans('messages.introduceContent') }}</p>
-                    <h3 class="font-weight-bold text-center text-uppercase" style="margin: 6rem 0;">--- highly rated tours ---</h3>
+                    <h3 class="font-weight-bold text-center text-uppercase" style="margin: 3rem 0;">--- highly rated tours ---</h3>
                     </div>
                 </div>
                 <?php use App\Models\Route; ?>
                 <div class="row justify-content-center">
                     @foreach($shareTour as $value)
-                        <div class="col-md-4 col-sm-6 col-12 hightly_div mb-5">
+                        <div class="col-md-4 col-sm-6 col-12 hightly_div mb-3">
                             <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
                             <p class="tourName">{{$route->to_name}}</p>
                             <div class="hightly_div_child">
@@ -170,11 +152,16 @@
                             </div>
                         </div>
                     @endforeach
+                    <div class="col-md-12 col-sm-12 col-12" id="div_loadMore">
+                        <?php $type="notlogin" ?>
+                        <a href="{{route('share.loadmore',$type)}}" id="loadMoreTour">--- See more <i class="fas fa-angle-double-right pt-2"></i> ---</a>
+                    </div>
                 </div>
             </div>
         </section>
         <!-- Modal -->
         <?php use App\Models\Destination; use Illuminate\Support\Arr; use App\Models\Language;?>
+        <?php use Illuminate\Support\Facades\Auth; ?>
         @foreach($shareTour as $value)
             <div class="modal fade" id="modal_{{$value->sh_id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg" role="document">
@@ -272,11 +259,46 @@
                                 <p>{{date('d/m/Y', strtotime($route->to_startDay))}}</p>
                             </div>
                         </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Introduce</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                <p>{{$value->content}}</p>
+                            </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Average number of stars</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                <p>{{$value->number_star}} <i class="fas fa-star text-warning"></i></p>
+                            </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Number of ratings</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                <p>{{$value->numberReviews}}</p>
+                            </div>
+                            @if(Auth::check())
+                                <div class="col-md-4 col-sm-6 col-12">
+                                    <p class="font-weight-bold font-italic">Your vote: </p>
+                                </div>
+                                <?php $findVotes =  Uservotes::where("sh_id",$value->sh_id)->where("us_id",Auth::user()->us_id)->first(); ?>
+                                @if(!empty($findVotes))
+                                    <div class="col-md-8 col-sm-6 col-12">
+                                        <p>{{$findVotes->vote_number}} <i class="fas fa-star text-warning"></i></p>
+                                    </div>
+                                @else
+                                    <div class="col-md-8 col-sm-6 col-12">
+                                        <span class="badge badge-success">You do not have reviews for this tour</span>
+                                    </div>
+                                @endif
+                            @endif
+                        </div>
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-warning">Rating</button>
-                    <a href="#" class="btn btn-success" target="_blank">View tour</a>
+                    <a href="{{route('viewtour',$value->sh_id)}}" class="btn btn-success">View tour</a>
                   </div>
                 </div>
               </div>
@@ -723,19 +745,23 @@
         <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
         <script type="text/javascript">
             $(document).ready(function(){
+                //chạy đến div tour -> đang lỗi
+                @if(isset($replace))
+                    let url = window.location.href.toString();
+                    if(url.indexOf("introduce") == "-1")
+                    {
+                        location.replace(window.location.href+"#introduce");
+                    }
+                @endif
                 @foreach($shareTour as $value)
                     $(".img_open_model{{$value->sh_id}}").click(function(){
                         $("#modal_{{$value->sh_id}}").modal("show");
                     });
+                    $(".img_open_model{{$value->sh_id}}").parent().click(function(){
+                        $("#modal_{{$value->sh_id}}").modal("show");
+                    });
+                    
                 @endforeach
-
-
-                $(".hightly_div_child").hover(function(){
-                    $(this).css("box-shadow","0px 1px 20px 11px white");
-                }); 
-                $(".hightly_div_child").mouseleave(function(){
-                    $(this).css("box-shadow","none");
-                }); 
                 $("#StarttourNow").click(function(){
                     location.replace("{{route('user.maps')}}");
                 });

@@ -106,4 +106,5 @@ return [
     'CmBck'=>'Come back to',
     'EditTour' => 'Edit Tour',
     'startLocation' => 'Your start location',
+    'hours' => 'hours',
 ];

@@ -18,25 +18,7 @@
         <link href="{{asset('css/styles.css')}}" rel="stylesheet" />
         <link rel="stylesheet" href="{{asset('css/dashboard.css')}}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" />
-        <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-        <style>
-            .hightly_div_child{width: 90%; margin: auto;position: relative; cursor: pointer;}
-            .hightly_div_child img{width: 100%;height: 12rem;}
-            .hightly_div_child .tourContent{
-                position: absolute;
-                bottom: -16px;
-                background: rgba(0,0,0,.6);
-                width: 100%;
-                text-align: center;
-                line-height: 3em;
-                font-weight: 700;
-            }
-            p.tourName {
-                font-size: 19px;
-                font-weight: bold;
-                padding-left: 1rem;
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>  
     </head>
     <body id="page-top">
         <?php use App\Models\Destination; use App\Models\Language;?>                                 
@@ -159,13 +141,13 @@
                 <!-- About Section Content-->
                 <div class="row">
                     <div class="col-lg-12 ml-auto"><p class="lead text-center">{{ trans('messages.introduceContent') }}</p>
-                    <h3 class="font-weight-bold text-center text-uppercase" style="margin: 6rem 0;">--- highly rated tours ---</h3>
+                    <h3 class="font-weight-bold text-center text-uppercase" style="margin: 3rem 0;">--- highly rated tours ---</h3>
                     </div>
-                </div>
+                </div>      
                 <?php use App\Models\Route; ?>
                 <div class="row justify-content-center">
                     @foreach($shareTour as $value)
-                        <div class="col-md-4 col-sm-6 col-12 hightly_div mb-5">
+                        <div class="col-md-4 col-sm-6 col-12 hightly_div mb-3">
                             <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
                             <p class="tourName">{{$route->to_name}}</p>
                             <div class="hightly_div_child">
@@ -178,13 +160,19 @@
                             </div>
                         </div>
                     @endforeach
+                    <div class="col-md-12 col-sm-12 col-12" id="div_loadMore">
+                        <?php $type="login"; ?>
+                        <a href="{{route('share.loadmore',$type)}}" id="loadMoreTour">--- See more <i class="fas fa-angle-double-right pt-2"></i> ---</a>
+                    </div>
                 </div>
             </div>
         </section>
         <!-- introduce Section-->
         <!-- Modal -->
+        <?php use App\Models\Uservotes; ?>
         <?php use Illuminate\Support\Arr;?>
         @foreach($shareTour as $value)
+            <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
             <div class="modal fade" id="modal_{{$value->sh_id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
@@ -194,7 +182,6 @@
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
-                  <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
                   <?php 
                         if($route->to_startLocat != "")
                         {
@@ -281,11 +268,44 @@
                                 <p>{{date('d/m/Y', strtotime($route->to_startDay))}}</p>
                             </div>
                         </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Introduce</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                <p>{{$value->content}}</p>
+                            </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Average number of stars</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                <p>{{$value->number_star}} <i class="fas fa-star text-warning"></i></p>
+                            </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Number of ratings</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12">
+                                <p>{{$value->numberReviews}}</p>
+                            </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Your vote: </p>
+                            </div>
+                            <?php $findVotes =  Uservotes::where("sh_id",$value->sh_id)->where("us_id",Auth::user()->us_id)->first(); ?>
+                            @if(!empty($findVotes))
+                                <div class="col-md-8 col-sm-6 col-12">
+                                    <p>{{$findVotes->vote_number}} <i class="fas fa-star text-warning"></i></p>
+                                </div>
+                            @else
+                                <div class="col-md-8 col-sm-6 col-12">
+                                    <span class="badge badge-success">You do not have reviews for this tour</span>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-warning">Rating</button>
-                    <a href="#" class="btn btn-success" target="_blank">View tour</a>
+                    <a href="{{route('viewtour',$value->sh_id)}}" class="btn btn-success">View tour</a>
                   </div>
                 </div>
               </div>
@@ -465,55 +485,57 @@
                                         {{ trans('messages.historyTitle') }}</p>
                                     <small>{{ trans('messages.routeDetails') }}</small>
                                     <small>-- (Double click to edit the route) </small>
-                                    <p class="mb-5">
-                                        <?php 
-                                              $route = Session::get('route');
-                                         ?>
-                                        @if ( count($route) > 0 )
-                                            @foreach($route as $value)
-                                                <?php 
-                                                    if($value->to_startLocat == "")
-                                                    {
-                                                       $des_1 = ""; 
-                                                    }
-                                                    else 
-                                                    {
-                                                        $findName = Destination::select("de_name")->where("de_remove",$value->to_startLocat)->first();
-                                                        $des_1 = $findName->de_name."--";
-                                                    }
-                                                    $pieces = explode("|", $value->to_des);
-                                                    for ($i=0; $i < count($pieces)-1; $i++) { 
-                                                        $checkPlace = Destination::where("de_remove",$pieces[$i])->first();
-                                                        if($checkPlace->de_default == "0")
+                                    <div class="openScroll">
+                                        <p class="mb-5">
+                                            <?php 
+                                                  $route = Session::get('route');
+                                             ?>
+                                            @if ( count($route) > 0 )
+                                                @foreach($route as $value)
+                                                    <?php 
+                                                        if($value->to_startLocat == "")
                                                         {
-                                                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                                                           $des_1 = ""; 
+                                                        }
+                                                        else 
+                                                        {
+                                                            $findName = Destination::select("de_name")->where("de_remove",$value->to_startLocat)->first();
+                                                            $des_1 = $findName->de_name."--";
+                                                        }
+                                                        $pieces = explode("|", $value->to_des);
+                                                        for ($i=0; $i < count($pieces)-1; $i++) { 
+                                                            $checkPlace = Destination::where("de_remove",$pieces[$i])->first();
+                                                            if($checkPlace->de_default == "0")
                                                             {
-                                                                $lang = Language::where("language","vn")->where("des_id",$pieces[$i])->first();
+                                                                if(Session::has('website_language') && Session::get('website_language') == "vi")
+                                                                {
+                                                                    $lang = Language::where("language","vn")->where("des_id",$pieces[$i])->first();
+                                                                }
+                                                                else
+                                                                {
+                                                                    $lang = Language::where("language","en")->where("des_id",$pieces[$i])->first();
+                                                                }
+                                                                $des_1 = $des_1.$lang->de_name.'--';
                                                             }
                                                             else
                                                             {
-                                                                $lang = Language::where("language","en")->where("des_id",$pieces[$i])->first();
+                                                                $des_1 = $des_1.$checkPlace->de_name.'--';
                                                             }
-                                                            $des_1 = $des_1.$lang->de_name.'--';
                                                         }
-                                                        else
-                                                        {
-                                                            $des_1 = $des_1.$checkPlace->de_name.'--';
-                                                        }
-                                                    }
-                                                 ?>
-                                                 <!-- <i class="fas fa-street-view point"></i> -->
-                                                <p style="font-family: auto" class="lead text-center tour" data-id="{{$value->to_id}}">
-                                                    <span style="font-style: italic;font-weight: bold;">{{$value->to_name}}: </span>{{$des_1}} - 
-                                                    Start day: {{date('d/m/Y', strtotime($value->to_startDay))}}
-                                                </p>
-                                            @endforeach
-                                        @else
-                                        <p class="lead text-center">
-                                            {{ trans('messages.notTrips') }}
+                                                     ?>
+                                                     <!-- <i class="fas fa-street-view point"></i> -->
+                                                    <p style="font-family: auto" class="lead text-center tour" data-id="{{$value->to_id}}">
+                                                        <span style="font-style: italic;font-weight: bold;">{{$value->to_name}}: </span>{{$des_1}} - 
+                                                        Start day: {{date('d/m/Y', strtotime($value->to_startDay))}}
+                                                    </p>
+                                                @endforeach
+                                            @else
+                                            <p class="lead text-center">
+                                                {{ trans('messages.notTrips') }}
+                                            </p>
+                                            @endif
                                         </p>
-                                        @endif
-                                    </p>
+                                    </div>
                                     <button class="btn btn-primary" data-dismiss="modal">
                                         <i class="fas fa-times fa-fw"></i>
                                         {{ trans('messages.CloseWindow') }}
@@ -570,7 +592,7 @@
                                     @endif
                                     <!-- de_duration -->
                                     @if($value->de_duration != "")
-                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Averagetraveltime') }}:</span> {{floatval($value->de_duration)/60/60}} {{ trans('messages.minutes') }}</p>
+                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Averagetraveltime') }}:</span> {{floatval($value->de_duration)/60/60}} {{ trans('messages.hours') }}</p>
                                     @else
                                         <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Averagetraveltime') }}:</span> {{ trans('messages.NoInformation') }}</p>
                                     @endif
@@ -708,18 +730,23 @@
         <script src="{{asset('js/Scripts/slick.min.js')}}"></script> -->
         <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
         <script type="text/javascript">
+            //chạy đến div tour -> đang lỗi
+            @if(isset($replace))
+                let url = window.location.href.toString();
+                if(url.indexOf("introduce") == "-1")
+                {
+                    location.replace(window.location.href+"#introduce");
+                }
+            @endif
             $(document).ready(function(){
                 @foreach($shareTour as $value)
                     $(".img_open_model{{$value->sh_id}}").click(function(){
                         $("#modal_{{$value->sh_id}}").modal("show");
                     });
+                    $(".img_open_model{{$value->sh_id}}").parent().click(function(){
+                        $("#modal_{{$value->sh_id}}").modal("show");
+                    });
                 @endforeach
-                $(".hightly_div_child").hover(function(){
-                    $(this).css("box-shadow","0px 1px 20px 11px white");
-                }); 
-                $(".hightly_div_child").mouseleave(function(){
-                    $(this).css("box-shadow","none");
-                }); 
                 $("#comback_admin").click(function(){
                     location.replace("{{route('admin.generalInfor')}}");
                 });
