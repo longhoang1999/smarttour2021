@@ -5,6 +5,7 @@
 @stop
 @section('header_styles')
 	<link rel="stylesheet" href="{{asset('css/adminDashboard.css')}}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" />
   <style>
     .box2 a {
         color: white;
@@ -19,7 +20,6 @@
         font-weight: bold;
     }
   </style>
-  
 @stop
 @section('content')
   @if ($message = Session::get('status'))
@@ -40,6 +40,17 @@
                 <option hidden="">--Your choice--</option>
                 <option selected="" value="en">English</option>
                 <option value="vn">Tiếng việt</option>
+              </select>
+            </div>
+            <div style="display: flex; margin-top: 1.5rem">
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Type of place</span> 
+              <select id="selectType" class="form-control" style="width: 40%">
+                <option value="All">--All--</option>
+                <option value="0">Scenic spots</option>
+                <option value="1">Restaurant</option>
+                <option value="2">Hotel</option>
+                <option value="3">Schools</option>
+                <option value="4">--Other</option>
               </select>
             </div>
             <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
@@ -77,6 +88,11 @@
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-right pb-3" id="placeName"></p>
+            </div>
+            <div class="col-md-3 col-sm-6 col-6">
+              <p class="font-weight-bold text-left pb-3">Type of place</p>
+            </div>
+            <div class="col-md-9 col-sm-6 col-6 text-right" id="placeType">
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Image') }}</p>
@@ -161,7 +177,7 @@
 	<!-- datatable -->
   	<script type="text/javascript" src="{{ asset('datatables/js/jquery.dataTables.js') }}" ></script>
   	<script type="text/javascript" src="{{ asset('datatables/js/dataTables.bootstrap4.js') }}" ></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.js"></script>
     <script>
     $(function() {
         var table = $('#Table_AllClass').DataTable({
@@ -198,6 +214,7 @@
             });
             $("#selectLang").change(function(){
               let $url_path = '{!! url('/') !!}';
+              $("#selectType").val("All");
               if($("#selectLang").val() == "en")
               {
                 var routeEN = $url_path+"/showDestinationRemove";
@@ -207,6 +224,31 @@
               {
                 var routeVN = $url_path+"/showDestinationRemoveVN";
                 table.ajax.url( routeVN ).load();
+              }
+            });
+
+            //choose type place
+            $("#selectType").change(function(){
+              let $url_path = '{!! url('/') !!}';
+              let type = $("#selectType").val();
+              let takeLang = $("#selectLang").val();
+              if(type == "All")
+              {
+                if($("#selectLang").val() == "en")
+                {
+                  var routeEN = $url_path+"/showDestinationRemove";
+                  table.ajax.url( routeEN ).load();
+                }
+                else if($("#selectLang").val() == "vn")
+                {
+                  var routeVN = $url_path+"/showDestinationRemoveVN";
+                  table.ajax.url( routeVN ).load();
+                }
+              }
+              else
+              {
+                var routeType = $url_path+"/showDestinationRemoveType/"+type+"/"+takeLang;
+                table.ajax.url( routeType ).load();
               }
             });
         });
@@ -247,6 +289,17 @@
                   {
                     $("#placeImage").append('<a data-fancybox="gallery" href="'+data[8]+'"><img class="img-fluid rounded mb-5" style="width:100%;" src="'+data[8]+'" alt=""></a>');
                   }
+                  $("#placeType").empty();
+                  if(data[9] == "0")
+                    $("#placeType").append('<span class="badge badge-success">Scenic spots</span>');
+                  else if(data[9] == "1")
+                    $("#placeType").append('<span class="badge badge-success">Restaurant</span>');
+                  else if(data[9] == "2")
+                    $("#placeType").append('<span class="badge badge-success">Hotel</span>');
+                  else if(data[9] == "3")
+                    $("#placeType").append('<span class="badge badge-success">Schools</span>');
+                  else if(data[9] == "4")
+                    $("#placeType").append('<span class="badge badge-success">--Other</span>');
                 }
              }
         });

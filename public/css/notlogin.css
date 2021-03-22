@@ -58,14 +58,11 @@ form .txt_field{
     border: none;
     font-size: 18px;
     font-family: auto;
-    background: rgb(78,73,157);
-    background: linear-gradient(
-90deg
-, rgba(78,73,157,0.8715861344537815) 0%, rgba(85,85,224,0.6727065826330532) 35%, rgba(135,202,255,1) 72%, rgb(0 165 199) 100%);
+    background: #304dc6;
+
 }
 .div_submit input[type="submit"]:hover{
-    background: rgb(63,59,124);
-background: linear-gradient(90deg, rgba(63,59,124,1) 0%, rgba(62,62,181,1) 35%, rgba(102,36,145,1) 72%, rgba(15,31,171,1) 100%);
+    background: #5576ff;
 }
 .div_submit input[type="button"] {
     margin-right: 1rem;
@@ -75,12 +72,11 @@ background: linear-gradient(90deg, rgba(63,59,124,1) 0%, rgba(62,62,181,1) 35%, 
     border: none;
     font-size: 18px;
     font-family: auto;
-    background: rgb(186,147,88);
-background: linear-gradient(90deg, rgba(186,147,88,1) 0%, rgba(219,184,74,1) 35%, rgba(209,147,52,1) 72%, rgba(232,201,20,1) 100%);
+    background: #304dc6;
+
 }
 .div_submit input[type="button"]:hover{
-    background: rgb(124,98,59);
-background: linear-gradient(90deg, rgba(124,98,59,1) 0%, rgba(181,152,62,1) 35%, rgba(145,102,36,1) 72%, rgba(171,148,15,1) 100%);
+    background: #5576ff;
 }
 .loginForm .pass{
     cursor: pointer;
@@ -116,4 +112,9 @@ background: linear-gradient(90deg, rgba(124,98,59,1) 0%, rgba(181,152,62,1) 35%,
 }
 #btn_senKey,#formCheckKey{
     display: none;
+}
+.div_submit input{width: 10rem;}
+.div_btn_register{
+    width: 96%;
+    text-align: right;
 }

@@ -6,42 +6,7 @@
 @section('header_styles')
 	<link rel="stylesheet" href="{{asset('css/adminDashboard.css')}}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" />
-  <style>
-    .box2 a {
-        color: white;
-    }
-    .user_content{display: block;}
-    .user_content .editPlace{background: #eaecf4;}
-    #link,#link_edit{overflow-x: auto;}
-    textarea{
-        min-height: 8rem;
-    }
-    #link, #link_vr {
-        color: blue;
-        text-decoration: underline;
-        font-style: italic;
-        font-weight: bold;
-    }
-    .btn_upload_edit {
-        background: rgb(78,68,230);
-        background: linear-gradient(
-    90deg
-    , rgb(130 125 214) 0%, rgb(17 101 155) 26%, rgb(147 147 223) 66%, rgba(0,212,255,1) 100%);
-        color: white;
-        font-weight: bold;
-        text-align: center;
-        padding: .5rem .2rem;
-        width: 20%;
-        cursor: pointer;
-        border-radius: 1.3em;
-        float: right;
-    }
-    .btn_upload_edit:hover{
-      background: rgb(73,211,255);
-      background: linear-gradient(90deg, rgba(73,211,255,1) 0%, rgba(60,74,218,1) 26%, rgba(153,138,235,1) 66%, rgba(0,168,255,1) 100%);
-    }
-  </style>
-  
+  <link rel="stylesheet" href="{{asset('css/editPlace.css')}}">
 @stop
 @section('content')
   @if ($message = Session::get('status'))
@@ -62,6 +27,17 @@
                 <option hidden="">--Your choice--</option>
                 <option selected="" value="en">English</option>
                 <option value="vn">Tiếng việt</option>
+              </select>
+            </div>
+            <div style="display: flex; margin-top: 1.5rem">
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Type of place</span> 
+              <select id="selectType" class="form-control" style="width: 40%">
+                <option value="All">--All--</option>
+                <option value="0">Scenic spots</option>
+                <option value="1">Restaurant</option>
+                <option value="2">Hotel</option>
+                <option value="3">Schools</option>
+                <option value="4">--Other</option>
               </select>
             </div>
             <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
@@ -99,6 +75,11 @@
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-right pb-3" id="placeName"></p>
+            </div>
+            <div class="col-md-3 col-sm-6 col-6">
+              <p class="font-weight-bold text-left pb-3">Type of place</p>
+            </div>
+            <div class="col-md-9 col-sm-6 col-6 text-right" id="placeType">
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Image') }}</p>
@@ -178,6 +159,19 @@
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <input type="text" class="form-control mb-3" id="placeName_edit" name="placeName" placeholder="{{ trans('admin.NamePlace') }}">
+            </div>
+
+            <div class="col-md-3 col-sm-6 col-6 mb-3">
+              <p class="font-weight-bold text-left mb-3">Type of place</p>
+            </div>
+            <div class="col-md-9 col-sm-6 col-6 mb-3">
+                <select id="selectType_edit" class="form-control" style="width: 40%" name="type">
+                  <option value="0">Scenic spots</option>
+                  <option value="1">Restaurant</option>
+                  <option value="2">Hotel</option>
+                  <option value="3">Schools</option>
+                  <option value="4">--Other</option>
+                </select>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left mb-2">Image</p>
@@ -332,6 +326,7 @@
             });
             $("#selectLang").change(function(){
               let $url_path = '{!! url('/') !!}';
+              $("#selectType").val("All");
               if($("#selectLang").val() == "en")
               {
                 var routeEN = $url_path+"/showDestinationEdit";
@@ -341,6 +336,30 @@
               {
                 var routeVN = $url_path+"/showDestinationEditVN";
                 table.ajax.url( routeVN ).load();
+              }
+            });
+            //choose type place
+            $("#selectType").change(function(){
+              let $url_path = '{!! url('/') !!}';
+              let type = $("#selectType").val();
+              let takeLang = $("#selectLang").val();
+              if(type == "All")
+              {
+                if($("#selectLang").val() == "en")
+                {
+                  var routeEN = $url_path+"/showDestinationEdit";
+                  table.ajax.url( routeEN ).load();
+                }
+                else if($("#selectLang").val() == "vn")
+                {
+                  var routeVN = $url_path+"/showDestinationEditVN";
+                  table.ajax.url( routeVN ).load();
+                }
+              }
+              else
+              {
+                var routeType = $url_path+"/showDestinationEditType/"+type+"/"+takeLang;
+                table.ajax.url( routeType ).load();
               }
             });
         });
@@ -381,6 +400,17 @@
                   {
                     $("#placeImage").append('<a data-fancybox="gallery" href="'+data[8]+'"><img class="img-fluid rounded mb-5" style="width:100%;" src="'+data[8]+'" alt=""></a>');
                   }
+                  $("#placeType").empty();
+                  if(data[9] == "0")
+                    $("#placeType").append('<span class="badge badge-success">Scenic spots</span>');
+                  else if(data[9] == "1")
+                    $("#placeType").append('<span class="badge badge-success">Restaurant</span>');
+                  else if(data[9] == "2")
+                    $("#placeType").append('<span class="badge badge-success">Hotel</span>');
+                  else if(data[9] == "3")
+                    $("#placeType").append('<span class="badge badge-success">Schools</span>');
+                  else if(data[9] == "4")
+                    $("#placeType").append('<span class="badge badge-success">--Other</span>');
                 }
              }
         });
@@ -420,6 +450,7 @@
                     $("#div_edit_img").append('<div onclick="MyOnclick()" class="btn_upload_edit mb-3">Update Image</div>')
                   }
                   $(".file_Name").html("");
+                  $("#selectType_edit").val(data[9]);
                 }
              }
         });

@@ -45,15 +45,9 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#portfolio">{{ trans('messages.StartTour') }}</a></li>
-                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#introduce">{{ trans('messages.Introduce') }}</a></li>
+                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#introduce">Tour</a></li>
                         <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#place">{{ trans('messages.Places') }}</a></li>
-                        <li class="nav-item mx-0 mx-lg-1" id="li_more">
-                            <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#">{{ trans('messages.More') }} <i class="fas fa-sort-down"></i></a>
-                            <div id="div_more">
-                                <a class="nav-link py-3 px-0 px-lg-3  js-scroll-trigger" href="#about" id="p_about">{{ trans('messages.About') }}</a>
-                                <a class="nav-link py-3 px-0 px-lg-3  js-scroll-trigger" href="#contact" id="p_feedback">{{ trans('messages.Feedback') }}</a>
-                            </div>
-                        </li>
+                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#about">{{ trans('messages.About') }}</a></li>
                         <li class="nav-item mx-0 mx-lg-1">
                             <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" id="titleLogin" href="#">{{ trans('messages.Login') }}</a>
                         </li>
@@ -62,7 +56,7 @@
             </div>
         </nav>
         <!-- Masthead-->
-        <header class="masthead bg-primary text-white text-center">
+        <header class="masthead bg-primary text-white text-center" >
             <div class="slider autoplay" role="toolbar">
                 <div style="background: url('{{asset('imgs/2.jpg')}}');background-size: cover;background-repeat: no-repeat;"></div>
                 <div style="background: url('{{asset('imgs/1.jpg')}}');background-size: cover;background-repeat: no-repeat;"></div>
@@ -73,7 +67,7 @@
             </div>
             <div class="container d-flex align-items-center flex-column" id="div_Logo">
                 <div>
-                    <h1 class="masthead-heading text-uppercase mb-0" style="text-shadow: 0 0 12px gray;">Tour Advice</h1>
+                    <h1 class="masthead-heading text-uppercase mb-0" style="text-shadow: 20px 5px 20px black">Tour Advice</h1>
                     <!-- Icon Divider-->
                     <div class="divider-custom divider-light">
                         <div class="divider-custom-line"></div>
@@ -81,7 +75,7 @@
                         <div class="divider-custom-line"></div>
                     </div>
                     <!-- Masthead Subheading-->
-                    <p class="masthead-subheading font-weight-light mb-0">{{ trans('messages.GiveTheBestAdvice') }}</p>
+                    <p class="masthead-subheading font-weight-light mb-0">Give The Best Advice</p>
                 </div>
             </div>
         </header>
@@ -99,7 +93,7 @@
                 <!-- Portfolio Grid Items-->
                 <div class="row justify-content-center">
                     <!-- Portfolio Item 1-->
-                    <div class="col-md-6 col-lg-4 mb-5">
+                    <div class="col-md-6 col-lg-6 mb-5">
                         <div class="portfolio-item mx-auto" id="StarttourNow">
                             <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
                                 <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
@@ -108,7 +102,7 @@
                         </div>
                     </div>
                     <!-- Portfolio Item 2-->
-                    <div class="col-md-6 col-lg-4 mb-5">
+                    <div class="col-md-6 col-lg-6 mb-5">
                         <div class="portfolio-item mx-auto" data-toggle="modal" data-target="#modalLogin">
                             <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
                                 <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
@@ -123,7 +117,7 @@
         <section class="page-section bg-primary text-white mb-0" id="introduce">
             <div class="container">
                 <!-- About Section Heading-->
-                <h2 class="page-section-heading text-center text-uppercase text-white">{{ trans('messages.Introduce') }}</h2>
+                <h2 class="page-section-heading text-center text-uppercase text-white">highly rated tours</h2>
                 <!-- Icon Divider-->
                 <div class="divider-custom divider-light">
                     <div class="divider-custom-line"></div>
@@ -131,11 +125,6 @@
                     <div class="divider-custom-line"></div>
                 </div>
                 <!-- About Section Content-->
-                <div class="row">
-                    <div class="col-lg-12 ml-auto"><p class="lead text-center">{{ trans('messages.introduceContent') }}</p>
-                    <h3 class="font-weight-bold text-center text-uppercase" style="margin: 3rem 0;">--- highly rated tours ---</h3>
-                    </div>
-                </div>
                 <?php use App\Models\Route; ?>
                 <div class="row justify-content-center">
                     @foreach($shareTour as $value)
@@ -154,7 +143,11 @@
                     @endforeach
                     <div class="col-md-12 col-sm-12 col-12" id="div_loadMore">
                         <?php $type="notlogin" ?>
-                        <a href="{{route('share.loadmore',$type)}}" id="loadMoreTour">--- See more <i class="fas fa-angle-double-right pt-2"></i> ---</a>
+                        <a href="{{route('searchTour')}}" id="loadMoreTour">--- See more <i class="fas fa-angle-double-right pt-2"></i> ---</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 ml-auto"><p class="lead text-center">{{ trans('messages.introduceContent') }}</p>
                     </div>
                 </div>
             </div>
@@ -327,12 +320,14 @@
                             <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
                                 <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
                             </div>
-                            <p class="lead">{{$value->de_name}}</p>
-                            @if($value->de_image != "")
-                            <img class="img-fluid" src="{{asset($value->de_image)}}" alt="" title="location with no photo" />
-                            @else
-                            <img class="img-fluid" src="{{asset('imgPlace/empty.png')}}" alt="" title="location with no photo" />
-                            @endif
+                            <p class="lead font-weight-bold font-italic">{{$value->de_name}}</p>
+                            <div class="imgInsite">
+                                @if($value->de_image != "")
+                                <img class="img-fluid" src="{{asset($value->de_image)}}" alt="" title="location with no photo" />
+                                @else
+                                <img class="img-fluid" src="{{asset('imgPlace/empty.png')}}" alt="" title="location with no photo" />
+                                @endif
+                            </div>
                         </div>
                     </div>
                     <?php $i++; ?>
@@ -362,54 +357,7 @@
                 </div>
             </div>
         </section>
-        <!-- Contact Section-->
-        <section class="page-section" id="contact">
-            <div class="container">
-                <!-- Contact Section Heading-->
-                <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">
-                {{ trans('messages.Feedback') }}</h2>
-                <!-- Icon Divider-->
-                <div class="divider-custom">
-                    <div class="divider-custom-line"></div>
-                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                    <div class="divider-custom-line"></div>
-                </div>
-                <!-- Contact Section Form-->
-                <div class="row">
-                    <div class="col-lg-8 mx-auto">
-                        <!-- To configure the contact form email address, go to mail/contact_me.php and update the email address in the PHP file on line 19.-->
-                        <form name="sentMessage" method="post" id="formFeedback">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                            <div class="control-group">
-                                <div class="form-group floating-label-form-group controls mb-0 pb-2">
-                                    <label>{{ trans('messages.Star') }}</label>
-                                    <input class="form-control" id="name" type="number" placeholder="{{ trans('messages.Star') }}" required="required" data-validation-required-message="Please enter your star" min=0 max=5 name="star"/>
-                                    <p class="help-block text-danger"></p>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <div class="form-group floating-label-form-group controls mb-0 pb-2">
-                                    <label>{{ trans('messages.Feedback') }}</label>
-                                    <textarea class="form-control" placeholder="{{ trans('messages.Feedback') }}" required="required" data-validation-required-message="Please enter your feedback." name="feedback"></textarea>
-                                    <p class="help-block text-danger"></p>
-                                </div>
-                            </div>
-                            <br />
-                            <div id="success"></div>
-                            <div class="form-group">
-                                <button class="btn btn-primary btn-xl" type="submit">{{ trans('messages.sendFeedback') }}</button>
-                            </div>
-                        </form>
-                        @if ($message = Session::get('notification'))
-                            <div class="alert alert-danger alert-block">
-                                <button type="button" class="close" data-dismiss="alert">x</button>
-                                <strong>{{$message}}</strong>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </section>
+        
         <!-- Footer-->
         <footer class="footer text-center">
             <div class="container">
@@ -515,10 +463,6 @@
                                         </div>
                                     </form>
                                     <!-- Form login -->
-                                    <button class="btn btn-primary" data-dismiss="modal">
-                                        <i class="fas fa-times fa-fw"></i>
-                                        {{ trans('messages.CloseWindow') }}
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -658,9 +602,10 @@
                     </div>
                 </div>
                 <hr>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('messages.CloseWindow') }}</button>
-                <input type="submit" class="btn btn-primary" value="{{ trans('messages.Registration') }}">
-                <p id="p_backLogin">{{ trans('messages.youHaveAcc') }} <span class="backFormLogin">{{ trans('messages.Login') }}</span></p>
+                <div class="div_btn_register">
+                    <input type="submit" class="btn btn-primary" value="{{ trans('messages.Registration') }}">
+                    <p id="p_backLogin">{{ trans('messages.youHaveAcc') }} <span class="backFormLogin">{{ trans('messages.Login') }}</span></p>
+                </div>
             </form>
           </div>
         </div>
@@ -745,14 +690,6 @@
         <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
         <script type="text/javascript">
             $(document).ready(function(){
-                //chạy đến div tour -> đang lỗi
-                @if(isset($replace))
-                    let url = window.location.href.toString();
-                    if(url.indexOf("introduce") == "-1")
-                    {
-                        location.replace(window.location.href+"#introduce");
-                    }
-                @endif
                 @foreach($shareTour as $value)
                     $(".img_open_model{{$value->sh_id}}").click(function(){
                         $("#modal_{{$value->sh_id}}").modal("show");

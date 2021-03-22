@@ -105,6 +105,16 @@
       #get-route{
         background-color: #4caf50;
         color: white; 
+        height: 90%;
+        margin-top: 3px;
+        width: 48%;
+        color: white;
+        padding: .5rem 1rem;
+        border: 0;
+        cursor: pointer;
+        font-size: 18px;
+        border-radius: 5px;
+        margin-left: 2%;
       }
 
       #your-start{
@@ -314,9 +324,9 @@
 
       #switch-tab{
         height: 50px;
-        position: relative;
+        /*position: relative;*/
       }
-      #switch-tab::before{
+      /*#switch-tab::before{
         top: 10px;
         bottom: 10px;
         position: absolute;
@@ -325,7 +335,7 @@
         background-color: #eeeeee;
         left: 50%;
         margin-left: -1px;
-      }
+      }*/
 
       .tablinks{
         height: 100%;

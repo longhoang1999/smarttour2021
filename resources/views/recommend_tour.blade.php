@@ -59,6 +59,7 @@ function initMap(){
 };
 
 function showMap(){
+  
   // init map and Direction service     
   const map = new google.maps.Map(document.getElementById("map"), {
           zoom: 12.5,
@@ -66,21 +67,43 @@ function showMap(){
         }),
       directionsService = new google.maps.DirectionsService();
 
-    //     directionsRenderer = new google.maps.DirectionsRenderer({
-    //         suppressMarkers: true
-    //     }); 
-    // directionsRenderer.setMap(map);
-  
-  //Click on map to get start location\
-
-  // $('#your-start-close').click(()=>{
-  //   staMarker.setMap(null);
-  //   staMarker = undefined;
-  //   $('.map-marker-label').remove();
-  //   $('#your-start').hide();
-  //   startlocat = undefined;
-  //   updateRoute();
-  // })
+  let timesrt = $("#time").flatpickr({
+        wrap: true,
+        onChange: function(selectedDates, dateStr) {
+          $("#time").val(dateStr);
+          console.log($('#time').val())
+        },
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        defaultDate: "07:00"
+    });
+  $('#time').val("07:00")
+  let datestart = $("#date-start").flatpickr({
+        wrap: true,
+        onChange: function(selectedDates, dateStr) {
+          $("#date-start").val(dateStr);
+        },
+        minDate: "today",
+        defaultDate: "today"
+    });
+  let dateend =  $("#date-end").flatpickr({
+        wrap: true,
+        onChange: function(selectedDates, dateStr) {
+          $("#date-end").val(dateStr);
+        },
+        minDate: "today",
+        defaultDate: "today"
+    });
+  let timeend =  $("#time-end").flatpickr({
+        wrap: true,
+        onChange: function(selectedDates, dateStr) {
+          $("#time-end").val(dateStr);
+        },
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i"
+    });
   
   map.addListener('click',function(evt){
     if(isclick == 1){
@@ -107,19 +130,25 @@ function showMap(){
   }
 
   function geocoderCallBack(response, status){
-
-    // if(clickMarker.length&& clickMarker[clickMarker.length-1])
     clickMarker= new google.maps.Marker({
           label: response[0].formatted_address,
     });
     clickMarker.setMap(map);
     clickMarker.setPosition(response[0].geometry.location);
     newPlaceId = response[0].place_id;
-    // startlocat = response[0].geometry.location.toJSON();
-    if($('#your-start').is(':visible') || $('.list-item').length){
-      $('#set-dur-panel').show();
-      $('#set-dur-panel').val(response[0].place_id);
+
+    // if($('#your-start').is(':visible') || $('.list-item').length){
+    $('#set-dur-panel').show();
+    if(startlocat == undefined){
+      $('#set-dur-input').data('durationPicker').setValue(0);
+      $('#set-dur-panel').val(0);
+    } else {
+      $('#set-dur-input').data('durationPicker').setValue(3600);
+      $('#set-dur-panel').val(3600);
     }
+    
+      // $('#set-dur-panel').val(response[0].place_id);
+    // }
     locationsdata.push({
       de_name: response[0].formatted_address,
       location: response[0].geometry.location.toJSON(),
@@ -128,31 +157,16 @@ function showMap(){
       de_default: 1
     })
     customLabel(clickMarker,response[0].place_id);
-    // document.getElementById('your-start').innerHTML= response[0].formatted_address+
-    // '<span id="your-start-close">×</span>';
-
-    // startinfo = {
-    //   address : response[0].formatted_address,
-    //   location: response[0].geometry.location,
-    //   place_id: response[0].place_id,
-    // }
-
+  
+    //add new location option in select 
     $("#waypoints").append('<option value="'+
           response[0].place_id+'">'+response[0].formatted_address+ '</option>');
-
     $('#waypoints').val(response[0].place_id);
 
-    // $('#your-start-close').click(()=>{
-    //   staMarker.setMap(null);
-    //   staMarker = undefined;
-    //   $('.map-marker-label').remove();
-    //   $('#your-start').hide();
-    //   startlocat = undefined;
-    //   startinfo = {};
-    //   updateRoute();
-    // })
+
   }
 
+  
   
   if(!$('#is-opt').is(':checked')){
     $('#is-opt-sub').hide();
@@ -160,15 +174,15 @@ function showMap(){
   } 
 
 
-  $('#is-opt').click(()=>{
-    if(!$('#is-opt').is(':checked')){
-      $('#is-opt-sub').hide();
-      isopt = 0;
-    } else {
-      $('#is-opt-sub').show();
-      isopt = parseInt($('.dur-dis').filter(":checked").val());
-    }
-  });
+  // $('#is-opt').click(()=>{
+  //   if(!$('#is-opt').is(':checked')){
+  //     $('#is-opt-sub').hide();
+  //     isopt = 0;
+  //   } else {
+  //     $('#is-opt-sub').show();
+  //     isopt = parseInt($('.dur-dis').filter(":checked").val());
+  //   }
+  // });
 
   //Reset all html onclick
   document.querySelectorAll(".reset-all").forEach(ele=>{
@@ -178,6 +192,10 @@ function showMap(){
     //Reset options
     $('.container').empty();
     $('#time').val('07:00');
+    timesrt.setDate("07:00");
+    datestart.setDate("today");
+    timeend.clear();
+    dateend.setDate("today");
     $('#is-back').prop('checked', false);
     $('.dur-dis[value="1"]').prop('checked', true);
 
@@ -220,6 +238,7 @@ function showMap(){
     $('#add-button').show();
     $('#get-route').show();
     $('#your-start').hide();
+    $('#set-dur-panel').hide();
     tablinks = document.getElementsByClassName('tablinks');
     for (i = 0; i < tablinks.length; i++) {
       tablinks[i].className = tablinks[i].className.replace(" active", "");
@@ -268,14 +287,14 @@ function showMap(){
   // }
   //add location button
   $("#add-button").click(()=>{
-    locatsList.forEach(ele=>{
-    })
+    idToData($("#waypoints").find(":selected").val(),"setDur",$('#set-dur-panel').val());
     //Add the start location
     if(startlocat == undefined && !$('.list-item').length &&clickMarker !=undefined){
-      startlocat = $("#waypoints").find(":selected").val(),'LatLng';
+      startlocat = $("#waypoints").find(":selected").val();
       staMarker = clickMarker;
       clickMarker = undefined;
       $('#your-start').show();
+      $('#set-dur-panel').hide(); 
       document.getElementById('your-start').innerHTML= $("#waypoints").find(":selected")[0].innerText+
       '<span id="your-start-close">×</span>';
       $("#waypoints").find(":selected").remove();
@@ -290,14 +309,14 @@ function showMap(){
       return;
     }
 
-    if($('#set-dur-panel').is(':visible')){
-      locationsdata.forEach(ele=>{
-        if(ele.place_id == $('#set-dur-panel').val()){
-          ele.de_duration = isNaN(converttime($('#set-dur-input').val()))?3600:converttime($('#set-dur-input').val());
-          $('#set-dur-panel').hide();
-        }
-      })
-    }
+    // if($('#set-dur-panel').is(':visible')){
+    //   locationsdata.forEach(ele=>{
+    //     if(ele.place_id == $('#set-dur-panel').val()){
+    //       ele.de_duration = isNaN(converttime($('#set-dur-input').val()))?3600:converttime($('#set-dur-input').val());
+    //       $('#set-dur-panel').hide();
+    //     }
+    //   })
+    // }
 
     if($("#waypoints").find(":selected").val() == newPlaceId){
       newClickMarker.push(clickMarker);
@@ -307,7 +326,8 @@ function showMap(){
     }
     locationContainerHeight('add'); 
     updateRoute();
-    $('#get-route').show();  
+    $('#get-route').show();
+    $('#set-dur-panel').hide(); 
     locatsList.push($("#waypoints").find(":selected").val());
     addLoText();
     sortlocats();
@@ -442,22 +462,7 @@ function showMap(){
     });
   }
 
-  function idToData(id,type){
-    if(type == 'text'){
-      for(var i=0; i<locationsdata.length; i++)
-        if (id == locationsdata[i].place_id)
-          return locationsdata[i].de_name;
-    }
-     if(type == 'default'){
-      for(var i=0; i<locationsdata.length; i++)
-        if (id == locationsdata[i].place_id)
-          return locationsdata[i].de_default;
-    }
-    if(type == 'LatLng'){
-      for(var i=0; i<locationsdata.length; i++)
-        if (id == locationsdata[i].place_id)
-          return locationsdata[i].location;
-    }
+  function idToData(id,type,value){
     if(type == 'LatLngArr'){
       locats = [];
       for( var j= 0; j<locatsList.length; j++)
@@ -468,21 +473,42 @@ function showMap(){
       if(startlocat != undefined)  locats.unshift(idToData(startlocat,'LatLng'));
       if($('#is-back').is(':checked')) locats.push(locats[0]);
     }
-    if(type == 'duration'){
-      for(var i=0; i<locationsdata.length; i++)
-        if (id == locationsdata[i].place_id)
-          return locationsdata[i].de_duration;
+
+    for(var i=0; i<locationsdata.length; i++){
+      switch(type){
+        case 'text':
+          if (id == locationsdata[i].place_id)
+            return locationsdata[i].de_name;
+          break;
+        case 'default':
+          if (id == locationsdata[i].place_id)
+            return locationsdata[i].de_default;
+          break;
+        case 'LatLng':
+          if (id == locationsdata[i].place_id)
+            return locationsdata[i].location;
+          break;
+        case 'duration':
+          if (id == locationsdata[i].place_id)
+            return locationsdata[i].de_duration;
+          break;
+        case 'link':
+          if (id == locationsdata[i].place_id)
+            return locationsdata[i].de_link;
+          break;
+        case 'description':
+          if (id == locationsdata[i].place_id)
+            return locationsdata[i].de_description;
+          break;
+        case 'setDur':
+          if (id == locationsdata[i].place_id && locationsdata[i].de_default != undefined){
+            locationsdata[i].de_duration = parseInt(value); 
+          }
+          break;
+        default: break;
+      }
     }
-    if(type == 'link'){
-      for(var i=0; i<locationsdata.length; i++)
-        if (id == locationsdata[i].place_id)
-          return locationsdata[i].de_link;
-    }
-    if(type == 'description'){
-      for(var i=0; i<locationsdata.length; i++)
-        if (id == locationsdata[i].place_id)
-          return locationsdata[i].de_description;
-    }
+    
   }
 
   function processanddrawrouteserver(){
@@ -642,25 +668,14 @@ function showMap(){
   };
 
   function getandsettimeline(response){
-    // $.ajax({
-    //   url: '{{ route("gettimeline") }}?time='+$('#time').val(),
-    //   type: 'get',
-    //   data:{ data:locatsList},
-    //   error: (err)=>{
-    //     alert("An error occured: " + err.status + " " + err.statusText);
-    //   },
-    //   success: (result)=>{
-    //     timeline = [];
-    //     for(var i =0 ;i<result.length;i++){
-    //       timeline.push(converttime(result[i]));
-    //     } 
-    //     settimeline();
-    //   }
-    // });
     timeline = [];
     timeline.push($('#time').val());
+    console.log($('#time').val())
     var tmp = converttime($('#time').val());
-
+    if(startlocat != undefined && idToData(startlocat,"duration")!=0){
+      tmp+=idToData(startlocat,"duration");
+      timeline.push(converttime(tmp));
+    }
     for(var i = 0; i < response.length-1 ; i++){
       if(startlocat == undefined){
         tmp += idToData(locatsList[i],'duration');
@@ -678,7 +693,6 @@ function showMap(){
       tmp += idToData(locatsList[locatsList.length-1],'duration');
       timeline.push(converttime(tmp));
     }
-
     // if($('#time-end').val() != null)
 
     settimeline();
@@ -704,7 +718,7 @@ function showMap(){
     for(var i=0; i<timeline.length;i++)
      icon[i].innerText = timeline[i]; 
     i=0;
-    if(startlocat!= undefined){
+    if(startlocat!= undefined && idToData(startlocat,'duration') == 0){
       i=1;
       title[0].innerText = '{{ trans("messages.YourLo") }}';
       $(title[0]).css('color','#ea4335');
@@ -721,7 +735,31 @@ function showMap(){
         );
         
       }
-    } else{
+    } 
+
+    if(startlocat!= undefined && idToData(startlocat,'duration') != 0){
+      i=2;
+      title[0].innerText = '{{ trans("messages.YourLo") }}';
+      $(title[0]).css('color','#ea4335');
+      $(body[0]).append(
+        '<p> {{ trans("messages.Startthetourat") }} ' +idToData(startlocat,'text')+ ' {{ trans("messages.At") }} '+timeline[0] +' {{ trans("messages.VisIn") }} '+converttime(idToData(startlocat,'duration')) +'</p>'
+      );
+      title[1].innerText = idToData(startlocat,'text');
+      $(title[1]).css('color','red');
+      $(body[1]).append('<p>{{ trans("messages.CplVis") }} '+idToData(startlocat,'text')+' {{ trans("messages.At") }} '+timeline[1]+' {{ trans("messages.GoNxt") }}</p>');
+      if($('#is-back').is(':checked')){
+        title[timeline.length-1 ].innerText = '{{ trans("messages.YourLo") }}';
+        $(body[timeline.length-1]).append(
+        '<p>{{ trans("messages.CmBck") }} '+idToData(startlocat,'text')+'</p>');
+      } else {
+        $(body[timeline.length-1]).append(
+        '<p> {{ trans("messages.Finish") }} '+ idToData(locatsList[locatsList.length-1],'text') +' {{ trans("messages.At") }} '+timeline[timeline.length-1]+'</p>'
+        );
+        
+      }
+    }
+
+    if(startlocat == undefined){
       $(body[0]).append(
         '<p> {{ trans("messages.Startthetourat") }} '+idToData(locatsList[0],'text')+' {{ trans("messages.At") }} '+timeline[0] +' {{ trans("messages.VisIn") }} '+converttime(idToData(locatsList[0],'duration'))+
         '</p><br><p>'+idToData(locatsList[0],'description')+'</p><p><a href="'+idToData(locatsList[0],'link')+'"target="_blank">View the location</a></p><div class="show-more">{{ trans("messages.Showmore") }} <i class="fa fa-chevron-down" aria-hidden="true"></i></div>'
@@ -745,7 +783,6 @@ function showMap(){
     for(; i<timeline.length;i+=2){
       if(i+1<timeline.length){
         title[i].innerText = idToData(locatsList[j],'text');
-      // title[i+1].innerText = idToData(locatsList[j],'text');
         title[i+1].innerText = '{{ trans("messages.TralTo") }}';
         $(title[i+1]).css('color','red');
       }
@@ -1682,10 +1719,6 @@ function showMap(){
                                         </div>
                                     </form>
                                     <!-- Form login -->
-                                    <button class="btn btn-primary" data-dismiss="modal">
-                                        <i class="fas fa-times fa-fw"></i>
-                                        {{ trans('messages.CloseWindow') }}
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1913,7 +1946,6 @@ function showMap(){
                 </div>
               </div>
               <button id="add-button">{{ trans('messages.Addlocation') }}</button>
-              <button id="get-route">{{ trans('messages.findWay') }}</button>
               <!-- <button id="get-route" style="display: none;">Update</button> -->
             </div>
             <div id="your-start" style="display: none;"> 
@@ -1923,34 +1955,61 @@ function showMap(){
             </div>
             <div id='container-height'></div>
         </div>
-        <div id='set-dur-panel' class="control-panel" style="height: 75px; display: none;">
-          <b>How long do you want to stay?</b>
+        <div id='set-dur-panel' class="control-panel" value="" style="height: 130px; display: none;">
+          <b>How long would you like to stay in this place?</b>
           <div>
-            <input id='set-dur-input'></input>
+            <input id='set-dur-input' class="form-control" type="text"></input>
             <!-- <button id='set-dur-button' style="width: 20px; height: 20px;" ></button> -->
           </div>
             
-        </div>
-        <div id="switch-tab" class="control-panel">
-          <button class="tablinks" onclick=""  id="saveTour">{{ trans('messages.SaveTour') }}</button>
-          <button class="tablinks reset-all"  onclick="">{{ trans('messages.Reset') }}</button>
         </div>
         <div id="options-control" class="control-panel">
           <div id="options-control-title"><b>{{ trans('messages.Selecttouroptions') }}</b></div>
           <div class="options-list options-list1">
             <div><b>{{ trans('messages.Selectthestarttime') }}:</b></div>
-            <input type="time" id="time" value="07:00" style="width: 100%;">
+            <!-- <input type="date" style="width: 100%; margin-bottom: 0.5rem" >
+            <div>
+              <input type="time" id="time" value="07:00" style="width: 80%">
+            </div> -->
+            <div id="date-start" value="" style="margin-bottom: 0.5rem;display: flex;">
+              <input type="text" placeholder="Select Date.." data-input style="width: 100%">  
+              <a class="input-button" title="clear" data-clear style="border: 1px solid #bbb;display: inline-block;padding: 1px 10px;cursor: pointer;margin-left: 0.2rem">
+                  <i class="fas fa-times"></i>
+              </a>
+            </div>
+            <div id="time" value="07:00" style="margin-bottom: 0.5rem;display: flex;">
+              <input type="text" placeholder="Select Time.." data-input style="width: 100%">  
+              <a class="input-button" title="clear" data-clear style="border: 1px solid #bbb;display: inline-block;padding: 1px 10px;cursor: pointer;margin-left: 0.2rem">
+                  <i class="fas fa-times"></i>
+              </a>
+            </div>
           </div>
           <div class="options-list">
             <div><b>{{ trans('messages.Selecttheendtime') }}:</b></div>
-            <input type="time" id="time-end" value="" style="width: 100%;">
+            <div id="date-end" value="" style="margin-bottom: 0.5rem;display: flex;">
+              <input type="text" placeholder="Select Date.." data-input style="width: 100%">  
+              <a class="input-button" title="clear" data-clear style="border: 1px solid #bbb;display: inline-block;padding: 1px 10px;cursor: pointer;margin-left: 0.2rem">
+                  <i class="fas fa-times"></i>
+              </a>
+            </div>
+            <div id="time-end" value="" style="margin-bottom: 0.5rem;display: flex;">
+              <input type="text" placeholder="Select Time.." data-input style="width: 100%">  
+              <a class="input-button" title="clear" data-clear style="border: 1px solid #bbb;display: inline-block;padding: 1px 10px;cursor: pointer;margin-left: 0.2rem">
+                  <i class="fas fa-times"></i>
+              </a>
+            </div>
+            <!-- <div>
+              <input type="time" id="time-end" value="" style="width: auto;">
+              <i class="fas fa-times" style="width: auto;"></i>
+            </div> -->
+            
           </div>
           <div class="options-list">
             <input type="checkbox" id='is-back'> <b>{{ trans('messages.Comebackthestart') }}</b>
           </div>
           <div class="options-list">
             <div><input type="checkbox" id='is-opt' checked><b> {{ trans('messages.Optimized') }}</b></div>
-            <div id="is-opt-sub">
+            <div id="is-opt-sub" style="display: none;">
               <input type="radio" class="dur-dis" name="durdis" value="1" checked> {{ trans('messages.Duration') }}   
               <input type="radio" class="dur-dis" name="durdis" value="2"> {{ trans('messages.Cost') }}
             </div>
@@ -1962,6 +2021,15 @@ function showMap(){
           <button class="slider-button slider-button-right" onclick="plusDivs(1)">
             &#10095;
           </button> -->
+        </div>
+        <!-- <div id="switch-tab" class="control-panel">
+          <button class="tablinks" onclick=""  id="saveTour">{{ trans('messages.SaveTour') }}</button>
+          <button class="tablinks reset-all"  onclick="">{{ trans('messages.Reset') }}</button>
+        </div> -->
+        <div id="switch-tab" class="control-panel">
+          <button id="get-route">{{ trans('messages.findWay') }}</button>
+          <button class="tablinks" onclick=""  id="saveTour">{{ trans('messages.SaveTour') }}</button>
+          <!-- <button class="tablinks reset-all"  onclick="">{{ trans('messages.Reset') }}</button> -->
         </div>
       </div>
     </div>
@@ -2245,8 +2313,10 @@ function showMap(){
     <script type="text/javascript" src="{{asset('vendor/bootstrap/js/bootstrap.min.js')}}"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+    <script src="{{ asset('js/bootstrap-duration-picker.js')}}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-duration-picker.css')}}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 
 
@@ -2274,7 +2344,6 @@ function showMap(){
       $(".name_file_tour").show();
     });
     
-    $('#set-dur-input').timepicker({ 'timeFormat': 'HH:mm' });
      $('select').select2();
     $("#comback_admin").click(function(){
         location.replace("{{route('admin.generalInfor')}}");
@@ -2293,8 +2362,11 @@ function showMap(){
       });
     @endif
     
-    
-    
+    $('#set-dur-input').durationPicker({
+      onChanged: function (value, isInitializing) {
+        $('#set-dur-panel').val(value);
+    }
+    }); 
     
     $(".menu_title_start").click(function(){
       location.reload();

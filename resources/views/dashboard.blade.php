@@ -107,7 +107,7 @@
                 <!-- Portfolio Grid Items-->
                 <div class="row justify-content-center">
                     <!-- Portfolio Item 1-->
-                    <div class="col-md-6 col-lg-4 mb-5">
+                    <div class="col-md-6 col-lg-6 mb-5">
                         <div class="portfolio-item mx-auto" id="StarttourNow">
                             <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
                                 <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
@@ -116,7 +116,7 @@
                         </div>
                     </div>
                     <!-- Portfolio Item 2-->
-                    <div class="col-md-6 col-lg-4 mb-5">
+                    <div class="col-md-6 col-lg-6 mb-5">
                         <div class="portfolio-item mx-auto" data-toggle="modal" data-target="#portfolioModal2">
                             <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
                                 <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
@@ -131,7 +131,7 @@
         <section class="page-section bg-primary text-white mb-0" id="introduce">
             <div class="container">
                 <!-- About Section Heading-->
-                <h2 class="page-section-heading text-center text-uppercase text-white">{{ trans('messages.Introduce') }}</h2>
+                <h2 class="page-section-heading text-center text-uppercase text-white">highly rated tours</h2>
                 <!-- Icon Divider-->
                 <div class="divider-custom divider-light">
                     <div class="divider-custom-line"></div>
@@ -139,11 +139,6 @@
                     <div class="divider-custom-line"></div>
                 </div>
                 <!-- About Section Content-->
-                <div class="row">
-                    <div class="col-lg-12 ml-auto"><p class="lead text-center">{{ trans('messages.introduceContent') }}</p>
-                    <h3 class="font-weight-bold text-center text-uppercase" style="margin: 3rem 0;">--- highly rated tours ---</h3>
-                    </div>
-                </div>      
                 <?php use App\Models\Route; ?>
                 <div class="row justify-content-center">
                     @foreach($shareTour as $value)
@@ -161,8 +156,12 @@
                         </div>
                     @endforeach
                     <div class="col-md-12 col-sm-12 col-12" id="div_loadMore">
-                        <?php $type="login"; ?>
-                        <a href="{{route('share.loadmore',$type)}}" id="loadMoreTour">--- See more <i class="fas fa-angle-double-right pt-2"></i> ---</a>
+                        <?php $type="notlogin" ?>
+                        <a href="{{route('searchTour')}}" id="loadMoreTour">--- See more <i class="fas fa-angle-double-right pt-2"></i> ---</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 ml-auto"><p class="lead text-center">{{ trans('messages.introduceContent') }}</p>
                     </div>
                 </div>
             </div>
@@ -730,14 +729,6 @@
         <script src="{{asset('js/Scripts/slick.min.js')}}"></script> -->
         <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
         <script type="text/javascript">
-            //chạy đến div tour -> đang lỗi
-            @if(isset($replace))
-                let url = window.location.href.toString();
-                if(url.indexOf("introduce") == "-1")
-                {
-                    location.replace(window.location.href+"#introduce");
-                }
-            @endif
             $(document).ready(function(){
                 @foreach($shareTour as $value)
                     $(".img_open_model{{$value->sh_id}}").click(function(){

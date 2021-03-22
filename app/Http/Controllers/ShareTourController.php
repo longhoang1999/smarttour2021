@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
@@ -18,6 +19,7 @@ use Session;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+
 
 
 class ShareTourController extends Controller
@@ -111,71 +113,71 @@ class ShareTourController extends Controller
 	    }
 	    return [$de_lat,$de_lng,$de_name,$image,$short,$description,$checkDes->de_duration,$checkDes->de_map,$checkDes->de_link];
     }
-    public function loadmore($type)
-    {
-	    if($type == "login")
-	    {
-	        if(Session::has('website_language') && Session::get('website_language') == "vi")
-	        {
-	            $user = Auth::user();
-	            $route = Route::where('to_id_user',$user->us_id)->get();
-	            session()->put('route',$route);
-	            $lang = Language::where("language","vn")->get();
-	            foreach ($lang as $value) {
-	                $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
-	                $value["de_image"] = $des->de_image;
-	                $value["de_duration"] = $des->de_duration;
-	                $value["de_link"] = $des->de_link;
-	                $value["de_map"] = $des->de_map;
-	            }
-	            $shareTour = ShareTour::inRandomOrder()->limit(9)->get();
-	        }
-	        else
-	        {
-	            $user = Auth::user();
-	            $route = Route::where('to_id_user',$user->us_id)->get();
-	            session()->put('route',$route);
-	            $lang = Language::where("language","en")->get();
-	            foreach ($lang as $value) {
-	                $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
-	                $value["de_image"] = $des->de_image;
-	                $value["de_duration"] = $des->de_duration;
-	                $value["de_link"] = $des->de_link;
-	                $value["de_map"] = $des->de_map;
-	            }
-	            $shareTour = ShareTour::inRandomOrder()->limit(9)->get();
-	        }
-        	return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang,'shareTour'=>$shareTour,'replace'=>'replace']);
-        }
-       	else if($type == "notlogin")
-       	{
-       		if(Session::has('website_language') && Session::get('website_language') == "vi")
-       		{
-       			$lang = Language::where("language","vn")->get();
-	            foreach ($lang as $value) {
-	                $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
-	                $value["de_image"] = $des->de_image;
-	                $value["de_duration"] = $des->de_duration;
-	                $value["de_link"] = $des->de_link;
-	                $value["de_map"] = $des->de_map;
-	            }
-	            $shareTour = ShareTour::inRandomOrder()->limit(9)->get();
-       		}
-       		else
-       		{
-       			$lang = Language::where("language","en")->get();
-	            foreach ($lang as $value) {
-	                $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
-	                $value["de_image"] = $des->de_image;
-	                $value["de_duration"] = $des->de_duration;
-	                $value["de_link"] = $des->de_link;
-	                $value["de_map"] = $des->de_map;
-	            }
-	            $shareTour = ShareTour::inRandomOrder()->limit(9)->get();
-       		}
-       		return view("generalinterface",['des'=>$lang,'shareTour'=>$shareTour,'replace'=>'replace']);
-       	}
-    }
+    // public function loadmore($type)
+    // {
+	   //  if($type == "login")
+	   //  {
+	   //      if(Session::has('website_language') && Session::get('website_language') == "vi")
+	   //      {
+	   //          $user = Auth::user();
+	   //          $route = Route::where('to_id_user',$user->us_id)->get();
+	   //          session()->put('route',$route);
+	   //          $lang = Language::where("language","vn")->get();
+	   //          foreach ($lang as $value) {
+	   //              $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
+	   //              $value["de_image"] = $des->de_image;
+	   //              $value["de_duration"] = $des->de_duration;
+	   //              $value["de_link"] = $des->de_link;
+	   //              $value["de_map"] = $des->de_map;
+	   //          }
+	   //          $shareTour = ShareTour::inRandomOrder()->limit(9)->get();
+	   //      }
+	   //      else
+	   //      {
+	   //          $user = Auth::user();
+	   //          $route = Route::where('to_id_user',$user->us_id)->get();
+	   //          session()->put('route',$route);
+	   //          $lang = Language::where("language","en")->get();
+	   //          foreach ($lang as $value) {
+	   //              $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
+	   //              $value["de_image"] = $des->de_image;
+	   //              $value["de_duration"] = $des->de_duration;
+	   //              $value["de_link"] = $des->de_link;
+	   //              $value["de_map"] = $des->de_map;
+	   //          }
+	   //          $shareTour = ShareTour::inRandomOrder()->limit(9)->get();
+	   //      }
+    //     	return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang,'shareTour'=>$shareTour,'replace'=>'replace']);
+    //     }
+    //    	else if($type == "notlogin")
+    //    	{
+    //    		if(Session::has('website_language') && Session::get('website_language') == "vi")
+    //    		{
+    //    			$lang = Language::where("language","vn")->get();
+	   //          foreach ($lang as $value) {
+	   //              $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
+	   //              $value["de_image"] = $des->de_image;
+	   //              $value["de_duration"] = $des->de_duration;
+	   //              $value["de_link"] = $des->de_link;
+	   //              $value["de_map"] = $des->de_map;
+	   //          }
+	   //          $shareTour = ShareTour::inRandomOrder()->limit(9)->get();
+    //    		}
+    //    		else
+    //    		{
+    //    			$lang = Language::where("language","en")->get();
+	   //          foreach ($lang as $value) {
+	   //              $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
+	   //              $value["de_image"] = $des->de_image;
+	   //              $value["de_duration"] = $des->de_duration;
+	   //              $value["de_link"] = $des->de_link;
+	   //              $value["de_map"] = $des->de_map;
+	   //          }
+	   //          $shareTour = ShareTour::inRandomOrder()->limit(9)->get();
+    //    		}
+    //    		return view("generalinterface",['des'=>$lang,'shareTour'=>$shareTour,'replace'=>'replace']);
+    //    	}
+    // }
     public function viewSharetour($id,$shareId)
     {
         $route = Route::where("to_id",$id)->first();
@@ -236,5 +238,832 @@ class ShareTourController extends Controller
             'duration_start' => $duration_start,
             'justview' => 'justview'
         ]);
+    }
+    public function searchTour()
+    {
+        $votes_over = ShareTour::where("number_star",">=","8")->get()->count();
+        $votes_number = ShareTour::where("numberReviews",">=","2")->get()->count();
+        $votes_number = ShareTour::where("numberReviews",">=","2")->get()->count();
+        $allShareTour = ShareTour::get();
+        $i=0;
+        $array = array();
+        foreach ($allShareTour as $sharetour) {
+            $array = Arr::add($array, $i ,$sharetour->sh_to_id);
+            $i++;
+        }
+        $findThisMon = Route::whereIn("to_id",$array)->whereMonth("to_startDay",Carbon::now()->month)->get()->count();
+
+        if(Session::has('website_language') && Session::get('website_language') == "vi")
+        {
+            $lang = Language::select('de_name','des_id')->where("language","vn")->get();
+        }
+        else
+        {
+            $lang = Language::select('de_name','des_id')->where("language","en")->get();
+        }
+        return view('sharetour.searchtour',[
+            'votes_over' => $votes_over,
+            'votes_number' => $votes_number,
+            'thismonth' => $findThisMon,
+            'lang' => $lang
+        ]);
+    }
+    // div_1
+    public function searchTourTable()
+    {
+        $votes_over = ShareTour::where("number_star",">=","8")->get();
+        return DataTables::of($votes_over)
+            ->addColumn(
+                'stt',
+                function ($votes_over) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'tourName',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $tourName = $route->to_name;
+                    return $tourName;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'rating',
+                function ($votes_over) {
+                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
+                    return $rating;
+                }
+            )
+            ->addColumn(
+                'votes',
+                function ($votes_over) {
+                    $votes = $votes_over->numberReviews.' votes';
+                    return $votes;
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
+                    $totalTime_hour = floatval($totalTime_minut)/60;
+
+                    return $totalTime_hour = round($totalTime_hour,2);
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->make(true);
+    }
+    //div_2
+    public function searchMostVotes()
+    {
+        $votes_over = ShareTour::where("numberReviews",">=","2")->get();
+        return DataTables::of($votes_over)
+            ->addColumn(
+                'stt',
+                function ($votes_over) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'tourName',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $tourName = $route->to_name;
+                    return $tourName;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'rating',
+                function ($votes_over) {
+                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
+                    return $rating;
+                }
+            )
+            ->addColumn(
+                'votes',
+                function ($votes_over) {
+                    $votes = $votes_over->numberReviews.' votes';
+                    return $votes;
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
+                    $totalTime_hour = floatval($totalTime_minut)/60;
+
+                    return $totalTime_hour = round($totalTime_hour,2);
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->make(true);
+    }
+    // div_3
+    public function searchThisMonth()
+    {
+        $votes_over = ShareTour::get();
+        foreach ($votes_over as $key => $value) {
+            $checkRoute = Route::where("to_id",$value->sh_to_id)->first();
+            $month = date("m", strtotime($checkRoute->to_startDay)); 
+            if($month != Carbon::now()->month)
+            {
+                // xóa phần tử khỏi model eloquent
+                $votes_over->forget($key);
+            }
+        }
+        return DataTables::of($votes_over)
+            ->addColumn(
+                'stt',
+                function ($votes_over) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'tourName',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $tourName = $route->to_name;
+                    return $tourName;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'rating',
+                function ($votes_over) {
+                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
+                    return $rating;
+                }
+            )
+            ->addColumn(
+                'votes',
+                function ($votes_over) {
+                    $votes = $votes_over->numberReviews.' votes';
+                    return $votes;
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
+                    $totalTime_hour = floatval($totalTime_minut)/60;
+
+                    return $totalTime_hour = round($totalTime_hour,2);
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->make(true);
+    }
+    //last month
+    public function searchLastMonth()
+    {
+        $votes_over = ShareTour::get();
+        foreach ($votes_over as $key => $value) {
+            $checkRoute = Route::where("to_id",$value->sh_to_id)->first();
+            $month = date("m", strtotime($checkRoute->to_startDay)); 
+            if($month != Carbon::now()->month-1)
+            {
+                // xóa phần tử khỏi model eloquent
+                $votes_over->forget($key);
+            }
+        }
+        return DataTables::of($votes_over)
+            ->addColumn(
+                'stt',
+                function ($votes_over) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'tourName',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $tourName = $route->to_name;
+                    return $tourName;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'rating',
+                function ($votes_over) {
+                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
+                    return $rating;
+                }
+            )
+            ->addColumn(
+                'votes',
+                function ($votes_over) {
+                    $votes = $votes_over->numberReviews.' votes';
+                    return $votes;
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
+                    $totalTime_hour = floatval($totalTime_minut)/60;
+
+                    return $totalTime_hour = round($totalTime_hour,2);
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->make(true);
+    }
+    public function searchAnyMonth($date)
+    {
+        $monthYear = explode("-", $date);
+        $monthRequest = $monthYear[1];
+        $yearRequest = $monthYear[0];
+
+        $votes_over = ShareTour::get();
+        foreach ($votes_over as $key => $value) {
+            $checkRoute = Route::where("to_id",$value->sh_to_id)->first();
+            $month = date("m", strtotime($checkRoute->to_startDay)); 
+            $year = date("Y", strtotime($checkRoute->to_startDay)); 
+            if($month != $monthRequest || $year != $yearRequest)
+            {
+                // xóa phần tử khỏi model eloquent
+                $votes_over->forget($key);
+            }
+        }
+        return DataTables::of($votes_over)
+            ->addColumn(
+                'stt',
+                function ($votes_over) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'tourName',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $tourName = $route->to_name;
+                    return $tourName;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'rating',
+                function ($votes_over) {
+                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
+                    return $rating;
+                }
+            )
+            ->addColumn(
+                'votes',
+                function ($votes_over) {
+                    $votes = $votes_over->numberReviews.' votes';
+                    return $votes;
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
+                    $totalTime_hour = floatval($totalTime_minut)/60;
+
+                    return $totalTime_hour = round($totalTime_hour,2);
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->make(true);
+    }
+
+    public function takeDetailRoute(Request $req)
+    {
+        $sharetour = ShareTour::where("sh_id",$req->idShareTour)->first();
+        $route = Route::where("to_id",$sharetour->sh_to_id)->first();
+        // img + label
+        $arrayImg = array();
+        $arrayLabel = array();
+        if($sharetour->image != "")
+        {
+            $imageStartLocat = array(asset($sharetour->image));
+            array_push($arrayImg,$imageStartLocat);
+            array_push($arrayLabel,array($route->to_name));
+        }
+        else
+        {
+            $imageStartLocat = array(asset('imgPlace/empty.png'));
+            array_push($arrayImg,$imageStartLocat);
+            array_push($arrayLabel,array($route->to_name));
+        }
+        // label
+        $pieces = explode("|", $route->to_des);
+        $array = array();
+        for ($i=0; $i < count($pieces)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces[$i]);
+        }
+        foreach ($array as $ar) {
+            $findDes = Destination::where("de_remove",$ar)->first();
+            if($findDes->de_default=="0")
+            {
+                if($findDes->de_image!= "")
+                {
+                    $imageLocation = array(asset($findDes->de_image));
+                    array_push($arrayImg,$imageLocation);
+                    if(Session::has('website_language') && Session::get('website_language') == "vi")
+                    {
+                        $lang = Language::where("des_id",$findDes->de_remove)->where("language","vn")->first();
+                        array_push($arrayLabel,array($lang->de_name));
+                    }
+                    else
+                    {
+                        $lang = Language::where("des_id",$findDes->de_remove)->where("language","en")->first();
+                        array_push($arrayLabel,array($lang->de_name));
+                    }
+                }
+                else
+                {
+                    $imageLocation = array(asset('imgPlace/empty.png'));
+                    array_push($arrayImg,$imageLocation);
+                    if(Session::has('website_language') && Session::get('website_language') == "vi")
+                    {
+                        $lang = Language::where("des_id",$findDes->de_remove)->where("language","vn")->first();
+                        array_push($arrayLabel,array($lang->de_name));
+                    }
+                    else
+                    {
+                        $lang = Language::where("des_id",$findDes->de_remove)->where("language","en")->first();
+                        array_push($arrayLabel,array($lang->de_name));
+                    }
+                }
+            }
+        }
+        // your votes
+        if(Auth::check())
+        {
+            $findVotes = Uservotes::where("us_id",Auth::user()->us_id)->where("sh_id",$sharetour->sh_id)->first();
+            if(!empty($findVotes))
+                $your_votes =  $findVotes->vote_number. ' <i class="fas fa-star text-warning"></i>';
+            else
+                $your_votes = '<span class="badge badge-warning">Not available</span>';
+        }
+        else $your_votes = "";
+        // other
+        $avgRating = $sharetour->number_star. '<i class="fas fa-star text-warning"></i>';
+        $number_rate = $sharetour->numberReviews. ' votes';
+        // start locat
+        if($route->to_startLocat != "")
+        {
+            $des = Destination::select("de_name")->where("de_remove",$route->to_startLocat)->first();
+            $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+        }
+        else
+            $startLocat = '<span class="badge badge-warning">Not available</span>';
+        $link_view_tour = route('share.viewSharetour',[$route->to_id,$sharetour->sh_id]);
+        return [$arrayImg,$arrayLabel,$route->to_name,$your_votes,$sharetour->content,$avgRating,$number_rate,$startLocat,$this->takeDetail($array),date('h:i a', strtotime($route->to_starttime)),date('h:i a', strtotime($route->to_endtime)),date('d/m/Y', strtotime($route->to_startDay)),$link_view_tour];
+    }
+    public function takeDetail($array)
+    {
+        $Detail = "";
+        foreach ($array as $value)
+        {
+            $checkDes = Destination::where("de_remove",$value)->first();
+            if($checkDes->de_default == "0")
+            {
+                if(Session::has('website_language') && Session::get('website_language') == "vi")
+                {
+                    $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                    $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                }
+                else
+                {
+                    $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                    $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                }
+            }
+            else if($checkDes->de_default == "1")
+            {
+                $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+            }
+        }
+        return $Detail;
+    }
+    public function selectPlaceForType(Request $req)
+    {
+        if($req->type == "All")
+        {
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+            {
+                $des = Language::select('des_id','de_name')->where("language","vn")->get();
+                foreach ($des as $value) {
+                    $value['de_remove'] = $value['des_id'];
+                }
+            }
+            else
+            {
+                $des = Language::select('des_id','de_name')->where("language","en")->get();
+                foreach ($des as $value) {
+                    $value['de_remove'] = $value['des_id'];
+                }
+            }
+        }
+        else
+        {
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+            {
+                $des = Destination::select('de_remove')->where("de_default","0")->where("de_type",$req->type)->get();
+                foreach ($des as $value) {
+                    $lang = Language::select('de_name')->where("language","vn")->where("des_id",$value->de_remove)->first();
+                    $value['de_name'] = $lang->de_name;
+                }
+            }
+            else
+            {
+                $des = Destination::select('de_remove')->where("de_default","0")->where("de_type",$req->type)->get();
+                foreach ($des as $value) {
+                    $lang = Language::select('de_name')->where("language","en")->where("des_id",$value->de_remove)->first();
+                    $value['de_name'] = $lang->de_name;
+                }
+            }
+        }
+        $arrayId = array();
+        $arrayName = array();
+        foreach ($des as $de) {
+            array_push($arrayId, $de->de_remove);
+            array_push($arrayName, $de->de_name);
+        }
+        return [$arrayId,$arrayName];
+    }
+    public function selectTourForPlace(Request $req)
+    {
+        //return $req->listIdSearch;
+        //$sharetour = ShareTour::get();
+        $route = DB::table('tour')
+            ->rightJoin('sharetour', 'sharetour.sh_to_id', '=', 'tour.to_id')
+            ->get();
+        $saveListId = array();
+        foreach ($route as $value) {
+            $pieces = explode("|", $value->to_des);
+            $array = array();
+            for ($i=0; $i < count($pieces)-1; $i++) {
+                $array = Arr::add($array, $i ,$pieces[$i]);
+            }
+            if(count(array_intersect($req->listIdSearch, $array)) == count($req->listIdSearch))
+            {
+                array_push($saveListId, $value->to_id);
+            }
+        }
+        return $saveListId;
+    }
+    public function searchListPlace($arrayToid)
+    {
+        $array = explode(',', $arrayToid);
+        $votes_over = ShareTour::whereIn("sh_to_id",$array)->get();
+        return DataTables::of($votes_over)
+            ->addColumn(
+                'stt',
+                function ($votes_over) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'tourName',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $tourName = $route->to_name;
+                    return $tourName;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'rating',
+                function ($votes_over) {
+                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
+                    return $rating;
+                }
+            )
+            ->addColumn(
+                'votes',
+                function ($votes_over) {
+                    $votes = $votes_over->numberReviews.' votes';
+                    return $votes;
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
+                    $totalTime_hour = floatval($totalTime_minut)/60;
+
+                    return $totalTime_hour = round($totalTime_hour,2);
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->make(true);
     }
 }

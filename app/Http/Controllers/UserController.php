@@ -49,7 +49,7 @@ class UserController extends Controller
                     $value["de_link"] = $des->de_link;
                     $value["de_map"] = $des->de_map;
                 }
-                $shareTour = ShareTour::orderBy('numberReviews', 'DESC')->limit(9)->get();
+                $shareTour = ShareTour::orderBy('number_star', 'DESC')->limit(6)->get();
                 return view("generalinterface",['des'=>$lang,'shareTour'=>$shareTour]);
             }
             else
@@ -62,7 +62,7 @@ class UserController extends Controller
                     $value["de_link"] = $des->de_link;
                     $value["de_map"] = $des->de_map;
                 }
-                $shareTour = ShareTour::orderBy('numberReviews', 'DESC')->limit(9)->get();
+                $shareTour = ShareTour::orderBy('number_star', 'DESC')->limit(6)->get();
                 return view("generalinterface",['des'=>$lang,'shareTour'=>$shareTour]);
             }
         }
@@ -79,24 +79,37 @@ class UserController extends Controller
     		'us_password.min' => "Mật khẩu quá ngắn",
     		'us_password.max' => "Mật khẩu quá dài"
     	]);
-    	if(Auth::attempt(['us_email'=>$req->us_email,'us_password'=>$req->us_password]))
-    	{
-            $user = Auth::user();
-            if($user->us_type == "0")
+        $userCheckLock = User::where("us_email",$req->us_email)->first();
+        if(!empty($userCheckLock))
+        {
+            if($userCheckLock->us_lock == "1")
             {
-                //$route = Route::where('to_id_user',$user->us_id)->get();
-                return redirect()->route('user.dashboard');
+                return back()->with("error","Tài khoản của bạn đang bị khóa");
             }
             else
             {
-                return redirect()->route('admin.generalInfor');
+                if(Auth::attempt(['us_email'=>$req->us_email,'us_password'=>$req->us_password]))
+                {
+                    $user = Auth::user();
+                    if($user->us_type == "0")
+                    {
+                        return redirect()->route('user.dashboard');
+                    }
+                    else
+                    {
+                        return redirect()->route('admin.generalInfor');
+                    }
+                }
+                else
+                {
+                    return back()->with("error","Đăng nhập không thành công");
+                }
             }
-    	}
-    	else
-    	{
-    		return back()->with("error","Đăng nhập không thành công");
-    	}
-    	
+        }
+        else
+        {
+            return back()->with("error","Đăng nhập không thành công");
+        }
     }
     public function dashboard()
     {
@@ -113,7 +126,7 @@ class UserController extends Controller
                 $value["de_link"] = $des->de_link;
                 $value["de_map"] = $des->de_map;
             }
-            $shareTour = ShareTour::orderBy('numberReviews', 'DESC')->limit(9)->get();
+            $shareTour = ShareTour::orderBy('numberReviews', 'DESC')->limit(6)->get();
             return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang,'shareTour'=>$shareTour]);
         }
         else
@@ -129,7 +142,7 @@ class UserController extends Controller
                 $value["de_link"] = $des->de_link;
                 $value["de_map"] = $des->de_map;
             }
-            $shareTour = ShareTour::orderBy('number_star', 'DESC')->limit(9)->get();
+            $shareTour = ShareTour::orderBy('number_star', 'DESC')->limit(6)->get();
             return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang,'shareTour'=>$shareTour]);
         }
     }

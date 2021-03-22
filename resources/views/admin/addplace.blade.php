@@ -32,6 +32,17 @@
                 <option value="vn">Tiếng việt</option>
               </select>
             </div>
+            <div style="display: flex; margin-top: 1.5rem">
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Type of place</span> 
+              <select id="selectType" class="form-control" style="width: 40%">
+                <option value="All">--All--</option>
+                <option value="0">Scenic spots</option>
+                <option value="1">Restaurant</option>
+                <option value="2">Hotel</option>
+                <option value="3">Schools</option>
+                <option value="4">--Other</option>
+              </select>
+            </div>
             <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
                   <thead>
                   <tr>
@@ -66,6 +77,11 @@
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-right pb-3" id="placeName"></p>
+            </div>
+            <div class="col-md-3 col-sm-6 col-6">
+              <p class="font-weight-bold text-left pb-3">Type of place</p>
+            </div>
+            <div class="col-md-9 col-sm-6 col-6 text-right" id="placeType">
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Image') }}</p>
@@ -201,6 +217,16 @@
               </div>
 
               <h4 class="font-weight-bold font-italic text-primary text-uppercase">-- information about coordinates and other information</h4>
+              <div style="display: flex; margin-top: 1.5rem">
+                <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Type of place</span> 
+                <select id="selectType_add" class="form-control" style="width: 40%" name="typePlace">
+                  <option value="0">Scenic spots</option>
+                  <option value="1">Restaurant</option>
+                  <option value="2">Hotel</option>
+                  <option value="3">Schools</option>
+                  <option value="4">--Other</option>
+                </select>
+              </div>
               <div class="form-group">
                 <label for="inputLongitude">{{ trans('admin.Longitude') }}</label>
                 <input type="text" class="form-control" id="inputLongitude" placeholder="{{ trans('admin.Longitude') }}" required="" readonly="" name="de_lng">
@@ -297,8 +323,10 @@
                   cell.innerHTML = i + 1 + PageInfo.start;
               } );
           });
+          // choose language
           $("#selectLang").change(function(){
             let $url_path = '{!! url('/') !!}';
+            $("#selectType").val("All");
             if($("#selectLang").val() == "en")
             {
               var routeEN = $url_path+"/showDestination";
@@ -308,6 +336,30 @@
             {
               var routeVN = $url_path+"/showDestinationVN";
               table.ajax.url( routeVN ).load();
+            }
+          });
+          //choose type place
+          $("#selectType").change(function(){
+            let $url_path = '{!! url('/') !!}';
+            let type = $("#selectType").val();
+            let takeLang = $("#selectLang").val();
+            if(type == "All")
+            {
+              if($("#selectLang").val() == "en")
+              {
+                var routeEN = $url_path+"/showDestination";
+                table.ajax.url( routeEN ).load();
+              }
+              else if($("#selectLang").val() == "vn")
+              {
+                var routeVN = $url_path+"/showDestinationVN";
+                table.ajax.url( routeVN ).load();
+              }
+            }
+            else
+            {
+              var routeType = $url_path+"/showDestinationType/"+type+"/"+takeLang;
+              table.ajax.url( routeType ).load();
             }
           });
         });
@@ -349,6 +401,17 @@
                   {
                     $("#placeImage").append('<a data-fancybox="gallery" href="'+data[8]+'"><img class="img-fluid rounded mb-5" style="width:100%;" src="'+data[8]+'" alt=""></a>');
                   }
+                  $("#placeType").empty();
+                  if(data[9] == "0")
+                    $("#placeType").append('<span class="badge badge-success">Scenic spots</span>');
+                  else if(data[9] == "1")
+                    $("#placeType").append('<span class="badge badge-success">Restaurant</span>');
+                  else if(data[9] == "2")
+                    $("#placeType").append('<span class="badge badge-success">Hotel</span>');
+                  else if(data[9] == "3")
+                    $("#placeType").append('<span class="badge badge-success">Schools</span>');
+                  else if(data[9] == "4")
+                    $("#placeType").append('<span class="badge badge-success">--Other</span>');
                 }
              }
         });

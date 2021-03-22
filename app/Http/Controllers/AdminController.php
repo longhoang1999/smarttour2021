@@ -13,6 +13,7 @@ use App\Models\Destination;
 use App\Models\Language;
 use App\Models\Path;
 use App\Models\ShareTour;
+use App\Models\Uservotes;
 
 use PHPMailer;
 use Session;
@@ -52,6 +53,20 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'status',
+                function ($allAccount) {
+                    if($allAccount->us_lock == "0")
+                    {
+                        $status = '<span class="badge badge-success">Active</span>';
+                    }
+                    else
+                    {
+                        $status = '<span class="badge badge-danger">Lock</span>';
+                    }
+                    return $status;
+                }
+            )
+            ->addColumn(
                 'actions',
                 function ($allAccount) {
                     $actions = '<button type="button" data-id="'.$allAccount->us_id.'"  class="btn btn-info btn-sm btn-block" data-toggle="modal" data-target="#modalDetail">
@@ -59,30 +74,93 @@ class AdminController extends Controller
                         </button>';
                     if($allAccount->us_type != "1")
                     {
-                        $actions = $actions.'<button type="button" data-id="'.$allAccount->us_id.'" class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#modalDelete">
-                              '.trans("admin.Delete").'
+                        if($allAccount->us_lock == "0")
+                        {
+                            $actions = $actions.'<button type="button" data-id="'.$allAccount->us_id.'" class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#modalDelete">
+                              '.trans("admin.lockaccount").'
                             </button>';
+                        }
+                        else
+                        {
+                            $actions = $actions.'<button type="button" data-id="'.$allAccount->us_id.'" class="btn btn-success btn-sm btn-block" data-toggle="modal" data-target="#modalUnlocked">
+                              '.trans("admin.unlocked").'
+                            </button>';
+                        }
                     }
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','position','actions'])
+            ->rawColumns(['stt','position','actions','status'])
             ->make(true);
     }
     public function deleteAcc($id)
     {
-        $feedback = Feedback::where('fb_us_id',$id)->get();
-        foreach ($feedback as $value) {
-            $value->delete();
-        }
-        $tour = Route::where("to_id_user",$id)->get();
-        foreach ($tour as $value) {
-            $value->delete();
-        }
+        //find and delete feedback
+        // $feedback = Feedback::where('fb_us_id',$id)->get();
+        // foreach ($feedback as $value) {
+        //     $value->delete();
+        // }
+        // //find and delete Uservotes -> refresh ->ShareTour
+        // $userVotes = Uservotes::where("us_id",$id)->get();
+        // foreach ($userVotes as $value) {
+        //     $idShareTour = $value->sh_id;
+        //     $value->delete();
+        //     $share = ShareTour::where("sh_id",$idShareTour)->first();
+        //     $share->numberReviews = (int)$share->numberReviews -1;
+
+        //     $votesAll = Uservotes::where("sh_id",$idShareTour)->get();
+        //     $countVotes = $votesAll->count();
+        //     $sum = 0;
+        //     foreach ($votesAll as $vAll) {
+        //         $sum += $vAll->vote_number;
+        //     }
+        //     if($countVotes != 0)
+        //     {
+        //         $share->number_star = $sum/$countVotes;
+        //     }
+        //     $share->save();
+        // }
+        // //deleete share toue and tour and des
+        // $tour = Route::where("to_id_user",$id)->get();
+        // foreach ($tour as $value) {
+        //     $share = ShareTour::where("sh_to_id",$value->to_id)->first();
+        //     if(!empty($share))
+        //     {
+        //         $share->delete();
+        //     }
+        //     if($value->to_startLocat != "")
+        //     {
+        //         $findDes = Destination::where("de_remove",$value->to_startLocat)->first();
+        //         $findDes->delete();
+        //     }
+        //     $pieces = explode("|", $value->to_des);
+        //     $array = array();
+        //     for ($i=0; $i < count($pieces)-1; $i++) {
+        //         $array = Arr::add($array, $i ,$pieces[$i]);
+        //     }
+        //     foreach ($array as $ar) {
+        //         $checkDes = Destination::where("de_remove",$ar)->first();
+        //         if($checkDes->de_default == "1")
+        //         {
+        //             $checkDes->delete();
+        //         }
+        //     }
+        //     $value->delete();
+        // }
+        // //delete user
         $user = User::where("us_id",$id)->first();
-        File::deleteDirectory(public_path('uploadUsers/'.$user->us_code));
-        $user->delete();
-        return back()->with("status","You have successfully deleted this account");
+        // File::deleteDirectory(public_path('uploadUsers/'.$user->us_code));
+        // $user->delete();
+        $user->us_lock = "1";
+        $user->save();
+        return back()->with("status","You have successfully locked your account");
+    }
+    public function unlockAcc($id)
+    {
+        $user = User::where("us_id",$id)->first();
+        $user->us_lock = "0";
+        $user->save();
+        return back()->with("status","You have successfully unlocked your account!");
     }
     public function feedback()
     {
@@ -222,6 +300,55 @@ class AdminController extends Controller
             ->rawColumns(['stt','duration','actions'])
             ->make(true);
     }
+    public function showDestinationType($type,$lang)
+    {
+        $findType = Destination::where("de_type",$type)->get();
+        $array=array();
+        $i=1;
+        foreach ($findType as $value) {
+            $array = Arr::add($array, $i ,$value->de_remove);
+            $i++;
+        }
+        if($lang == "en")
+        {
+            $destination = Language::whereIn("des_id",$array)->where("language","en")->get();
+        }
+        else
+        {
+            $destination = Language::whereIn("des_id",$array)->where("language","vn")->get();
+        }
+            foreach ($destination as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $value["de_remove"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_duration"] = $des->de_duration;
+            }
+        return DataTables::of($destination)
+            ->addColumn(
+                'stt',
+                function ($destination) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'duration',
+                function ($destination) {
+                    $duration = floatval($destination->de_duration)/60/60;
+                    return $duration;
+                }
+            )
+            ->addColumn(
+                'actions',
+                function ($destination) {
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','duration','actions'])
+            ->make(true);
+    }
     public function showDestinationVN ()
     {
         $destination = Language::where("language","vn")->get();
@@ -303,6 +430,8 @@ class AdminController extends Controller
     	$destination->de_name = $req->de_name_vn;
     	$destination->de_lat = $req->de_lat;
     	$destination->de_lng = $req->de_lng;
+        $destination->de_type = $req->typePlace;
+        
         $destination->de_map = $req->de_map;
     	$destination->de_link = $req->de_link;
     	$destination->de_duration = floatval($req->de_duration)*60*60;
@@ -332,8 +461,6 @@ class AdminController extends Controller
         $lang_en->de_description = $req->de_description_en;
         $lang_en->de_shortdes = $req->de_shortdes_en;
         $lang_en->save();
-        
-
         $array = array();
         $array = Arr::add($array, 0 ,$randomletter);
         $allDes = Destination::where('de_id','<>',$randomletter)->get();
@@ -462,6 +589,56 @@ class AdminController extends Controller
             ->rawColumns(['stt','duration','actions'])
             ->make(true);
     }
+    public function showDestinationRemoveType($type,$lang)
+    {
+        $findType = Destination::where("de_type",$type)->get();
+        $array=array();
+        $i=1;
+        foreach ($findType as $value) {
+            $array = Arr::add($array, $i ,$value->de_remove);
+            $i++;
+        }
+        if($lang == "en")
+        {
+            $destination = Language::whereIn("des_id",$array)->where("language","en")->get();
+        }
+        else
+        {
+            $destination = Language::whereIn("des_id",$array)->where("language","vn")->get();
+        }
+            foreach ($destination as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $value["de_remove"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_duration"] = $des->de_duration;
+            }
+        return DataTables::of($destination)
+            ->addColumn(
+                'stt',
+                function ($destination) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'duration',
+                function ($destination) {
+                    $duration = floatval($destination->de_duration)/60/60;
+                    return $duration;
+                }
+            )
+            ->addColumn(
+                'actions',
+                function ($destination) {
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
+                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','duration','actions'])
+            ->make(true);
+    }
     public function showDestinationRemoveVN()
     {
         $destination = Language::where("language","vn")->get();
@@ -512,7 +689,7 @@ class AdminController extends Controller
                 }
                 else $image="";
                 $duration = floatval($de->de_duration)/60/60;
-                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image];
+                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type];
             }
             else
             {
@@ -532,13 +709,63 @@ class AdminController extends Controller
                 }
                 else $image="";
                 $duration = floatval($de->de_duration)/60/60;
-                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image];
+                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type];
             }
             else
             {
                 return "Can not find data";
             }
         }
+    }
+    public function showDestinationEditType($type,$lang)
+    {
+        $findType = Destination::where("de_type",$type)->get();
+        $array=array();
+        $i=1;
+        foreach ($findType as $value) {
+            $array = Arr::add($array, $i ,$value->de_remove);
+            $i++;
+        }
+        if($lang == "en")
+        {
+            $destination = Language::whereIn("des_id",$array)->where("language","en")->get();
+        }
+        else
+        {
+            $destination = Language::whereIn("des_id",$array)->where("language","vn")->get();
+        }
+            foreach ($destination as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $value["de_remove"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_duration"] = $des->de_duration;
+            }
+        return DataTables::of($destination)
+            ->addColumn(
+                'stt',
+                function ($destination) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'duration',
+                function ($destination) {
+                    $duration = floatval($destination->de_duration)/60/60;
+                    return $duration;
+                }
+            )
+            ->addColumn(
+                'actions',
+                function ($destination) {
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
+                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalEdit">'.trans("admin.Edit").'</button>';
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','duration','actions'])
+            ->make(true);
     }
     public function placeDelete($remove)
     {
@@ -553,6 +780,34 @@ class AdminController extends Controller
         $lang = Language::where("des_id",$remove)->get();
         foreach ($lang as $value) {
             $value->delete();
+        }
+        //Xóa tất cả các tour có đi qua điểm đó
+        $allTour = Route::get();
+        foreach ($allTour as $tour) {
+            $pieces = explode("|", $tour->to_des);
+            $array = array();
+            for ($i=0; $i < count($pieces)-1; $i++) {
+                $array = Arr::add($array, $i ,$pieces[$i]);
+            }
+            foreach ($array as $ar) {
+                if($ar == $remove)
+                {
+                    $findShare = ShareTour::where("sh_to_id",$tour->to_id)->first();
+                    if(!empty($findShare))
+                    {
+                        //delete user votes
+                        $findUserVotes = Uservotes::where("sh_id",$findShare->sh_id)->get();
+                        foreach ($findUserVotes as  $findVote) {
+                            $findVote->delete();
+                        }
+                        //delete share
+                        File::delete(public_path($findShare->image));
+                        $findShare->delete();
+                    }
+                    //delete tour
+                    $tour->delete();
+                }
+            }
         }
     	$des = Destination::where("de_remove",$remove)->first();
     	if(!empty($des))
@@ -612,7 +867,7 @@ class AdminController extends Controller
                 }
                 else $image="";
                 $duration = floatval($de->de_duration)/60/60;
-                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image];
+                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type];
             }
             else
             {
@@ -632,7 +887,7 @@ class AdminController extends Controller
                 }
                 else $image="";
                 $duration = floatval($de->de_duration)/60/60;
-                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image];
+                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type];
             }
             else
             {
@@ -654,6 +909,7 @@ class AdminController extends Controller
                 $des->save();
                 $de->de_duration= floatval($req->duration)*60*60;
                 $de->de_lat=$req->latitude_edit;
+                $de->de_type=$req->type;
                 $de->de_lng=$req->longitude_edit;
                 $de->de_map=$req->link_edit;
                 $de->de_link=$req->de_link;

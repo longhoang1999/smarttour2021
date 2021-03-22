@@ -42,12 +42,22 @@ Route::group(
 		Route::get('maps',function(){
 		    return view('recommend_tour');
 		})->name("user.maps");
-
 		Route::get("viewtour/{id}","ShareTourController@viewtour")->name('viewtour');
 		Route::post("takeInforPlace","ShareTourController@takeInforPlace")->name('takeInforPlace');
-		Route::get("loadmore/{type}","ShareTourController@loadmore")->name('share.loadmore');
+		//Route::get("loadmore/{type}","ShareTourController@loadmore")->name('share.loadmore');
 		Route::get("viewSharetour/{routeid}/{shareId}","ShareTourController@viewSharetour")->name('share.viewSharetour');
 		Route::get("editTour/{id}","AdminController@editTour")->name('admin.editTour');
+		Route::get("searchTour","ShareTourController@searchTour")->name('searchTour');
+		Route::get("searchTourTable","ShareTourController@searchTourTable")->name('share.searchTourTable');
+		Route::get("searchMostVotes","ShareTourController@searchMostVotes")->name('share.searchMostVotes');
+		Route::get("searchThisMonth","ShareTourController@searchThisMonth")->name('share.searchThisMonth');
+		Route::get("searchLastMonth","ShareTourController@searchLastMonth")->name('share.searchLastMonth');
+		Route::get("searchAnyMonth/{date}","ShareTourController@searchAnyMonth")->name('share.searchAnyMonth');
+		
+		Route::post("takeDetailRoute","ShareTourController@takeDetailRoute")->name('share.takeDetailRoute');
+		Route::post("selectPlaceForType","ShareTourController@selectPlaceForType")->name('share.selectPlaceForType');
+		Route::post("selectTourForPlace","ShareTourController@selectTourForPlace")->name('share.selectTourForPlace');
+		Route::get("searchListPlace/{array}","ShareTourController@searchListPlace")->name('share.searchListPlace');
 	}
 );
 
@@ -84,6 +94,7 @@ Route::group(
 		Route::get("addPlace","AdminController@addPlace")->name("admin.addPlace");
 		Route::get("showDestination","AdminController@showDestination")->name("admin.showDestination");
 		Route::get("showDestinationVN","AdminController@showDestinationVN")->name("admin.showDestinationVN");
+		Route::get("showDestinationType/{type}/{lang}","AdminController@showDestinationType")->name("admin.showDestinationType");
 		Route::post("postaddPlace","AdminController@postaddPlace")->name("admin.postaddPlace");
 		Route::post("checkPlace","AdminController@checkPlace");
 		//edit place
@@ -92,18 +103,25 @@ Route::group(
 		//remove place
 		Route::get("removePlace","AdminController@removePlace")->name("admin.removePlace");
 		Route::get("showDestinationRemove","AdminController@showDestinationRemove")->name("admin.showDestinationRemove");
+
+		Route::get("showDestinationRemoveType/{type}/{lang}","AdminController@showDestinationRemoveType")->name("admin.showDestinationRemoveType");
+
 		Route::get("showDestinationRemoveVN","AdminController@showDestinationRemoveVN")->name("admin.showDestinationRemoveVN");
 		Route::get("showDetail/{remove}/{lang}","AdminController@showDetail")->name("admin.showDetail");
 		Route::get("placeDelete/{remove}","AdminController@placeDelete")->name("admin.placeDelete");
 		Route::get("showDestinationEdit","AdminController@showDestinationEdit")->name("admin.showDestinationEdit");
+
+		Route::get("showDestinationEditType/{type}/{lang}","AdminController@showDestinationEditType")->name("admin.showDestinationEditType");
+
 		Route::get("showDetailEdit/{remove}/{lang}","AdminController@showDetailEdit")->name("admin.showDetailEdit");
 		Route::post("formEditPlace/{remove}/{lang}","AdminController@formEditPlace")->name("admin.formEditPlace");
 		//dash board
 		Route::get("generalInfor","AdminController@generalInfor")->name('admin.generalInfor');
 		Route::post("getLatLng","AdminController@getLatLng")->name("admin.getLatLng");
 		Route::get("updatePath","AdminController@updatePath")->name("admin.updatePath");
-		//delete user
+		//lock user
 		Route::get("deleteAcc/{id}","AdminController@deleteAcc")->name("admin.deleteAcc");
+		Route::get("unlockAcc/{id}","AdminController@unlockAcc")->name("admin.unlockAcc");
 		Route::post("checkUserAdmin","AdminController@checkUserAdmin")->name("admin.checkUserAdmin");
 		Route::post("addaccount","AdminController@addaccount")->name("admin.addaccount");
 		//language

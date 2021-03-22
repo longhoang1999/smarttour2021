@@ -1,0 +1,33 @@
+.box2 a {
+    color: white;
+}
+.user_content{display: block;}
+.user_content .editPlace{background: #eaecf4;}
+#link,#link_edit{overflow-x: auto;}
+textarea{
+    min-height: 8rem;
+}
+#link, #link_vr {
+    color: blue;
+    text-decoration: underline;
+    font-style: italic;
+    font-weight: bold;
+}
+.btn_upload_edit {
+    background: rgb(78,68,230);
+    background: linear-gradient(
+90deg
+, rgb(130 125 214) 0%, rgb(17 101 155) 26%, rgb(147 147 223) 66%, rgba(0,212,255,1) 100%);
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: .5rem .2rem;
+    width: 20%;
+    cursor: pointer;
+    border-radius: 1.3em;
+    float: right;
+}
+.btn_upload_edit:hover{
+  background: rgb(73,211,255);
+  background: linear-gradient(90deg, rgba(73,211,255,1) 0%, rgba(60,74,218,1) 26%, rgba(153,138,235,1) 66%, rgba(0,168,255,1) 100%);
+}

@@ -51,6 +51,7 @@
                       <th>{{ trans('admin.Gender') }}</th>
                       <th>{{ trans('admin.Age') }}</th>
                       <th>{{ trans('admin.Position') }}</th>
+                      <th>{{ trans('admin.status') }}</th>
                       <th>{{ trans('admin.Actions') }}</th>
                   </tr>
                   </thead>
@@ -153,7 +154,7 @@
         </div>
       </div>
     </div>
-    <!-- Modal warning delete -->
+    <!-- Modal warning lock -->
     <div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="modalDetailLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -167,7 +168,27 @@
             <h6 class="text-danger">{{ trans('admin.WarningTitle') }}</h6>
           </div>
           <div class="modal-footer">
-            <a href="#" id="btn_delete" class="btn btn-danger">{{ trans('admin.Delete') }}</a>
+            <a href="#" id="btn_delete" class="btn btn-danger">{{ trans('admin.lockaccount') }}</a>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- modal  modalUnlocked-->
+    <div class="modal fade" id="modalUnlocked" tabindex="-1" role="dialog" aria-labelledby="modalUnlockedLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalUnlockedLabel">{{ trans('admin.notification') }}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h6 class="text-success">{{ trans('admin.wantunlock') }}</h6>
+          </div>
+          <div class="modal-footer">
+            <a href="#" id="btn_delete" class="btn btn-success">{{ trans('admin.unlocked') }}</a>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
           </div>
         </div>
@@ -270,6 +291,7 @@
                 { data: 'us_gender', name: 'us_gender' },
                 { data: 'us_age', name: 'us_age' },
                 { data: 'position', name: 'position' },
+                { data: 'status', name: 'status' },
                 { data: 'actions', name: 'actions' },
                 ]
             });
@@ -298,8 +320,16 @@
             var routeDelete=$url_path+"/deleteAcc/"+recipient;
             var modal = $(this)
             modal.find('.modal-footer #btn_delete').prop("href",routeDelete);
-            
         });
+        $('#modalUnlocked').on('shown.bs.modal', function (event) {
+            var $url_path = '{!! url('/') !!}';
+            var button = $(event.relatedTarget)
+            recipient = button.data('id');
+            var routeDelete=$url_path+"/unlockAcc/"+recipient;
+            var modal = $(this)
+            modal.find('.modal-footer #btn_delete').prop("href",routeDelete);
+        });
+        
         $('#modalDetail').on('show.bs.modal', function (event) {
             let _token = $('meta[name="csrf-token"]').attr('content');
             var button = $(event.relatedTarget)
