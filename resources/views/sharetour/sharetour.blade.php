@@ -340,8 +340,6 @@
             });
         });
     </script>
-
-    
     <script type="text/javascript">    
         var markers=[];
         function initMap(){

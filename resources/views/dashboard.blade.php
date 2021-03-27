@@ -383,6 +383,12 @@
                 <!-- Contact Section Form-->
                 <div class="row">
                     <div class="col-lg-8 mx-auto">
+                        @if ($message = Session::get('notification'))
+                            <div class="alert alert-success alert-block">
+                                <button type="button" class="close" data-dismiss="alert">x</button>
+                                <strong>{{$message}}</strong>
+                            </div>
+                        @endif
                         <!-- To configure the contact form email address, go to mail/contact_me.php and update the email address in the PHP file on line 19.-->
                         <form name="sentMessage" method="post" action="{{route('user.feedback')}}">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}" />
@@ -406,12 +412,6 @@
                                 <button class="btn btn-primary btn-xl" type="submit">{{ trans('messages.sendFeedback') }}</button>
                             </div>
                         </form>
-                        @if ($message = Session::get('notification'))
-                            <div class="alert alert-danger alert-block">
-                                <button type="button" class="close" data-dismiss="alert">x</button>
-                                <strong>{{$message}}</strong>
-                            </div>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -523,7 +523,7 @@
                                                         }
                                                      ?>
                                                      <!-- <i class="fas fa-street-view point"></i> -->
-                                                    <p style="font-family: auto" class="lead text-center tour" data-id="{{$value->to_id}}">
+                                                    <p style="font-family: auto" class="lead text-justify tour" data-id="{{$value->to_id}}">
                                                         <span style="font-style: italic;font-weight: bold;">{{$value->to_name}}: </span>{{$des_1}} - 
                                                         Start day: {{date('d/m/Y', strtotime($value->to_startDay))}}
                                                     </p>
@@ -535,10 +535,7 @@
                                             @endif
                                         </p>
                                     </div>
-                                    <button class="btn btn-primary" data-dismiss="modal">
-                                        <i class="fas fa-times fa-fw"></i>
-                                        {{ trans('messages.CloseWindow') }}
-                                    </button>
+                                    <a href="{{route('searchTour')}}" class="btn btn-primary">--- See more <i class="fas fa-angle-double-right pt-1"></i> ---</a>
                                 </div>
                             </div>
                         </div>

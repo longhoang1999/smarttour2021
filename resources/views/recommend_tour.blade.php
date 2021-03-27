@@ -1479,130 +1479,276 @@ function showMap(){
       this.span.style.top = (position.y)  -15+ 'px';
     }
   });
-  $("#btnSaveNameTour").click(function(){
-        let nameTour = $('input[name="nameTour"]').val();
-        if(nameTour == "")
-        {
-          alert("Please enter the tour name first");
-        }
-        else
-        {
-          let $url_path = '{!! url('/') !!}';
-          let _token = $('meta[name="csrf-token"]').attr('content');
-          let routeDetail=$url_path+"/saveTour";
-          let timeStart = $('#time').val();
-          let timeEnd = $('#time-end').val();
-          let to_comback;
-          if ($('#is-back').is(':checked'))
+  <?php use Illuminate\Support\Arr;
+        use App\Models\Destination; 
+  ?>
+  @if(!isset($to_des))
+    $("#btnSaveNameTour").click(function(){
+          let nameTour = $('input[name="nameTour"]').val();
+          if(nameTour == "")
           {
-              to_comback = "1";
+            alert("Please enter the tour name first");
           }
-          else to_comback = "0";
-          let to_optimized;
-          if ($('#is-opt').is(':checked') == false)
+          else
           {
-            to_optimized="0";
-          }
-          else{
-            to_optimized = $('input[name="durdis"]').val();
-          }
-          let tmparr = [];
-          let val = {};
-          if(startlocat != undefined){
-            val.de_id = startlocat;
-            let coor = idToData(startlocat,'LatLng');
-            val.location = coor.lat+"|"+coor.lng;
-            val.de_name = idToData(startlocat,'text');
-            val.de_duration = idToData(startlocat,'duration');
-            val.de_default = idToData(startlocat,'default');
-          }
+            let $url_path = '{!! url('/') !!}';
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            let routeDetail=$url_path+"/saveTour";
+            let timeStart = $('#time').val();
+            let timeEnd = $('#time-end').val();
+            let to_comback;
+            if ($('#is-back').is(':checked'))
+            {
+                to_comback = "1";
+            }
+            else to_comback = "0";
+            let to_optimized;
+            if ($('#is-opt').is(':checked') == false)
+            {
+              to_optimized="0";
+            }
+            else{
+              to_optimized = $('input[name="durdis"]').val();
+            }
+            let tmparr = [];
+            let val = {};
+            if(startlocat != undefined){
+              val.de_id = startlocat;
+              let coor = idToData(startlocat,'LatLng');
+              val.location = coor.lat+"|"+coor.lng;
+              val.de_name = idToData(startlocat,'text');
+              val.de_duration = idToData(startlocat,'duration');
+              val.de_default = idToData(startlocat,'default');
+            }
 
-          locatsList.forEach(ele=>{
-            let coor = idToData(ele,'LatLng');
-            let tmp = ele+'';
-            tmparr.push({
-              de_id: tmp,
-              location: coor.lat+"|"+coor.lng,
-              de_name: idToData(ele,'text'),
-              de_duration: idToData(ele,'duration'),
-              de_default: idToData(ele,'default')
+            locatsList.forEach(ele=>{
+              let coor = idToData(ele,'LatLng');
+              let tmp = ele+'';
+              tmparr.push({
+                de_id: tmp,
+                location: coor.lat+"|"+coor.lng,
+                de_name: idToData(ele,'text'),
+                de_duration: idToData(ele,'duration'),
+                de_default: idToData(ele,'default')
+              })
             })
-          })
-          console.log(val);
-          console.log(tmparr);
+            console.log(val);
+            console.log(tmparr);
 
-          $.ajax({
-                url:routeDetail,
-                method:"get",
-                data:{_token:_token,tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,nameTour:nameTour,val:val},
-                success:function(data){ 
-                  alert("Your tour has been saved");
-                  $("#saveTour").css("display","none");
-                  $("#enterNameTour").modal("hide");
-                }
-          });
-        }
-  });
-  $("#btnSaveShareTour").click(function(){
-        let nameTour = $('input[name="nameTour"]').val();
-        if(nameTour == "")
-        {
-          alert("Please enter the tour name first");
-        }
-        else
-        {
-          let $url_path = '{!! url('/') !!}';
-          let _token = $('meta[name="csrf-token"]').attr('content');
-          let routeDetail=$url_path+"/saveTour";
-          let timeStart = $('#time').val();
-          let timeEnd = $('#time-end').val();
-          let to_comback;
-          if ($('#is-back').is(':checked'))
+            $.ajax({
+                  url:routeDetail,
+                  method:"get",
+                  data:{_token:_token,tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,nameTour:nameTour,val:val},
+                  success:function(data){ 
+                    alert("Your tour has been saved");
+                    $("#saveTour").css("display","none");
+                    $("#enterNameTour").modal("hide");
+                  }
+            });
+          }
+    });
+    $("#btnSaveShareTour").click(function(){
+          let nameTour = $('input[name="nameTour"]').val();
+          if(nameTour == "")
           {
-              to_comback = "1";
+            alert("Please enter the tour name first");
           }
-          else to_comback = "0";
-          let to_optimized;
-          if ($('#is-opt').is(':checked') == false)
+          else
           {
-            to_optimized="0";
-          }
-          else{
-            to_optimized = $('input[name="durdis"]').val();
-          }
-          let tmparr = [];
-          let val = {};
-          if(startlocat != undefined){
-            val.de_id = startlocat;
-            let coor = idToData(startlocat,'LatLng');
-            val.location = coor.lat+"|"+coor.lng;
-            val.de_name = idToData(startlocat,'text');
-            val.de_duration = idToData(startlocat,'duration');
-            val.de_default = idToData(startlocat,'default');
-          }
+            let $url_path = '{!! url('/') !!}';
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            let routeDetail=$url_path+"/saveTour";
+            let timeStart = $('#time').val();
+            let timeEnd = $('#time-end').val();
+            let to_comback;
+            if ($('#is-back').is(':checked'))
+            {
+                to_comback = "1";
+            }
+            else to_comback = "0";
+            let to_optimized;
+            if ($('#is-opt').is(':checked') == false)
+            {
+              to_optimized="0";
+            }
+            else{
+              to_optimized = $('input[name="durdis"]').val();
+            }
+            let tmparr = [];
+            let val = {};
+            if(startlocat != undefined){
+              val.de_id = startlocat;
+              let coor = idToData(startlocat,'LatLng');
+              val.location = coor.lat+"|"+coor.lng;
+              val.de_name = idToData(startlocat,'text');
+              val.de_duration = idToData(startlocat,'duration');
+              val.de_default = idToData(startlocat,'default');
+            }
 
-          locatsList.forEach(ele=>{
-            let coor = idToData(ele,'LatLng');
-            let tmp = ele+'';
-            tmparr.push({
-              de_id: tmp,
-              location: coor.lat+"|"+coor.lng,
-              de_name: idToData(ele,'text'),
-              de_duration: idToData(ele,'duration'),
-              de_default: idToData(ele,'default')
+            locatsList.forEach(ele=>{
+              let coor = idToData(ele,'LatLng');
+              let tmp = ele+'';
+              tmparr.push({
+                de_id: tmp,
+                location: coor.lat+"|"+coor.lng,
+                de_name: idToData(ele,'text'),
+                de_duration: idToData(ele,'duration'),
+                de_default: idToData(ele,'default')
+              })
             })
-          })
-          $.ajax({
-                url:routeDetail,
-                method:"get",
-                data:{_token:_token,tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,nameTour:nameTour,val:val},
-                success:function(data){ 
-                  $("#rankModal").modal("show");
-                  $("#route_ID").val(data);
-                }
-          });
+            $.ajax({
+                  url:routeDetail,
+                  method:"get",
+                  data:{_token:_token,tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,nameTour:nameTour,val:val},
+                  success:function(data){ 
+                    $("#rankModal").modal("show");
+                    $("#route_ID").val(data);
+                  }
+            });
+          }
+    });
+  @else
+    $("#btnSaveNameTour").click(function(){
+          let nameTour = $('input[name="nameTour"]').val();
+          if(nameTour == "")
+          {
+            alert("Please enter the tour name first");
+          }
+          else
+          {
+            let $url_path = '{!! url('/') !!}';
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            let routeId = {{$id}};
+            let routeDetail=$url_path+"/editRoute/"+routeId;
+            let timeStart = $('#time').val();
+            let timeEnd = $('#time-end').val();
+            let to_comback;
+            if ($('#is-back').is(':checked'))
+            {
+                to_comback = "1";
+            }
+            else to_comback = "0";
+            let to_optimized;
+            if ($('#is-opt').is(':checked') == false)
+            {
+              to_optimized="0";
+            }
+            else{
+              // to_optimized = $('input[name="durdis"]').val();
+              to_optimized = "1";
+            }
+            let tmparr = [];
+            let val = {};
+            if(startlocat != undefined){
+              val.de_id = startlocat;
+              let coor = idToData(startlocat,'LatLng');
+              val.location = coor.lat+"|"+coor.lng;
+              val.de_name = idToData(startlocat,'text');
+              val.de_duration = idToData(startlocat,'duration');
+              val.de_default = idToData(startlocat,'default');
+            }
+
+            locatsList.forEach(ele=>{
+              let coor = idToData(ele,'LatLng');
+              let tmp = ele+'';
+              tmparr.push({
+                de_id: tmp,
+                location: coor.lat+"|"+coor.lng,
+                de_name: idToData(ele,'text'),
+                de_duration: idToData(ele,'duration'),
+                de_default: idToData(ele,'default')
+              })
+            })
+            $.ajax({
+                  url:routeDetail,
+                  method:"get",
+                  data:{_token:_token,tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,nameTour:nameTour,val:val},
+                  success:function(data){ 
+                    location.reload();
+                  }
+            });
+          }
+    });
+    //vẽ đường
+    <?php 
+        $pieces_2 = explode("|", $to_des);
+        $array = array();
+        for ($i=0; $i < count($pieces_2)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces_2[$i]);
         }
-  });
+     ?>
+    @foreach($array as $value)
+      locatsList.push('{{$value}}');
+    @endforeach
+    $("#time").val('{{$to_starttime}}');
+    @if($to_endtime != "")
+      $("#time-end").val('{{$to_endtime}}');
+    @endif
+    @if($to_comback == '1')
+      $('#is-back').prop('checked',true);
+    @endif
+    @if($to_optimized == '1')
+      //$('.dur-dis[value="1"]').prop('checked', true);
+    @elseif($to_optimized == '2')
+      //$('.dur-dis[value="2"]').prop('checked', true);
+    @else
+      $('#is-opt').prop('checked',false);
+    @endif
+    <?php $dem = 0 ?>
+    @if(count($latlng_new) > 0)
+        @foreach($latlng_new as $value)
+            locationsdata.push({
+                de_name: "{{$dename_new[$dem]}}",
+                location: <?php echo json_encode($latlng_new[$dem]); ?>,
+                place_id: "{{$placeId_new[$dem]}}",
+                de_duration: {{$duration_new[$dem]}},
+                de_default: 1
+            })
+            newPlaceIdArr.push("{{$placeId_new[$dem]}}")
+            <?php $dem++; ?>
+        @endforeach
+    @endif
+    @if( $latlng_start != "")
+      locationsdata.push({
+          de_name: "{{$dename_start}}",
+          location: <?php echo json_encode($latlng_start); ?>,
+          place_id: "{{$placeId_start}}",
+          de_duration: {{$duration_start}},
+          de_default: 1
+      })
+      newPlaceIdArr.push("{{$placeId_start}}")
+    @endif
+    // startlocat
+    @if( $latlng_start != "")
+      startlocat = "{{$placeId_start}}";
+      staMarker = new google.maps.Marker({
+            label: idToData(startlocat,'text'),
+      });
+      staMarker.setMap(map);
+      staMarker.setPosition(idToData(startlocat,'LatLng'));
+      $('#your-start').show();
+      document.getElementById('your-start').innerHTML= idToData(startlocat,'text')+'<span id="your-start-close">×</span>';
+      $('#your-start-close').click(()=>{
+          //staMarker.setMap(null);
+          staMarker = undefined;
+          $('.map-marker-label').remove();
+          $('#your-start').hide();
+          startlocat = undefined;
+          updateRoute();
+      })
+      customLabel(staMarker);
+    @endif
+    // drawRoutes
+    @if($to_des != "")
+      // idToData(null,'LatLngArr');
+      // drawRoutes();
+      setTimeout(function(){ 
+        $("#get-route").click();
+      }, 200);
+      let height = ($('.list-item').length+1) * 45 +5;
+      $('#container-height').css('height',height+'px');
+    @endif
+  @endif
 };
 </script> 
   <link href="{{asset('css/styles.css')}}" rel="stylesheet" />
@@ -2028,7 +2174,17 @@ function showMap(){
         </div> -->
         <div id="switch-tab" class="control-panel">
           <button id="get-route">{{ trans('messages.findWay') }}</button>
-          <button class="tablinks" onclick=""  id="saveTour">{{ trans('messages.SaveTour') }}</button>
+          <style type="text/css">
+            #btn-rating{display: none;}
+          </style>
+          <button class="tablinks" onclick=""  id="btn-rating">Rating</button>
+          <button class="tablinks" onclick=""  id="saveTour">
+          @if(!isset($to_des))
+            {{ trans('messages.SaveTour') }}
+          @else
+          {{ trans('messages.EditTour') }}
+          @endif
+          </button>
           <!-- <button class="tablinks reset-all"  onclick="">{{ trans('messages.Reset') }}</button> -->
         </div>
       </div>
@@ -2226,8 +2382,16 @@ function showMap(){
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="btnSaveNameTour">{{ trans('messages.SaveTour') }}</button>
-        <button type="button" class="btn btn-success" id="btnSaveShareTour">Save and share the tour</button>
+        <button type="button" class="btn btn-primary" id="btnSaveNameTour">
+          @if(!isset($to_des))
+            {{ trans('messages.SaveTour') }}
+          @else
+            {{ trans('messages.EditTour') }}
+          @endif
+        </button>
+        @if(!isset($to_des))
+          <button type="button" class="btn btn-success" id="btnSaveShareTour">Save and share the tour</button>
+        @endif
       </div>
     </div>
   </div>
@@ -2612,9 +2776,10 @@ function openTab(evt, tabName) {
                   </div>
               </div>
               <hr>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('messages.CloseWindow') }}</button>
-              <input type="submit" class="btn btn-primary" value="{{ trans('messages.Registration') }}">
-              <p id="p_backLogin">{{ trans('messages.youHaveAcc') }} <span class="backFormLogin">{{ trans('messages.Login') }}</span></p>
+              <div class="div_btn_register">
+                  <input type="submit" class="btn btn-primary" value="{{ trans('messages.Registration') }}">
+                  <p id="p_backLogin">{{ trans('messages.youHaveAcc') }} <span class="backFormLogin">{{ trans('messages.Login') }}</span></p>
+              </div>
           </form>
         </div>
       </div>
@@ -2768,6 +2933,91 @@ function openTab(evt, tabName) {
       });
       //hết trang dashboard
     })
+  </script>
+@endif
+@if(isset($justview) && Auth::check())
+<!-- Modal -->
+<div class="modal fade" id="modalRating" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Rating</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fuild">
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-12">
+                <p class="font-weight-bold font-italic">Rating for your tour</p>
+              </div>
+              <div class="col-md-12 col-sm-12 col-12 mb-3" id="div_Starrank_tour">
+                <i class="fas fa-star star_1 fa-2x"  data-value="1" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_2 fa-2x" data-value="2" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_3 fa-2x" data-value="3" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_4 fa-2x"  data-value="4" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_5 fa-2x" data-value="5" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_6 fa-2x" data-value="6" style="cursor: pointer;"></i> 
+                <i class="fas fa-star star_7 fa-2x" data-value="7" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_8 fa-2x" data-value="8" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_9 fa-2x" data-value="9" style="cursor: pointer;"></i>
+                <i class="fas fa-star star_10 fa-2x" data-value="10" style="cursor: pointer;"></i>
+              </div>
+              <input type="hidden" id="star_Share" name="numberStar">
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn_Rating">Rating</button>
+      </div>
+    </div>
+  </div>
+</div>
+@endif
+@if(isset($justview))
+  <style>
+    #saveTour{display: none !important;}
+    #btn-rating{display: block;}
+  </style>
+  <script type="text/javascript">
+    @if(!Auth::check())
+      $("#btn-rating").click(function(){
+        $("#modalLogin").modal("show");
+      });
+    @else
+      $("#btn-rating").click(function(){
+        $("#modalRating").modal("show");
+      });
+      // votess star
+      @for($i = 1; $i<= 10; $i++)
+        $("#div_Starrank_tour .star_{{$i}}").click(function(){
+            @for($j = 1 ; $j <= 10; $j++)
+                $("#div_Starrank_tour .star_{{$j}}").css("color","#212529");
+            @endfor
+            @for($j = 1 ; $j <= $i; $j++)
+                $("#div_Starrank_tour .star_{{$j}}").css("color","#ff9700");
+            @endfor
+            //console.log($(this).attr("data-value"));
+            $("#star_Share").val($(this).attr("data-value"));
+        });
+      @endfor
+      $("#btn_Rating").click(function(){
+          let _token = $('meta[name="csrf-token"]').attr('content');
+          let $url_path = '{!! url('/') !!}';
+          let routeRating=$url_path+"/rating";
+          let numberStar = $("#star_Share").val();
+          $.ajax({
+                url:routeRating,
+                method:"POST",
+                data:{_token:_token,numberStar:numberStar,shareId:{{$shareId}}},
+                success:function(data){ 
+                  alert("You have successfully evaluated");
+                  location.reload();
+               }
+          });
+      });
+    @endif
   </script>
 @endif
   </body>

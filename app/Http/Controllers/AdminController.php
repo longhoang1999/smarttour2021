@@ -1460,7 +1460,7 @@ class AdminController extends Controller
             $duration_start = "";
         }
         //$user = Auth::user();
-        return view('admin.edittour',[
+        return view('recommend_tour',[
             'startLocat'=>$route->to_startLocat,
             'to_des'=>$route->to_des,
             'to_starttime'=>$route->to_starttime,
@@ -1500,7 +1500,7 @@ class AdminController extends Controller
                 $checkDes->delete();
             }
         }
-        $route->delete();
+        //$route->delete();
         // thêm mới
         $user = Auth::user();
         if(!empty($req->val))
@@ -1519,7 +1519,7 @@ class AdminController extends Controller
         }
 
         $user = Auth::user();
-        $new_route = new Route();
+        $new_route = Route::where("to_id",$id)->first();
         $new_route->to_id_user = $user->us_id;
         $new_route->to_starttime = $req->timeStart;
         $new_route->to_endtime = $req->timeEnd;

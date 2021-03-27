@@ -41,7 +41,7 @@ class UserController extends Controller
         {
             if(Session::has('website_language') && Session::get('website_language') == "vi")
             {
-                $lang = Language::where("language","vn")->get();
+                $lang = Language::where("language","vn")->inRandomOrder()->limit(10)->get();
                 foreach ($lang as $value) {
                     $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
                     $value["de_image"] = $des->de_image;
@@ -54,7 +54,7 @@ class UserController extends Controller
             }
             else
             {
-                $lang = Language::where("language","en")->get();
+                $lang = Language::where("language","en")->inRandomOrder()->limit(10)->get();
                 foreach ($lang as $value) {
                     $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
                     $value["de_image"] = $des->de_image;
@@ -118,7 +118,7 @@ class UserController extends Controller
             $user = Auth::user();
             $route = Route::where('to_id_user',$user->us_id)->get();
             session()->put('route',$route);
-            $lang = Language::where("language","vn")->get();
+            $lang = Language::where("language","vn")->inRandomOrder()->limit(10)->get();
             foreach ($lang as $value) {
                 $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
                 $value["de_image"] = $des->de_image;
@@ -134,7 +134,7 @@ class UserController extends Controller
             $user = Auth::user();
             $route = Route::where('to_id_user',$user->us_id)->get();
             session()->put('route',$route);
-            $lang = Language::where("language","en")->get();
+            $lang = Language::where("language","en")->inRandomOrder()->limit(10)->get();
             foreach ($lang as $value) {
                 $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
                 $value["de_image"] = $des->de_image;

@@ -4,6 +4,14 @@
 @parent   
 @stop
 @section('header_styles')
+  <style>
+    #detail_location span{
+      display: block;
+    }
+    .startlocat_class{
+      width: 10rem !important;
+    }
+  </style>
 @stop
 @section('content')
   <h2 id="page_title" lass="page-section-heading text-center text-uppercase text-secondary mb-0">search tour</h2>
@@ -20,6 +28,9 @@
           </ul>
           <span id="site_searchTitle">--Search</span>
           <div id="content_search">
+              @if(Auth::check())
+                <span id="site_youShared">Tour you shared</span>
+              @endif
               <span id="site_highlyRated">Highly rated tours</span>
               <span id="site_thisMonth">Tour this month</span>
               <span id="site_lastMonth">Tour last month</span>
@@ -165,7 +176,7 @@
                   <span id="text_number_rates"></span></p>
 
                   <p><span class="font-weight-bold font-italic">Start Location: </span>
-                  <span id="startLocation" data-id=""></span></p>
+                  <span id="startLocation"></span></p>
 
                   <p class="font-weight-bold font-italic mb-0">Location:</p>
                   <p id="detail_location"></p>
@@ -284,8 +295,62 @@
     </div>
   </div>
   <!-- / modal not found tour -->
+  <!-- Model -->
+  <div class="modal fade" id="modalDetailPlace" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Detail Place</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="opSelection">
+              <div class="showImage">Show image</div>
+              <div class="showMap">Show Map</div>
+          </div>
+          <div class="imgPlace mt-4 mb-4">
+          </div>
+          <div id="map" class="mt-4 mb-4"></div>
+          <div class="container-fuild">
+              <div class="row">
+                  <div class="col-md-4 col-sm-6 col-12 mb-4">
+                      <p class="font-weight-bold font-italic">Short description</p>
+                  </div>
+                  <div class="col-md-8 col-sm-6 col-12 mb-4">
+                      <p id="short"></p>
+                  </div>
+                  <div class="col-md-4 col-sm-6 col-12 mb-4">
+                      <p class="font-weight-bold font-italic">Description</p>
+                  </div>
+                  <div class="col-md-8 col-sm-6 col-12 mb-4">
+                      <p id="description"></p>
+                  </div>
+                  <div class="col-md-4 col-sm-6 col-12 mb-4">
+                      <p class="font-weight-bold font-italic">Average travel time</p>
+                  </div>
+                  <div class="col-md-8 col-sm-6 col-12 mb-4">
+                      <p id="timeAvg"></p>
+                  </div>
+                  <div class="col-md-4 col-sm-6 col-12 mb-4">
+                      <p class="font-weight-bold font-italic">Link on google map</p>
+                  </div>
+                  <div class="col-md-8 col-sm-6 col-12 mb-4" id="linkMap">
+                  </div>
+                  <div class="col-md-4 col-sm-6 col-12 mb-4">
+                      <p class="font-weight-bold font-italic">Link on VR</p>
+                  </div>
+                  <div class="col-md-8 col-sm-6 col-12 mb-4" id="linkvr">
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /Model -->
 @stop
-
 @section('footer-js')     
 <script type="text/javascript">
     var listIdSearch = [];
@@ -334,7 +399,8 @@
           "lengthMenu": [[5, 10, -1], [5, 10,"All"]],
           "order": [[ 1, 'asc' ]],
           "columnDefs": [
-              { className: "id_class", "targets": [ 1 ] }
+              { className: "id_class", "targets": [ 1 ] },
+              { className: "startlocat_class", "targets": [ 3 ] }
             ],
             processing: true,
             serverSide: true,
@@ -375,6 +441,17 @@
               var routeOverStart = $url_path+"/searchTourTable";
               table.ajax.url( routeOverStart ).load();
           });
+          @if(Auth::check())
+            $("#site_youShared").click(function(){
+                $(".AllClass_Table").show();
+                $("html, body").animate({
+                    scrollTop: $('.AllClass_Table').offset().top - '100'
+                }, 200);
+                let $url_path = '{!! url('/') !!}';
+                var routeYouShared = $url_path+"/searchTourYouShared";
+                table.ajax.url( routeYouShared ).load();
+            });
+          @endif
           $("#div_2").click(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({
@@ -502,6 +579,7 @@
                     $("#text_number_rates").empty();
                     $("#text_number_rates").append(data[6]);
                     $("#startLocation").empty();
+                    
                     $("#startLocation").append(data[7]);
                     $("#detail_location").empty();
                     $("#detail_location").append(data[8]);
@@ -531,6 +609,14 @@
                       location.reload();
                     }
               });
+          });
+          $(".showImage").click(function(){
+              $("#map").hide();
+              $(".imgPlace").show();
+          });
+          $(".showMap").click(function(){
+              $("#map").show();
+              $(".imgPlace").hide();
           });
       });
       function getSliderSettings(){
@@ -589,4 +675,111 @@
         });
       });
 </script>
+<script type="text/javascript">    
+        var markers=[];
+        function initMap(){
+            //let lll = { lat: 21.0374, lng: 105.774 }
+            var map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 12.5,
+                center: { lat: 21.0226586, lng: 105.8179091 },
+            }),
+            directionsService = new google.maps.DirectionsService();
+            const geocoder = new google.maps.Geocoder();
+            $(document).ready(function(){
+              $("#startLocation").on('click','span',function(){
+                showdetail($(this).attr("data-id"));
+              });
+              $("#detail_location").on('click','span',function(){
+                showdetail($(this).attr("data-id"));
+              });
+            });
+            function showdetail(data_id){
+              $("#modalDetailPlace").modal("show");
+              let $url_path = '{!! url('/') !!}';
+              let _token = $('meta[name="csrf-token"]').attr('content');
+              let routeGetCooor = $url_path+"/takeInforPlace";
+              let des_id = data_id;
+              $.ajax({
+                  url:routeGetCooor,
+                  method:"post",
+                  data:{_token:_token,des_id:des_id},
+                  success:function(data){ 
+                    $("#exampleModalLabel").html(data[2]);
+                    $(".imgPlace").empty();
+                    if(data[3] != "")
+                    {
+                        $(".imgPlace").append("<a data-fancybox='gallery' href='"+data[3]+"'> <img class='img-fluid' src='"+data[3]+"' alt='' style='width: 70%'></a>");
+                    }
+                    else
+                    {
+                        $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='location with no photo'></a>");
+                    }
+                    $("#short").empty();
+                    $("#description").empty();
+                    if(data[4] != "")
+                        $("#short").append(data[4]);
+                    else
+                        $("#short").append('<span class="badge badge-warning">Not available</span>');
+
+                    if(data[5] != "")
+                        $("#description").append(data[5]);
+                    else
+                        $("#description").append('<span class="badge badge-warning">Not available</span>');  
+
+                    $("#timeAvg").html(parseFloat(data[6])/60/60+" hours");
+                    $("#linkMap").empty();
+                    if(data[7] != null)
+                        $("#linkMap").append('<a href="'+data[7]+'" target="_blank">Link here</a>');
+                    else
+                        $("#linkMap").append('<span class="badge badge-warning">Not available</span>');
+                    $("#linkvr").empty();
+                    if(data[8] != null)
+                        $("#linkvr").append('<a href="'+data[8]+'" target="_blank">Link here</a>');
+                    else
+                        $("#linkvr").append('<span class="badge badge-warning">Not available</span>');
+                    //vẽ map
+                    deleteMarker();
+                    let add = data[0]+","+data[1];
+                    geocodeAddress(geocoder,map,data[2],add);
+                  }
+                });
+            }
+            function deleteMarker()
+            {
+                $('.map-marker-label').remove();
+                for (let i = 0; i < markers.length; i++) {
+                  markers[i].setMap(null);
+                }
+                markers=[];
+            }
+            function geocodeAddress(geocoder, resultsMap, label,add) {
+                const address = add;
+                geocoder.geocode({ address: address }, (results, status) => {
+                  if (status === "OK") {
+                    resultsMap.setCenter(results[0].geometry.location);
+                    var staMarker = new google.maps.Marker({
+                      map: resultsMap,
+                      position: results[0].geometry.location,
+                      icon: {
+                        url: "{{asset('images/red-dot.png')}}",
+                        labelOrigin: new google.maps.Point(65, 32),
+                        size: new google.maps.Size(40,40),
+                        anchor: new google.maps.Point(16,32),
+                      },
+                      label: {
+                        text: label,
+                        color: "#C70E20",
+                        fontWeight: "bold"
+                      },
+                    });
+                    //đặt lại marker cào mảng để xóa
+                    markers.push(staMarker);
+                  } else {
+                    alert("Geocode was not successful for the following reason: " + status);
+                  }
+                });
+            };
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBgbjwIY5Q1eZ-Ejqur0a8avEQWowfA39s&callback=initMap" async defer></script>
 @stop

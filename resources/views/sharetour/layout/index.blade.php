@@ -215,9 +215,10 @@
                         </div>
                     </div>
                     <hr>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('messages.CloseWindow') }}</button>
-                    <input type="submit" class="btn btn-primary" value="{{ trans('messages.Registration') }}">
-                    <p id="p_backLogin">{{ trans('messages.youHaveAcc') }} <span class="backFormLogin">{{ trans('messages.Login') }}</span></p>
+                    <div class="div_btn_register">
+                        <input type="submit" class="btn btn-primary" value="{{ trans('messages.Registration') }}">
+                        <p id="p_backLogin">{{ trans('messages.youHaveAcc') }} <span class="backFormLogin">{{ trans('messages.Login') }}</span></p>
+                    </div>
                 </form>
               </div>
             </div>

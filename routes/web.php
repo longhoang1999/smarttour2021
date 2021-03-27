@@ -49,6 +49,7 @@ Route::group(
 		Route::get("editTour/{id}","AdminController@editTour")->name('admin.editTour');
 		Route::get("searchTour","ShareTourController@searchTour")->name('searchTour');
 		Route::get("searchTourTable","ShareTourController@searchTourTable")->name('share.searchTourTable');
+		Route::get("searchTourYouShared","ShareTourController@searchTourYouShared")->name('share.searchTourYouShared');
 		Route::get("searchMostVotes","ShareTourController@searchMostVotes")->name('share.searchMostVotes');
 		Route::get("searchThisMonth","ShareTourController@searchThisMonth")->name('share.searchThisMonth');
 		Route::get("searchLastMonth","ShareTourController@searchLastMonth")->name('share.searchLastMonth');
@@ -69,7 +70,6 @@ Route::group(
 	function(){
 		//user
 		Route::get("dashboard","UserController@dashboard")->name("user.dashboard");
-		
 		Route::post("feedback","UserController@feedback")->name("user.feedback");
 		Route::get("saveTour","UserController@saveTour")->name("user.saveTour");
 		Route::post("checkTour","UserController@checkTour")->name("user.checkTour");
@@ -78,6 +78,7 @@ Route::group(
 		Route::get("editTourUser/{id}","AdminController@editTour")->name('user.editTour');
 		Route::post("shareTour","UserController@shareTour")->name("user.shareTour");
 		Route::post("rating","ShareTourController@rating")->name("user.rating");
+		Route::get("editRoute/{id}","AdminController@editRoute")->name("user.editRoute");
 		
 	}
 );
@@ -129,7 +130,7 @@ Route::group(
 		Route::get("history","AdminController@history")->name("admin.history");
 		Route::get("showAllRoute","AdminController@showAllRoute")->name("admin.showAllRoute");
 		Route::get("showAllRouteRating","AdminController@showAllRouteRating")->name("admin.showAllRouteRating");
-		Route::get("editRoute/{id}","AdminController@editRoute")->name("user.editRoute");
+		
 		Route::post("routeDetail","AdminController@routeDetail")->name("admin.routeDetail");
 		Route::post("routeDetail2","AdminController@routeDetail2")->name("admin.routeDetail2");
 

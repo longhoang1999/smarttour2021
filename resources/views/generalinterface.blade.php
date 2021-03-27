@@ -23,6 +23,9 @@
         <!-- css notlogin -->
         <link rel="stylesheet" href="{{asset('css/notlogin.css')}}">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <style>
+            .modaldetail_Place p{text-align: justify !important;}
+        </style>
     </head>
     <body id="page-top">
         <!-- Navigation-->
@@ -473,7 +476,7 @@
 
         <?php $i=1; ?>
         @foreach($des as $value)
-        <div class="portfolio-modal modal fade" id="placeModal{{$i}}" tabindex="-1" role="dialog" aria-labelledby="portfolioModal3Label" aria-hidden="true">
+        <div class="portfolio-modal modal fade modaldetail_Place" id="placeModal{{$i}}" tabindex="-1" role="dialog" aria-labelledby="portfolioModal3Label" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
@@ -531,10 +534,6 @@
                                     @else
                                         <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.LinkVR') }} :</span> {{ trans('messages.NoInformation') }}</p>
                                     @endif
-                                    <button class="btn btn-primary" data-dismiss="modal">
-                                        <i class="fas fa-times fa-fw"></i>
-                                        {{ trans('messages.CloseWindow') }}
-                                    </button>
                                 </div>
                             </div>
                         </div>

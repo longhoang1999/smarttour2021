@@ -107,10 +107,8 @@
     margin-top: 2rem;
 }
 #content_search,#content_totalName{
-    height: 95px;
     font-size: 12px;
-    padding-top: 16px;
-    padding-left: 15px;
+    padding: 1em 0 .9em 2em;
     border: 1px solid #cacaca;
     border-top: 0;
     font-size: 14px;

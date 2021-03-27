@@ -215,3 +215,8 @@ p.tourName {
 .hightly_div_child:hover svg {
     transform: rotate(180deg);
 }
+.portfolio-modal-title
+{
+    line-height: 3.5rem !important;
+    margin-top: .5rem !important;
+}

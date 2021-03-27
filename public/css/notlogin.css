@@ -118,3 +118,7 @@ form .txt_field{
     width: 96%;
     text-align: right;
 }
+.div_submit input:focus {
+    border: none;
+    outline: none;
+}
