@@ -3,7 +3,7 @@
     Share Tour
 @parent   
 @stop
-@section('header_styles')
+@section('header_styles')  
 @stop
 @section('content')
     <?php use App\Models\Destination; use App\Models\Language;use App\Models\Uservotes;use Illuminate\Support\Facades\Auth;?>
@@ -94,9 +94,23 @@
                     <p class="font-weight-bold font-italic mb-0">Location:</p>
                     <p id="detail_location"></p>
                     <p><span class="font-weight-bold font-italic">Start time: </span>
-                    <span>{{date('h:i a', strtotime($route->to_starttime))}}</span></p>
+                    <span>{{date('d/m/Y h:i a', strtotime($route->to_starttime))}}</span></p>
                     <p><span class="font-weight-bold font-italic">Endtime time: </span>
-                    <span>{{date('h:i a', strtotime($route->to_endtime))}}</span></p>
+                    <span>{{date('d/m/Y h:i a', strtotime($route->to_endtime))}}</span></p>
+                    <?php 
+                        $total = Carbon\Carbon::parse($route->to_endtime)->diffInMinutes(Carbon\Carbon::parse($route->to_starttime));
+                     ?>
+                    <p><span class="font-weight-bold font-italic">Total tour time: </span>
+                    <span class="total_time"></span></p>
+                    <!-- js take total -->
+                    <script type="text/javascript">
+                        let duration = moment.duration({{$total}}, 'minutes');
+                        let durationString = duration.days() + 'd ' + duration.hours() + 'h ' + duration.minutes() + 'm';
+                        console.log(durationString);
+                        $(".total_time").html(durationString);
+                    </script>
+                    <!-- /endis -->
+
                     <p><span class="font-weight-bold font-italic">Date created: </span>
                     <span>{{date('d/m/Y', strtotime($route->to_startDay))}}</span></p>
                 </div>

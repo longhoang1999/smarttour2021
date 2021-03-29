@@ -19,6 +19,7 @@ use PHPMailer;
 use Session;
 use Illuminate\Support\Arr;
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use View;
 
 
@@ -1118,7 +1119,7 @@ class AdminController extends Controller
                     else
                     {
                         $des = Destination::where("de_remove",$route->to_startLocat)->first();
-                        $startLocat = $des->de_name;
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i>'.$des->de_name;
                     }
                     return $startLocat;
                 }
@@ -1140,17 +1141,17 @@ class AdminController extends Controller
                             if(Session::has('website_language') && Session::get('website_language') == "vi")
                             {
                                 $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
-                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
                             }
                             else
                             {
                                 $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
-                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
                             }
                         }
                         else if($checkDes->de_default == "1")
                         {
-                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name;
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
                         }
                     }
                     return $Detail;
@@ -1165,7 +1166,7 @@ class AdminController extends Controller
                     }
                     else
                     {
-                        $startTime = date('h:i:s a', strtotime($route->to_starttime));
+                        $startTime = date('d/m/Y h:i:s a', strtotime($route->to_starttime));
                     }
                     return $startTime;
                 }
@@ -1179,7 +1180,7 @@ class AdminController extends Controller
                     }
                     else
                     {
-                        $endTime = date('h:i:s a', strtotime($route->to_endtime));
+                        $endTime = date('d/m/Y h:i:s a', strtotime($route->to_endtime));
                     }
                     return $endTime;
                 }
@@ -1215,6 +1216,22 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'startLocat',
+                function ($share) {
+                    $route = Route::where("to_id",$share->sh_to_id)->first();
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i>'.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
                 'Detail',
                 function ($share) {
                     $route = Route::where("to_id",$share->sh_to_id)->first();
@@ -1231,17 +1248,17 @@ class AdminController extends Controller
                             if(Session::has('website_language') && Session::get('website_language') == "vi")
                             {
                                 $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
-                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
                             }
                             else
                             {
                                 $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
-                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name;
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
                             }
                         }
                         else if($checkDes->de_default == "1")
                         {
-                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name;
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
                         }
                     }
                     return $Detail;
@@ -1263,7 +1280,7 @@ class AdminController extends Controller
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','tourName','Detail','avg','actions'])
+            ->rawColumns(['stt','tourName','Detail','avg','actions','startLocat'])
             ->make(true);
     }
     public function sharetourDelete($id)
@@ -1283,7 +1300,7 @@ class AdminController extends Controller
         if($route->to_startLocat != "")
         {
             $des = Destination::where("de_remove",$route->to_startLocat)->first();
-            $startLocat = $des->de_name;
+            $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i>'.$des->de_name;
         }
         else $startLocat = '<span class="badge badge-warning">'.trans("admin.Notavailable").'</span>';
 
@@ -1329,18 +1346,30 @@ class AdminController extends Controller
         }
         else if($route->to_optimized == "1")
         {
-            $Optimized = '<span class="badge badge-success">'.trans("admin.Optimizedforduration").'</span>';
+            // $Optimized = '<span class="badge badge-success">'.trans("admin.Optimizedforduration").'</span>';
+            $Optimized = '<span class="badge badge-success">Optimized</span>';
+            
         }
         else if($route->to_optimized == "2")
         {
             $Optimized = '<span class="badge badge-success">'.trans("admin.Optimizedforcost").'</span>';
         }
-        $starttime = date('h:i:s a', strtotime($route->to_starttime));
+        $starttime = date('d/m/Y h:i:s a', strtotime($route->to_starttime));
         if($route->to_endtime != "")
-            $endtime = date('h:i:s a', strtotime($route->to_endtime));
+            $endtime = date('d/m/Y h:i:s a', strtotime($route->to_endtime));
         else
             $endtime = '<span class="badge badge-success">'.trans("admin.Thereisnoendtime").'</span>';
-        return [$creator,$tourName,$startLocat,$Detail,$starttime,$endtime,$comeBack,$Optimized];
+        // total time
+        $start_time = Carbon::parse($route->to_starttime);
+        $finish_time = Carbon::parse($route->to_endtime);
+        $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+        //convert second to H:i:s
+        $dt = Carbon::now();
+        $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+        $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+        $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+        $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
+        return [$creator,$tourName,$startLocat,$Detail,$starttime,$endtime,$comeBack,$Optimized,$totalTime];
     }
     public function routeDetail2(Request $req)
     {
@@ -1352,7 +1381,7 @@ class AdminController extends Controller
         if($route->to_startLocat != "")
         {
             $des = Destination::where("de_remove",$route->to_startLocat)->first();
-            $startLocat = $des->de_name;
+            $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i>'.$des->de_name;
         }
         else $startLocat = '<span class="badge badge-warning">'.trans("admin.Notavailable").'</span>';
 
@@ -1398,15 +1427,16 @@ class AdminController extends Controller
         }
         else if($route->to_optimized == "1")
         {
-            $Optimized = '<span class="badge badge-success">'.trans("admin.Optimizedforduration").'</span>';
+            // $Optimized = '<span class="badge badge-success">'.trans("admin.Optimizedforduration").'</span>';
+            $Optimized = '<span class="badge badge-success">Optimized</span>';
         }
         else if($route->to_optimized == "2")
         {
             $Optimized = '<span class="badge badge-success">'.trans("admin.Optimizedforcost").'</span>';
         }
-        $starttime = date('h:i:s a', strtotime($route->to_starttime));
+        $starttime = date('d/m/Y h:i:s a', strtotime($route->to_starttime));
         if($route->to_endtime != "")
-            $endtime = date('h:i:s a', strtotime($route->to_endtime));
+            $endtime = date('d/m/Y h:i:s a', strtotime($route->to_endtime));
         else
             $endtime = '<span class="badge badge-success">'.trans("admin.Thereisnoendtime").'</span>';
 
@@ -1416,7 +1446,17 @@ class AdminController extends Controller
             $imageShare = "";
         }
         else  $imageShare = asset($share->image);
-        return [$creator,$tourName,$startLocat,$Detail,$starttime,$endtime,$comeBack,$Optimized,$share->content,$share->number_star,$imageShare];
+        //total time
+        $start_time = Carbon::parse($route->to_starttime);
+        $finish_time = Carbon::parse($route->to_endtime);
+        $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+        //convert second to H:i:s
+        $dt = Carbon::now();
+        $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+        $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+        $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+        $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
+        return [$creator,$tourName,$startLocat,$Detail,$starttime,$endtime,$comeBack,$Optimized,$share->content,$share->number_star,$imageShare,$totalTime];
     }
     public function editTour($id)
     {
@@ -1521,8 +1561,8 @@ class AdminController extends Controller
         $user = Auth::user();
         $new_route = Route::where("to_id",$id)->first();
         $new_route->to_id_user = $user->us_id;
-        $new_route->to_starttime = $req->timeStart;
-        $new_route->to_endtime = $req->timeEnd;
+        $new_route->to_starttime = Carbon::parse($req->timeStart)->toDateTimeString();
+        $new_route->to_endtime = Carbon::parse($req->timeStart)->addSeconds($req->timeEnd);
         $new_route->to_comback = $req->to_comback;
         $new_route->to_optimized = $req->to_optimized;
         $new_route->to_name = $req->nameTour;

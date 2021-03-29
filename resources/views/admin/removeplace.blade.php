@@ -87,12 +87,12 @@
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.NamePlace') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
-              <p class="text-right pb-3" id="placeName"></p>
+              <p class="text-justify pb-3" id="placeName"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">Type of place</p>
             </div>
-            <div class="col-md-9 col-sm-6 col-6 text-right" id="placeType">
+            <div class="col-md-9 col-sm-6 col-6 text-justify" id="placeType">
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Image') }}</p>
@@ -103,49 +103,46 @@
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Longitude') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
-              <p class="text-right pb-3" id="longitude"></p>
+              <p class="text-justify pb-3" id="longitude"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Latitude') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
-              <p class="text-right pb-3" id="latitude"></p>
+              <p class="text-justify pb-3" id="latitude"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Description') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
-              <p class="text-right pb-3" id="description"></p>
+              <p class="text-justify pb-3" id="description"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Shortdes') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
-              <p class="text-right pb-3" id="shortdes"></p>
+              <p class="text-justify pb-3" id="shortdes"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Duration') }} ({{ trans('admin.hours') }})</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
-              <p class="text-right pb-3" id="duration"></p>
+              <p class="text-justify pb-3" id="duration"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.linkmap') }}</p>
             </div>
-            <div class="col-md-9 col-sm-6 col-6 text-right">
+            <div class="col-md-9 col-sm-6 col-6 text-justify">
               <a href="#" class="pb-3" id="link" target="_blank">{{ trans('admin.Linkhere') }}</a>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.linkVR') }}</p>
             </div>
-            <div class="col-md-9 col-sm-6 col-6 text-right">
+            <div class="col-md-9 col-sm-6 col-6 text-justify">
               <a href="#" class="pb-3" id="link_vr" target="_blank">{{ trans('admin.Linkhere') }}</a>
             </div>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
       </div>
     </div>
   </div>
@@ -167,7 +164,6 @@
       </div>
       <div class="modal-footer">
         <a href="#" id="removePlace" class="btn btn-danger">{{ trans('admin.Remove') }}</a>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
       </div>
     </div>
   </div>

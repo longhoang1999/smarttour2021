@@ -169,7 +169,6 @@
           </div>
           <div class="modal-footer">
             <a href="#" id="btn_delete" class="btn btn-danger">{{ trans('admin.lockaccount') }}</a>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
           </div>
         </div>
       </div>
@@ -189,7 +188,6 @@
           </div>
           <div class="modal-footer">
             <a href="#" id="btn_delete" class="btn btn-success">{{ trans('admin.unlocked') }}</a>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
           </div>
         </div>
       </div>
@@ -254,9 +252,6 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
           </div>
         </div>
       </div>

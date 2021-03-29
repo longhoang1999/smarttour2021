@@ -66,44 +66,6 @@ function showMap(){
           center: { lat: 21.0226586, lng: 105.8179091 },
         }),
       directionsService = new google.maps.DirectionsService();
-
-  let timesrt = $("#time").flatpickr({
-        wrap: true,
-        onChange: function(selectedDates, dateStr) {
-          $("#time").val(dateStr);
-          console.log($('#time').val())
-        },
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i",
-        defaultDate: "07:00"
-    });
-  $('#time').val("07:00")
-  let datestart = $("#date-start").flatpickr({
-        wrap: true,
-        onChange: function(selectedDates, dateStr) {
-          $("#date-start").val(dateStr);
-        },
-        minDate: "today",
-        defaultDate: "today"
-    });
-  let dateend =  $("#date-end").flatpickr({
-        wrap: true,
-        onChange: function(selectedDates, dateStr) {
-          $("#date-end").val(dateStr);
-        },
-        minDate: "today",
-        defaultDate: "today"
-    });
-  let timeend =  $("#time-end").flatpickr({
-        wrap: true,
-        onChange: function(selectedDates, dateStr) {
-          $("#time-end").val(dateStr);
-        },
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i"
-    });
   
   map.addListener('click',function(evt){
     if(isclick == 1){
@@ -173,17 +135,6 @@ function showMap(){
     isopt = 0;
   } 
 
-
-  // $('#is-opt').click(()=>{
-  //   if(!$('#is-opt').is(':checked')){
-  //     $('#is-opt-sub').hide();
-  //     isopt = 0;
-  //   } else {
-  //     $('#is-opt-sub').show();
-  //     isopt = parseInt($('.dur-dis').filter(":checked").val());
-  //   }
-  // });
-
   //Reset all html onclick
   document.querySelectorAll(".reset-all").forEach(ele=>{
     ele.addEventListener('click',function(){
@@ -191,11 +142,10 @@ function showMap(){
     $("#saveTour").css("display","none");
     //Reset options
     $('.container').empty();
-    $('#time').val('07:00');
-    timesrt.setDate("07:00");
-    datestart.setDate("today");
-    timeend.clear();
-    dateend.setDate("today");
+    document.querySelector("#time")._flatpickr.setDate(new Date().setHours(7,0,0));
+    // datestart.setDate("today");
+    document.querySelector("#time-end")._flatpickr.clear();
+    // dateend.setDate("today");
     $('#is-back').prop('checked', false);
     $('.dur-dis[value="1"]').prop('checked', true);
 
@@ -237,7 +187,9 @@ function showMap(){
     $('#timeline').hide();
     $('#add-button').show();
     $('#get-route').show();
-    $('#your-start').hide();
+    $('#your-start')[0].setAttribute('data-strtlocat',0);
+    $('#your-start')[0].setAttribute('data-clsclk',0);
+    $('#your-start')[0].innerText = 'Click on map to start location';
     $('#set-dur-panel').hide();
     tablinks = document.getElementsByClassName('tablinks');
     for (i = 0; i < tablinks.length; i++) {
@@ -287,9 +239,15 @@ function showMap(){
   // }
   //add location button
   $("#add-button").click(()=>{
+    let datastrtlocat = parseInt(document.getElementById('your-start').getAttribute('data-strtlocat'));
+    if(datastrtlocat == 0){
+      $('#your-start')[0].innerHTML = 'Click here to add start location'
+    }
+
     idToData($("#waypoints").find(":selected").val(),"setDur",$('#set-dur-panel').val());
     //Add the start location
-    if(startlocat == undefined && !$('.list-item').length &&clickMarker !=undefined){
+    if(startlocat == undefined && !$('.list-item').length &&clickMarker !=undefined || datastrtlocat == 1){
+      document.getElementById('your-start').setAttribute('data-strtlocat',2);
       startlocat = $("#waypoints").find(":selected").val();
       staMarker = clickMarker;
       clickMarker = undefined;
@@ -299,24 +257,18 @@ function showMap(){
       '<span id="your-start-close">×</span>';
       $("#waypoints").find(":selected").remove();
       $('#your-start-close').click(()=>{
+        $('#your-start')[0].setAttribute('data-clsclk',1);
+        $('#your-start')[0].setAttribute('data-strtlocat',0);
         staMarker.setMap(null);
         staMarker = undefined;
-        $('.map-marker-label').remove();
-        $('#your-start').hide();
+        $('.map-marker-label[value='+startlocat+']').remove();
+        $('#your-start')[0].innerHTML = 'Click here to add start location';
         startlocat = undefined;
         updateRoute();
       })
+      if(locatsList.length==5) $("#add-button").hide();
       return;
     }
-
-    // if($('#set-dur-panel').is(':visible')){
-    //   locationsdata.forEach(ele=>{
-    //     if(ele.place_id == $('#set-dur-panel').val()){
-    //       ele.de_duration = isNaN(converttime($('#set-dur-input').val()))?3600:converttime($('#set-dur-input').val());
-    //       $('#set-dur-panel').hide();
-    //     }
-    //   })
-    // }
 
     if($("#waypoints").find(":selected").val() == newPlaceId){
       newClickMarker.push(clickMarker);
@@ -337,19 +289,17 @@ function showMap(){
 
   //get route button
   $("#get-route").click(()=>{
-
+    //Reset resmarker 
     if(resmarkers.length){
       resmarkers.forEach(ele=>ele.setMap(null));
       resmarkers = [];
     }
     
-
-    
     if(locatsList.length>1){
       setOptions();
       if(!isopt){
-      // if(locatsList.length == 2){
-        $('#overlay').show()// turn on loader
+      // turn on loader
+        $('#overlay').show()
         idToData(null,'LatLngArr');
         drawRoutes();
       }else{
@@ -359,7 +309,16 @@ function showMap(){
       $("#get-route").hide();
       if(locatsList.length==5) $("#add-button").hide();
       $("#tab-timeline").attr('style','display: block');
-    } else{
+    }
+    if(startlocat != undefined && locatsList.length == 1){
+      $('#overlay').show()// turn on loader
+      idToData(null,'LatLngArr');
+      drawRoutes();
+      $("#get-route").hide();
+      if(locatsList.length==5) $("#add-button").hide();
+      $("#tab-timeline").attr('style','display: block');
+    }
+    if((startlocat != undefined && locatsList.length == 0) || (startlocat == undefined && locatsList.length<=1)){
       alert("Please choose at least 2 locations");
     } 
     $("#saveTour").css("display","block");
@@ -382,6 +341,27 @@ function showMap(){
     }
   }
   
+  $('#your-start').click(()=>{
+    let dataclsclk = parseInt(document.getElementById('your-start').getAttribute('data-clsclk'));
+    if(dataclsclk == 1){
+      $('#your-start')[0].setAttribute('data-clsclk',0);
+      return;
+    }
+    if(startlocat == undefined ){
+      $('#your-start')[0].innerHTML = 'Please click on map to choose start location';
+      if(locatsList.length){
+        $('#your-start')[0].setAttribute('data-strtlocat',1);
+        updateRoute();
+      }
+    }
+    $('#add-button').show();
+  })
+  $('#clear-service').click(()=>{
+    $('#clear-service').hide();
+    for(var i = 0; i<resmarkers.length;i++)
+      resmarkers[i].setMap(null);
+    $('.map-marker-label[value="nearByPlace"]').remove();
+  })
   $('#is-back').click(updateRoute);
   $('#is-opt').click(updateRoute);
   $('.dur-dis').click(updateRoute);
@@ -440,9 +420,24 @@ function showMap(){
     var closebtn = document.getElementsByClassName("closebtn");
     closebtn[closebtn.length-1].addEventListener("click", function() {
         locationContainerHeight('del');
-      // if(disresponse != undefined && closebtn.length == 2){
-      //   alert("You can't delete any more locations.");
-      // } else {
+        let id = this.parentElement.parentElement.getAttribute('value');
+        //Delete markers
+        for(let i = 0; i < newClickMarker.length; i++){
+          if(Object.entries(newClickMarker[i].position.toJSON()).toString() === Object.entries(idToData(id,'LatLng')).toString()){
+            newClickMarker[i].setMap(null);
+            $('.map-marker-label[value='+id+']').remove();
+            newClickMarker.splice(i,1);
+            break;
+          }
+        }
+        //Delete markers
+        for(let i = 0; i < markersArray.length; i++){
+          if(Object.entries(markersArray[i].position.toJSON()).toString() === Object.entries(idToData(id,'LatLng')).toString()){
+            markersArray[i].setMap(null)
+            markersArray.splice(i,1);
+            break;
+          }
+        }
         this.parentElement.parentElement.remove();
         var num = parseInt(this.parentElement.lastElementChild.innerText);
         locatsList.splice(num-1,1);
@@ -516,8 +511,7 @@ function showMap(){
     var data =  { 
       locatsList: locatsList, 
       durordis: isopt,
-      choosendur: converttime($('#time-end').val()) - 
-      converttime($('#time').val()),
+      choosendur: (document.querySelector("#time-end")._flatpickr.selectedDates[0] - document.querySelector("#time")._flatpickr.selectedDates[0])/1000,
       isback: ($('#is-back').is(':checked') === true),
       dello: dello
     };
@@ -669,29 +663,29 @@ function showMap(){
 
   function getandsettimeline(response){
     timeline = [];
-    timeline.push($('#time').val());
-    console.log($('#time').val())
-    var tmp = converttime($('#time').val());
+    let tmp = document.querySelector("#time")._flatpickr.selectedDates[0];
+    console.log(document.querySelector("#time")._flatpickr.selectedDates[0]);
+    timeline.push(tmp);
     if(startlocat != undefined && idToData(startlocat,"duration")!=0){
-      tmp+=idToData(startlocat,"duration");
-      timeline.push(converttime(tmp));
+      tmp = new Date(tmp.getTime() + idToData(startlocat,"duration")*1000);
+      timeline.push(tmp);
     }
     for(var i = 0; i < response.length-1 ; i++){
       if(startlocat == undefined){
-        tmp += idToData(locatsList[i],'duration');
-        timeline.push(converttime(tmp));
+        tmp = new Date(tmp.getTime() + idToData(locatsList[i],"duration")*1000);
+        timeline.push(tmp);
       } else if(i >=1){
-         tmp += idToData(locatsList[i-1],'duration');
-        timeline.push(converttime(tmp));
+         tmp = new Date(tmp.getTime() + idToData(locatsList[i-1],"duration")*1000);
+        timeline.push(tmp);
       }
       
-      tmp += response[i].duration.value;
-      timeline.push(converttime(tmp));
+      tmp = new Date(tmp.getTime() + response[i].duration.value*1000);
+      timeline.push(tmp);
     }
 
     if(!$('#is-back').is(':checked')){
-      tmp += idToData(locatsList[locatsList.length-1],'duration');
-      timeline.push(converttime(tmp));
+      tmp = new Date(tmp.getTime() + idToData(locatsList[locatsList.length-1],"duration")*1000);
+      timeline.push(tmp);
     }
     // if($('#time-end').val() != null)
 
@@ -716,22 +710,22 @@ function showMap(){
     }
 
     for(var i=0; i<timeline.length;i++)
-     icon[i].innerText = timeline[i]; 
+     icon[i].innerText = converttime(timeline[i]); 
     i=0;
     if(startlocat!= undefined && idToData(startlocat,'duration') == 0){
       i=1;
-      title[0].innerText = '{{ trans("messages.YourLo") }}';
+      title[0].innerText = '{{ trans("messages.YourLo") }} '+timeline[0].toLocaleDateString();
       $(title[0]).css('color','#ea4335');
       $(body[0]).append(
-        '<p> {{ trans("messages.Startthetourat") }} ' +idToData(startlocat,'text')+ ' {{ trans("messages.At") }} '+timeline[0] +'</p>'
+        '<p> {{ trans("messages.Startthetourat") }} ' +idToData(startlocat,'text')+ ' {{ trans("messages.At") }} '+converttime(timeline[0]) +'</p>'
       );
       if($('#is-back').is(':checked')){
-        title[timeline.length-1 ].innerText = '{{ trans("messages.YourLo") }}';
+        title[timeline.length-1 ].innerText = '{{ trans("messages.YourLo") }} '+timeline[timeline.length-1].toLocaleDateString();
         $(body[timeline.length-1]).append(
         '<p>{{ trans("messages.CmBck") }} '+idToData(startlocat,'text')+'</p>');
       } else {
         $(body[timeline.length-1]).append(
-        '<p> {{ trans("messages.Finish") }} '+ idToData(locatsList[locatsList.length-1],'text') +' {{ trans("messages.At") }} '+timeline[timeline.length-1]+'</p>'
+        '<p> {{ trans("messages.Finish") }} '+ idToData(locatsList[locatsList.length-1],'text') +' {{ trans("messages.At") }} '+converttime(timeline[timeline.length-1])+'</p>'
         );
         
       }
@@ -739,21 +733,21 @@ function showMap(){
 
     if(startlocat!= undefined && idToData(startlocat,'duration') != 0){
       i=2;
-      title[0].innerText = '{{ trans("messages.YourLo") }}';
+      title[0].innerText = '{{ trans("messages.YourLo") }} '+timeline[0].toLocaleDateString();
       $(title[0]).css('color','#ea4335');
       $(body[0]).append(
-        '<p> {{ trans("messages.Startthetourat") }} ' +idToData(startlocat,'text')+ ' {{ trans("messages.At") }} '+timeline[0] +' {{ trans("messages.VisIn") }} '+converttime(idToData(startlocat,'duration')) +'</p>'
+        '<p> {{ trans("messages.Startthetourat") }} ' +idToData(startlocat,'text')+ ' {{ trans("messages.At") }} '+converttime(timeline[0]) +' {{ trans("messages.VisIn") }} '+converttime(idToData(startlocat,'duration')) +'</p>'
       );
-      title[1].innerText = idToData(startlocat,'text');
+      title[1].innerText = idToData(startlocat,'text')+' '+timeline[1].toLocaleDateString();
       $(title[1]).css('color','red');
-      $(body[1]).append('<p>{{ trans("messages.CplVis") }} '+idToData(startlocat,'text')+' {{ trans("messages.At") }} '+timeline[1]+' {{ trans("messages.GoNxt") }}</p>');
+      $(body[1]).append('<p>{{ trans("messages.CplVis") }} '+idToData(startlocat,'text')+' {{ trans("messages.At") }} '+converttime(timeline[1])+' {{ trans("messages.GoNxt") }}</p>');
       if($('#is-back').is(':checked')){
-        title[timeline.length-1 ].innerText = '{{ trans("messages.YourLo") }}';
+        title[timeline.length-1 ].innerText = '{{ trans("messages.YourLo") }} '+timeline[timeline.length-1].toLocaleDateString();
         $(body[timeline.length-1]).append(
         '<p>{{ trans("messages.CmBck") }} '+idToData(startlocat,'text')+'</p>');
       } else {
         $(body[timeline.length-1]).append(
-        '<p> {{ trans("messages.Finish") }} '+ idToData(locatsList[locatsList.length-1],'text') +' {{ trans("messages.At") }} '+timeline[timeline.length-1]+'</p>'
+        '<p> {{ trans("messages.Finish") }} '+ idToData(locatsList[locatsList.length-1],'text') +' {{ trans("messages.At") }} '+converttime(timeline[timeline.length-1])+'</p>'
         );
         
       }
@@ -761,20 +755,20 @@ function showMap(){
 
     if(startlocat == undefined){
       $(body[0]).append(
-        '<p> {{ trans("messages.Startthetourat") }} '+idToData(locatsList[0],'text')+' {{ trans("messages.At") }} '+timeline[0] +' {{ trans("messages.VisIn") }} '+converttime(idToData(locatsList[0],'duration'))+
+        '<p> {{ trans("messages.Startthetourat") }} '+idToData(locatsList[0],'text')+' {{ trans("messages.At") }} '+converttime(timeline[0]) +' {{ trans("messages.VisIn") }} '+converttime(idToData(locatsList[0],'duration'))+
         '</p><br><p>'+idToData(locatsList[0],'description')+'</p><p><a href="'+idToData(locatsList[0],'link')+'"target="_blank">View the location</a></p><div class="show-more">{{ trans("messages.Showmore") }} <i class="fa fa-chevron-down" aria-hidden="true"></i></div>'
       ); 
       $(heading[0]).append('<div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-utensils" value="'+0+'"></i></div><span class="nearby-find-text">Restaurant</span></div><div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-store" value="'+0+'"></i></div><span class="nearby-find-text">Store</span></div><div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-coffee" value="'+0+'"></i></div><span class="nearby-find-text">Coffe Store</span></div>');
 
 
       if($('#is-back').is(':checked')){
-        title[timeline.length-1].innerText = idToData(locatsList[0],'text');
+        title[timeline.length-1].innerText = idToData(locatsList[0],'text') +' '+timeline[timeline.length-1].toLocaleDateString() ;
         $(body[timeline.length-1]).append(
-            '<p>{{ trans("messages.CmBck") }} '+idToData(locatsList[0],'text')+' {{ trans("messages.At") }} '+timeline[timeline.length-1]+'</p>'
+            '<p>{{ trans("messages.CmBck") }} '+idToData(locatsList[0],'text')+' {{ trans("messages.At") }} '+converttime(timeline[timeline.length-1])+'</p>'
         );
       } else {
         $(body[timeline.length-1]).append(
-          '<p> {{ trans("messages.Finish") }} '+ idToData(locatsList[locatsList.length-1],'text') +' {{ trans("messages.At") }} '+timeline[timeline.length-1]+'</p>'
+          '<p> {{ trans("messages.Finish") }} '+ idToData(locatsList[locatsList.length-1],'text') +' {{ trans("messages.At") }} '+converttime(timeline[timeline.length-1])+'</p>'
         );
       }
     }
@@ -782,17 +776,17 @@ function showMap(){
     j=0;
     for(; i<timeline.length;i+=2){
       if(i+1<timeline.length){
-        title[i].innerText = idToData(locatsList[j],'text');
-        title[i+1].innerText = '{{ trans("messages.TralTo") }}';
+        title[i].innerText = idToData(locatsList[j],'text') + ' '+timeline[i].toLocaleDateString();
+        title[i+1].innerText = '{{ trans("messages.TralTo") }} '+timeline[i+1].toLocaleDateString();
         $(title[i+1]).css('color','red');
       }
       
       if(i>0&&i<timeline.length-1){
         $(heading[i]).append('<div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-utensils" value="'+j+'"></i></div><span class="nearby-find-text">Restaurant</span></div><div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-store" value="'+j+'"></i></div><span class="nearby-find-text">Store</span></div><div class="nearby-find-content"><div class="nearby-find-icon"><i class="fas fa-coffee" value="'+j+'"></i></div><span class="nearby-find-text">Coffe Store</span></div>');
-        $(body[i]).append('<p>{{ trans("messages.Arr") }} '+ idToData(locatsList[j],'text') +' {{ trans("messages.At") }} '+timeline[i]+' {{ trans("messages.VisIn") }} '+ converttime(idToData(locatsList[j],'duration'))+'</p><br><p>'+idToData(locatsList[j],'description')+'</p><p><a href="'+idToData(locatsList[j],'link')+'" target="_blank">View the location</a></p><div class="show-more">{{ trans("messages.Showmore") }} <i class="fa fa-chevron-down" aria-hidden="true"></i></div>');
+        $(body[i]).append('<p>{{ trans("messages.Arr") }} '+ idToData(locatsList[j],'text') +' {{ trans("messages.At") }} '+converttime(timeline[i])+' {{ trans("messages.VisIn") }} '+ converttime(idToData(locatsList[j],'duration'))+'</p><br><p>'+idToData(locatsList[j],'description')+'</p><p><a href="'+idToData(locatsList[j],'link')+'" target="_blank">View the location</a></p><div class="show-more">{{ trans("messages.Showmore") }} <i class="fa fa-chevron-down" aria-hidden="true"></i></div>');
       }
       if(i<timeline.length-2){
-        $(body[i+1]).append('<p>{{ trans("messages.CplVis") }} '+idToData(locatsList[j],'text')+' {{ trans("messages.At") }} '+timeline[i+1]+' {{ trans("messages.GoNxt") }}</p>');
+        $(body[i+1]).append('<p>{{ trans("messages.CplVis") }} '+idToData(locatsList[j],'text')+' {{ trans("messages.At") }} '+converttime(timeline[i+1])+' {{ trans("messages.GoNxt") }}</p>');
       }
       j++;
     }
@@ -809,6 +803,7 @@ function showMap(){
         }
       });
     }
+    document.getElementById('total-time-value').innerText = converttime('duration');
     
     for(i= timeline.length; i<li.length;i++)
       li[i].style.display = "none"; 
@@ -819,6 +814,7 @@ function showMap(){
     fa = document.querySelectorAll('.nearby-find-icon');
     for( var i =0;i<fa.length;i++)
       fa[i].addEventListener('click',function(){
+        $('#clear-service').show();
         var type = this.parentElement.children[1].innerText;
         if(type == 'Restaurant'){
           type = 'restaurant'
@@ -847,9 +843,9 @@ function showMap(){
           radius: '500',
           type: type,
         }, (response, status) => {
-          
-            for(var i = 0; i<resmarkers.length;i++)
-              resmarkers[i].setMap(null);
+          for(var i = 0; i<resmarkers.length;i++)
+            resmarkers[i].setMap(null);
+          $('.map-marker-label[value="nearByPlace"]').remove();
           
           for (let i = 0; i <15; i++) {
             resMarker(response[i]);
@@ -875,21 +871,47 @@ function showMap(){
       icon: icon
     });
     resmarkers.push(resMarker);
-    customLabel(resMarker);
+    customLabel(resMarker,'nearByPlace');
 
   }
   // convert time in seconds and HH:MM format
   function converttime(time){
+    if(time === 'duration'){
+      let seconds = (timeline[timeline.length-1].getTime() - timeline[0])/1000;
+      var d = Math.floor(seconds / (3600*24));
+      seconds  -= d*3600*24;
+      let h   = Math.floor(seconds / 3600);
+      seconds  -= h*3600;
+      let m = Math.floor(seconds / 60);
+      seconds  -= m*60;
+      if(seconds>=30) m+=1;
+
+      let tmp = [];
+      if(d){(d==1)?tmp.push(d + ' Day'):tmp.push(d + ' Days')}
+      if(d || h){(h==1)?tmp.push(h + ' Hour'):tmp.push(h + ' Hours')};
+      if(d || h || m){(m==1)?tmp.push(h + ' Minute'):tmp.push(h + ' Minutes')};
+      return tmp.join(' ');
+    }
+    if(time === 'duration_second'){
+      let seconds = (timeline[timeline.length-1].getTime() - timeline[0])/1000;
+      return seconds;
+    }
+    if(time instanceof Date ){
+      let tmpDate = time.toTimeString();
+      let tmp = tmpDate.split(":");
+      time = tmp[0]+":"+tmp[1];
+      return time;
+    }
     if(typeof(time) == "number"){
-      var hours = Math.floor(time / 3600);
+      let hours = Math.floor(time / 3600);
       time %= 3600;
-      var minutes = Math.floor(time / 60);
+      let minutes = Math.floor(time / 60);
       minutes = String(minutes).padStart(2, "0");
       hours = String(hours).padStart(2, "0");
       time = hours + ":" + minutes;
     } else{
-      var a = time.split(':'); 
-      var time = (+a[0]) * 60 * 60 + (+a[1]) * 60; 
+      let a = time.split(':'); 
+      time = (+a[0]) * 60 * 60 + (+a[1]) * 60; 
     }
     return time;
   }
@@ -994,7 +1016,7 @@ function showMap(){
   }
 
   function timealert(serverres){
-    choosendur = converttime($('#time-end').val()) - converttime($('#time').val());
+    choosendur = (document.querySelector("#time-end")._flatpickr.selectedDates[0] - document.querySelector("#time")._flatpickr.selectedDates[0])/1000;
     if(isNaN(choosendur)){
       bestWay();
     } else {
@@ -1021,8 +1043,8 @@ function showMap(){
         $("#timeAlert-close").click(()=>{
           $('#overlay').hide();
           $("#timeAlert").modal("hide");
-          $('.options-list').hide();
-          $(document.getElementById('time-end').parentElement).show();        
+          // $('.options-list').hide();
+          // $(document.getElementById('time-end').parentElement).show();        
           $('#add-button').hide();
           $('#get-route').show();
         });
@@ -1201,11 +1223,9 @@ function showMap(){
             min = allRouteOptimize[k]
           }
         }
-        console.log(min);
       }
 
       routeOptimized = min;
-      console.log(routeOptimized);
     }
 
     if(dello && startlocat == undefined){
@@ -1249,11 +1269,9 @@ function showMap(){
             min = allRouteOptimize[k]
           }
         }
-        console.log(min);
       }
 
       routeOptimized = min;
-      console.log(routeOptimized);
     }
 
 
@@ -1452,7 +1470,7 @@ function showMap(){
     if(place_id!=undefined);
       this.span.setAttribute('value',place_id);
   };
-
+ 
   MarkerLabel.prototype = $.extend(new google.maps.OverlayView(), {
     onAdd: function() {
       this.getPanes().overlayImage.appendChild(this.span);
@@ -1494,8 +1512,8 @@ function showMap(){
             let $url_path = '{!! url('/') !!}';
             let _token = $('meta[name="csrf-token"]').attr('content');
             let routeDetail=$url_path+"/saveTour";
-            let timeStart = $('#time').val();
-            let timeEnd = $('#time-end').val();
+            let timeStart = $('#time input').val();
+            let timeEnd = converttime('duration_second');
             let to_comback;
             if ($('#is-back').is(':checked'))
             {
@@ -1532,8 +1550,6 @@ function showMap(){
                 de_default: idToData(ele,'default')
               })
             })
-            console.log(val);
-            console.log(tmparr);
 
             $.ajax({
                   url:routeDetail,
@@ -1558,8 +1574,8 @@ function showMap(){
             let $url_path = '{!! url('/') !!}';
             let _token = $('meta[name="csrf-token"]').attr('content');
             let routeDetail=$url_path+"/saveTour";
-            let timeStart = $('#time').val();
-            let timeEnd = $('#time-end').val();
+            let timeStart = $('#time input').val();
+            let timeEnd = converttime('duration_second');
             let to_comback;
             if ($('#is-back').is(':checked'))
             {
@@ -1620,8 +1636,8 @@ function showMap(){
             let _token = $('meta[name="csrf-token"]').attr('content');
             let routeId = {{$id}};
             let routeDetail=$url_path+"/editRoute/"+routeId;
-            let timeStart = $('#time').val();
-            let timeEnd = $('#time-end').val();
+            let timeStart = $('#time input').val();
+            let timeEnd = converttime('duration_second');
             let to_comback;
             if ($('#is-back').is(':checked'))
             {
@@ -1680,9 +1696,9 @@ function showMap(){
     @foreach($array as $value)
       locatsList.push('{{$value}}');
     @endforeach
-    $("#time").val('{{$to_starttime}}');
+      $("#time input").val('{{date("d-m-Y h:i", strtotime($to_starttime))}}');
     @if($to_endtime != "")
-      $("#time-end").val('{{$to_endtime}}');
+      $("#time-end input").val('{{date("d-m-Y h:i", strtotime($to_endtime))}}');
     @endif
     @if($to_comback == '1')
       $('#is-back').prop('checked',true);
@@ -1740,11 +1756,13 @@ function showMap(){
     @endif
     // drawRoutes
     @if($to_des != "")
-      // idToData(null,'LatLngArr');
-      // drawRoutes();
-      setTimeout(function(){ 
-        $("#get-route").click();
-      }, 200);
+      idToData(null,'LatLngArr');
+      drawRoutes();
+      $("#tab-timeline").attr('style','display: block');
+      $("#get-route").hide();
+      // setTimeout(function(){ 
+      //   $("#get-route").click();
+      // }, 200);
       let height = ($('.list-item').length+1) * 45 +5;
       $('#container-height').css('height',height+'px');
     @endif
@@ -2070,6 +2088,11 @@ function showMap(){
                 </div>
               </li>
           </ul>
+
+        </div>
+        <div id="total-time">
+          <span>Total time: </span>
+          <span id="total-time-value"></span>
         </div>
       </div>
       <!--timeline ends-->
@@ -2094,7 +2117,7 @@ function showMap(){
               <button id="add-button">{{ trans('messages.Addlocation') }}</button>
               <!-- <button id="get-route" style="display: none;">Update</button> -->
             </div>
-            <div id="your-start" style="display: none;"> 
+            <div id="your-start" data-strtlocat='0' data-clsclk="0" style="display: block;">Click on map to choose start location
             <!-- <span id="your-start-close">×</span> -->
             </div>
             <div class="container" id='container'>  
@@ -2117,13 +2140,13 @@ function showMap(){
             <div>
               <input type="time" id="time" value="07:00" style="width: 80%">
             </div> -->
-            <div id="date-start" value="" style="margin-bottom: 0.5rem;display: flex;">
+            <!-- <div id="date-start" value="" style="margin-bottom: 0.5rem;display: flex;">
               <input type="text" placeholder="Select Date.." data-input style="width: 100%">  
               <a class="input-button" title="clear" data-clear style="border: 1px solid #bbb;display: inline-block;padding: 1px 10px;cursor: pointer;margin-left: 0.2rem">
                   <i class="fas fa-times"></i>
               </a>
-            </div>
-            <div id="time" value="07:00" style="margin-bottom: 0.5rem;display: flex;">
+            </div> -->
+            <div id="time" value="" style="margin-bottom: 0.5rem;display: flex;">
               <input type="text" placeholder="Select Time.." data-input style="width: 100%">  
               <a class="input-button" title="clear" data-clear style="border: 1px solid #bbb;display: inline-block;padding: 1px 10px;cursor: pointer;margin-left: 0.2rem">
                   <i class="fas fa-times"></i>
@@ -2132,12 +2155,12 @@ function showMap(){
           </div>
           <div class="options-list">
             <div><b>{{ trans('messages.Selecttheendtime') }}:</b></div>
-            <div id="date-end" value="" style="margin-bottom: 0.5rem;display: flex;">
+            <!-- <div id="date-end" value="" style="margin-bottom: 0.5rem;display: flex;">
               <input type="text" placeholder="Select Date.." data-input style="width: 100%">  
               <a class="input-button" title="clear" data-clear style="border: 1px solid #bbb;display: inline-block;padding: 1px 10px;cursor: pointer;margin-left: 0.2rem">
                   <i class="fas fa-times"></i>
               </a>
-            </div>
+            </div> -->
             <div id="time-end" value="" style="margin-bottom: 0.5rem;display: flex;">
               <input type="text" placeholder="Select Time.." data-input style="width: 100%">  
               <a class="input-button" title="clear" data-clear style="border: 1px solid #bbb;display: inline-block;padding: 1px 10px;cursor: pointer;margin-left: 0.2rem">
@@ -2159,14 +2182,8 @@ function showMap(){
               <input type="radio" class="dur-dis" name="durdis" value="1" checked> {{ trans('messages.Duration') }}   
               <input type="radio" class="dur-dis" name="durdis" value="2"> {{ trans('messages.Cost') }}
             </div>
-              
           </div>
-          <!-- <button class="slider-button slider-button-left" onclick="plusDivs(-1)">
-            &#10094;
-          </button>
-          <button class="slider-button slider-button-right" onclick="plusDivs(1)">
-            &#10095;
-          </button> -->
+          <button id="clear-service" style="display: none;">Clear service</button>
         </div>
         <!-- <div id="switch-tab" class="control-panel">
           <button class="tablinks" onclick=""  id="saveTour">{{ trans('messages.SaveTour') }}</button>
@@ -2486,7 +2503,29 @@ function showMap(){
 
 <script type="text/javascript">
   $(document).ready(function(){
-    
+    // input time
+    let todayDate = new Date();
+      todayDate.setHours(7,0,0);
+      $("#time").flatpickr({
+        wrap: true,
+        onChange: function(selectedDates, dateStr, instance) {
+          $("#time").val(selectedDates);
+        },
+        enableTime: true,
+        minDate: "today",
+        defaultDate: todayDate,
+        dateFormat: "d-m-Y H:i"
+      });
+      $('#time').val(todayDate);
+
+      $("#time-end").flatpickr({
+            wrap: true,
+            onChange: function(selectedDates, dateStr) {
+              $("#time-end").val(dateStr);
+            },
+            enableTime: true
+        });
+
     @for($i = 1; $i<= 10; $i++)
       $("#div_Starrank_tour .star_{{$i}}").click(function(){
           @for($j = 1 ; $j <= 10; $j++)
@@ -2533,7 +2572,7 @@ function showMap(){
     }); 
     
     $(".menu_title_start").click(function(){
-      location.reload();
+      location.replace("{{route('user.maps')}}");
     });
     $("#p_logout").click(function(){
       location.replace("{{route('logout')}}");

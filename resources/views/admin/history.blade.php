@@ -13,6 +13,15 @@
     div#Table_AllClass_Star_filter {
         float: right;
     }
+    .startlocat_class {
+        width: 10rem !important;
+    }
+    .startendtime{
+      width: 7rem !important;
+    }
+    .intro_class{
+       width: 10rem !important;
+    }
   </style>
 @stop
 @section('content')
@@ -53,6 +62,7 @@
                   <tr>
                       <th>{{ trans("admin.Order") }}</th>
                       <th>{{ trans("admin.Tourname") }}</th>
+                      <th>{{ trans("admin.Startlocation") }}</th>
                       <th>{{ trans("admin.DetailTour") }}</th>
                       <th>Introduce</th>
                       <th>Average rating</th>
@@ -142,6 +152,13 @@
               <div class="col-md-8 col-sm-6 col-6 mb-3">
                 <p id="textEndTime"></p>
               </div>
+              <!-- total time -->
+              <div class="col-md-4 col-sm-6 col-6 mb-3">
+                <p class="font-weight-bold text-italic">Total tour time</p>
+              </div>
+              <div class="col-md-8 col-sm-6 col-6 mb-3">
+                <p id="textTotalTime"></p>
+              </div>
               <!-- Comback -->
               <div class="col-md-4 col-sm-6 col-6 mb-3">
                 <p class="font-weight-bold text-italic">{{ trans('admin.Comeback') }}</p>
@@ -159,9 +176,6 @@
 
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
         </div>
       </div>
     </div>
@@ -223,6 +237,13 @@
               <div class="col-md-8 col-sm-6 col-6 mb-3">
                 <p id="textEndTime_detail2"></p>
               </div>
+              <!-- total time -->
+              <div class="col-md-4 col-sm-6 col-6 mb-3">
+                <p class="font-weight-bold text-italic">Total tour time</p>
+              </div>
+              <div class="col-md-8 col-sm-6 col-6 mb-3">
+                <p id="textTotalTour_detail2"></p>
+              </div>
               <!-- Comback -->
               <div class="col-md-4 col-sm-6 col-6 mb-3">
                 <p class="font-weight-bold text-italic">{{ trans('admin.Comeback') }}</p>
@@ -266,7 +287,6 @@
         </div>
         <div class="modal-footer">
           <a href="#" class="btn btn-danger" target="_blank">Edit tour</a>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
         </div>
       </div>
     </div>
@@ -293,6 +313,11 @@
         },
           "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]],
           "order": [[ 1, 'asc' ]],
+          "columnDefs": [
+              { className: "startlocat_class", "targets": [ 2 ] },
+              { className: "startendtime", "targets": [ 4 ] },
+              { className: "startendtime", "targets": [ 5 ] },
+            ],
             processing: true,
             serverSide: true,
             ajax: '{!! route('admin.showAllRoute') !!}',
@@ -319,16 +344,20 @@
     $(function() {
         var table = $('#Table_AllClass_Star').DataTable({
           "language": {
-          "emptyTable": "{{trans('admin.emptyTable')}}",
-          "sLengthMenu": "{{ trans('admin.showEntries') }}",
-          "search": "{{ trans('admin.search') }}",
-          "info": "{{ trans('admin.showingToOf') }}",
-          "paginate": {
-            "previous": "{{ trans('admin.previous') }}",
-            "next": "{{ trans('admin.next') }}"
-          }
-        },
+            "emptyTable": "{{trans('admin.emptyTable')}}",
+            "sLengthMenu": "{{ trans('admin.showEntries') }}",
+            "search": "{{ trans('admin.search') }}",
+            "info": "{{ trans('admin.showingToOf') }}",
+            "paginate": {
+              "previous": "{{ trans('admin.previous') }}",
+              "next": "{{ trans('admin.next') }}"
+            }
+          },
           "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]],
+          "columnDefs": [
+              { className: "startlocat_class", "targets": [ 2 ] },
+              { className: "intro_class", "targets": [ 4 ] },
+            ],
           "order": [[ 1, 'asc' ]],
             processing: true,
             serverSide: true,
@@ -337,6 +366,7 @@
             columns: [
               { data: 'stt', name: 'stt' },
                 { data: 'tourName', name: 'tourName' },
+                { data: 'startLocat', name: 'startLocat' },
                 { data: 'Detail', name: 'Detail' },
                 { data: 'content', name: 'content' },
                 { data: 'avg', name: 'avg' },
@@ -380,6 +410,8 @@
                 $("#textEndTime").append(data[5]);
                 $("#textComeback").append(data[6]);
                 $("#textOptimized").append(data[7]);
+                $("#textTotalTime").empty();
+                $("#textTotalTime").append(data[8]);
               }
             });
         });
@@ -404,6 +436,7 @@
                 $("#textLocatList_detail2").empty();
                 $("#textStartTime_detail2").empty();
                 $("#textEndTime_detail2").empty();
+                $("#textTotalTour_detail2").empty();
                 $("#textComeback_detail2").empty();
                 $("#textOptimized_detail2").empty();
                 $("#introduce_detail2").empty();
@@ -416,6 +449,7 @@
                 $("#textLocatList_detail2").append(data[3]);
                 $("#textStartTime_detail2").append(data[4]);
                 $("#textEndTime_detail2").append(data[5]);
+                $("#textTotalTour_detail2").append(data[11]);
                 $("#textComeback_detail2").append(data[6]);
                 $("#textOptimized_detail2").append(data[7]);
                 $("#introduce_detail2").append(data[8]);

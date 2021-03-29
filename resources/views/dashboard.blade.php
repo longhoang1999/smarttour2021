@@ -19,6 +19,12 @@
         <link rel="stylesheet" href="{{asset('css/dashboard.css')}}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" />
         <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>  
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type="text/javascript">
+            var duration;
+            var durationString;
+        </script>
     </head>
     <body id="page-top">
         <?php use App\Models\Destination; use App\Models\Language;?>                                 
@@ -144,7 +150,7 @@
                     @foreach($shareTour as $value)
                         <div class="col-md-4 col-sm-6 col-12 hightly_div mb-3">
                             <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
-                            <p class="tourName">{{$route->to_name}}</p>
+                            <p class="tourName" title="{{$route->to_name}}">{{$route->to_name}}</p>
                             <div class="hightly_div_child">
                                 <p class="tourContent">{{$value->number_star}} <i class="fas fa-star text-warning"></i> - {{$value->numberReviews}} votes</p>
                                 @if($value->image != "")
@@ -238,18 +244,34 @@
                                 <p class="font-weight-bold font-italic">Time start</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
-                                <p>{{date('h:i a', strtotime($route->to_starttime))}}</p>
+                                <p>{{date('d/m/Y h:i a', strtotime($route->to_starttime))}}</p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
                                 <p class="font-weight-bold font-italic">Time end</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 @if($route->to_endtime != "")
-                                    <p>{{date('h:i a', strtotime($route->to_endtime))}}</p>
+                                    <p>{{date('d/m/Y h:i a', strtotime($route->to_endtime))}}</p>
                                 @else
                                     <span class="badge badge-warning">Not available</span>
                                 @endif
                             </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Total tour time</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12 total_time">
+                            </div>
+                            <?php 
+                                $total = Carbon\Carbon::parse($route->to_endtime)->diffInMinutes(Carbon\Carbon::parse($route->to_starttime));
+                             ?>
+                            <!-- js take total -->
+                            <script type="text/javascript">
+                                duration = moment.duration({{$total}}, 'minutes');
+                                durationString = duration.days() + 'd ' + duration.hours() + 'h ' + duration.minutes() + 'm';
+                                console.log(durationString);
+                                $("#modal_{{$value->sh_id}} .total_time").html(durationString);
+                            </script>
+                            <!-- /endis -->
                             <div class="col-md-4 col-sm-6 col-12">
                                 <p class="font-weight-bold font-italic">Comeback</p>
                             </div>
@@ -535,7 +557,7 @@
                                             @endif
                                         </p>
                                     </div>
-                                    <a href="{{route('searchTour')}}" class="btn btn-primary">--- See more <i class="fas fa-angle-double-right pt-1"></i> ---</a>
+                                    <a href="{{route('user.tourhistory')}}" class="btn btn-primary">--- See more <i class="fas fa-angle-double-right pt-1"></i> ---</a>
                                 </div>
                             </div>
                         </div>
@@ -546,7 +568,7 @@
         <!-- Place Modal 3-->
         <?php $i=1; ?>
         @foreach($des as $value)
-        <div class="portfolio-modal modal fade" id="placeModal{{$i}}" tabindex="-1" role="dialog" aria-labelledby="portfolioModal3Label" aria-hidden="true">
+        <div class="portfolio-modal modal fade modaldetail_Place" id="placeModal{{$i}}" tabindex="-1" role="dialog" aria-labelledby="portfolioModal3Label" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
@@ -576,15 +598,15 @@
                                     @endif
                                     <!-- de_shortdes-->
                                     @if($value->de_shortdes != "")
-                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Shortdescription') }}:</span> {{$value->de_shortdes}}</p>
+                                        <p class="mb-5 text-justify"><span class="font-weight-bold">{{ trans('messages.Shortdescription') }}:</span> {{$value->de_shortdes}}</p>
                                     @else
-                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Shortdescription') }}:</span> {{ trans('messages.NoInformation') }}</p>
+                                        <p class="mb-5 text-justify"><span class="font-weight-bold">{{ trans('messages.Shortdescription') }}:</span> {{ trans('messages.NoInformation') }}</p>
                                     @endif
                                     <!-- de_description-->
                                     @if($value->de_description != "")
-                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Description') }}:</span> {{$value->de_description}}</p>
+                                        <p class="mb-5 text-justify"><span class="font-weight-bold">{{ trans('messages.Description') }}:</span> {{$value->de_description}}</p>
                                     @else
-                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Description') }}:</span> {{ trans('messages.NoInformation') }}</p>
+                                        <p class="mb-5 text-justify"><span class="font-weight-bold">{{ trans('messages.Description') }}:</span> {{ trans('messages.NoInformation') }}</p>
                                     @endif
                                     <!-- de_duration -->
                                     @if($value->de_duration != "")
@@ -604,10 +626,6 @@
                                     @else
                                         <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.LinkVR') }} :</span> {{ trans('messages.NoInformation') }}</p>
                                     @endif
-                                    <button class="btn btn-primary" data-dismiss="modal">
-                                        <i class="fas fa-times fa-fw"></i>
-                                        {{ trans('messages.CloseWindow') }}
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -701,7 +719,6 @@
         </form> 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('messages.CloseWindow') }}</button>
         <button type="button" class="btn btn-primary" id="btn_editInfo">{{ trans('messages.Editinformation') }}</button>
         <button type="button" class="btn btn-primary" id="btn_submitInfo">{{ trans('messages.SubmitEdit') }}</button>
       </div>
@@ -710,7 +727,7 @@
 </div>
         
         <!-- Bootstrap core JS-->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Third party plugin JS-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>

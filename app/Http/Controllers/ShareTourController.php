@@ -17,8 +17,10 @@ use App\Models\Uservotes;
 
 use Session;
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+
 
 
 
@@ -241,8 +243,14 @@ class ShareTourController extends Controller
     }
     public function searchTour()
     {
+        // find total share tour
+        $votes_total_time = ShareTour::get();
+        foreach ($votes_total_time as $key =>$sharetour) {
+            $route = Route::where("to_id",$sharetour->sh_to_id)->first();
+            if(intval(Carbon::parse($route->to_endtime)->day) - intval(Carbon::parse($route->to_starttime)->day) == 0)
+                $votes_total_time->forget($key);
+        }
         $votes_over = ShareTour::where("number_star",">=","8")->get()->count();
-        $votes_number = ShareTour::where("numberReviews",">=","2")->get()->count();
         $votes_number = ShareTour::where("numberReviews",">=","2")->get()->count();
         $allShareTour = ShareTour::get();
         $i=0;
@@ -265,6 +273,7 @@ class ShareTourController extends Controller
             'votes_over' => $votes_over,
             'votes_number' => $votes_number,
             'thismonth' => $findThisMon,
+            'votes_total_time' => $votes_total_time->count(),
             'lang' => $lang
         ]);
     }
@@ -324,10 +333,13 @@ class ShareTourController extends Controller
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
                     $start_time = Carbon::parse($route->to_starttime);
                     $finish_time = Carbon::parse($route->to_endtime);
-                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
-                    $totalTime_hour = floatval($totalTime_minut)/60;
-
-                    return $totalTime_hour = round($totalTime_hour,2);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
                 }
             )
             ->addColumn(
@@ -422,10 +434,13 @@ class ShareTourController extends Controller
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
                     $start_time = Carbon::parse($route->to_starttime);
                     $finish_time = Carbon::parse($route->to_endtime);
-                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
-                    $totalTime_hour = floatval($totalTime_minut)/60;
-
-                    return $totalTime_hour = round($totalTime_hour,2);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
                 }
             )
             ->addColumn(
@@ -529,10 +544,331 @@ class ShareTourController extends Controller
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
                     $start_time = Carbon::parse($route->to_starttime);
                     $finish_time = Carbon::parse($route->to_endtime);
-                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
-                    $totalTime_hour = floatval($totalTime_minut)/60;
-
-                    return $totalTime_hour = round($totalTime_hour,2);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->make(true);
+    }
+    //div_4
+    public function searchForHighTotal()
+    {
+        $votes_over = ShareTour::get();
+        foreach ($votes_over as $key =>$sharetour) {
+            $route = Route::where("to_id",$sharetour->sh_to_id)->first();
+            if(intval(Carbon::parse($route->to_endtime)->day) - intval(Carbon::parse($route->to_starttime)->day) == 0)
+                $votes_over->forget($key);
+        }
+        return DataTables::of($votes_over)
+            ->addColumn(
+                'stt',
+                function ($votes_over) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'tourName',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $tourName = $route->to_name;
+                    return $tourName;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'rating',
+                function ($votes_over) {
+                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
+                    return $rating;
+                }
+            )
+            ->addColumn(
+                'votes',
+                function ($votes_over) {
+                    $votes = $votes_over->numberReviews.' votes';
+                    return $votes;
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->make(true);
+    }
+    //max total
+    public function searchMaxTotal()
+    {
+        $votes_over = ShareTour::get();
+        foreach ($votes_over as $key =>$sharetour) {
+            $route = Route::where("to_id",$sharetour->sh_to_id)->first();
+            $sharetour['minutes'] = Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime));
+        }
+        $votes_over = $votes_over->sortBy('minutes');
+        return DataTables::of($votes_over)
+            ->addColumn(
+                'stt',
+                function ($votes_over) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'tourName',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $tourName = $route->to_name;
+                    return $tourName;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'rating',
+                function ($votes_over) {
+                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
+                    return $rating;
+                }
+            )
+            ->addColumn(
+                'votes',
+                function ($votes_over) {
+                    $votes = $votes_over->numberReviews.' votes';
+                    return $votes;
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->make(true);
+    }
+    //min total
+    public function searchMinTotal()
+    {
+        $votes_over = ShareTour::get();
+        foreach ($votes_over as $key =>$sharetour) {
+            $route = Route::where("to_id",$sharetour->sh_to_id)->first();
+            $sharetour['minutes'] = Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime));
+        }
+        $votes_over = $votes_over->sortBy('minutes',SORT_REGULAR, true);
+        return DataTables::of($votes_over)
+            ->addColumn(
+                'stt',
+                function ($votes_over) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'tourName',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $tourName = $route->to_name;
+                    return $tourName;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'rating',
+                function ($votes_over) {
+                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
+                    return $rating;
+                }
+            )
+            ->addColumn(
+                'votes',
+                function ($votes_over) {
+                    $votes = $votes_over->numberReviews.' votes';
+                    return $votes;
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
                 }
             )
             ->addColumn(
@@ -636,10 +972,13 @@ class ShareTourController extends Controller
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
                     $start_time = Carbon::parse($route->to_starttime);
                     $finish_time = Carbon::parse($route->to_endtime);
-                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
-                    $totalTime_hour = floatval($totalTime_minut)/60;
-
-                    return $totalTime_hour = round($totalTime_hour,2);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
                 }
             )
             ->addColumn(
@@ -742,10 +1081,13 @@ class ShareTourController extends Controller
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
                     $start_time = Carbon::parse($route->to_starttime);
                     $finish_time = Carbon::parse($route->to_endtime);
-                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
-                    $totalTime_hour = floatval($totalTime_minut)/60;
-
-                    return $totalTime_hour = round($totalTime_hour,2);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
                 }
             )
             ->addColumn(
@@ -853,10 +1195,13 @@ class ShareTourController extends Controller
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
                     $start_time = Carbon::parse($route->to_starttime);
                     $finish_time = Carbon::parse($route->to_endtime);
-                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
-                    $totalTime_hour = floatval($totalTime_minut)/60;
-
-                    return $totalTime_hour = round($totalTime_hour,2);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
                 }
             )
             ->addColumn(
@@ -989,10 +1334,12 @@ class ShareTourController extends Controller
             $number_rate,
             $startLocat,
             $this->takeDetail($array),
-            date('h:i a', strtotime($route->to_starttime)),
-            date('h:i a', strtotime($route->to_endtime)),
+            date('d/m/Y h:i a', strtotime($route->to_starttime)),
+            date('d/m/Y h:i a', strtotime($route->to_endtime)),
             date('d/m/Y', strtotime($route->to_startDay)),
-            $link_view_tour];
+            $link_view_tour,
+            Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime))
+        ];
     }
     public function takeDetail($array)
     {
@@ -1143,10 +1490,13 @@ class ShareTourController extends Controller
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
                     $start_time = Carbon::parse($route->to_starttime);
                     $finish_time = Carbon::parse($route->to_endtime);
-                    $totalTime_minut = $finish_time->diffInMinutes($start_time);
-                    $totalTime_hour = floatval($totalTime_minut)/60;
-
-                    return $totalTime_hour = round($totalTime_hour,2);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
                 }
             )
             ->addColumn(
@@ -1184,5 +1534,154 @@ class ShareTourController extends Controller
             )
             ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
             ->make(true);
+    }
+    public function tourhistory()
+    {
+        return view('sharetour.tourhistory');
+    }
+    public function showtourhistory()
+    {
+        $route = Route::where("to_id_user",Auth::user()->us_id)->get();
+        return DataTables::of($route)
+            ->addColumn(
+                'stt',
+                function ($route) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($route) {
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($route) {
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($route) {
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','startLocat','detailPlace','totalTime'])
+            ->make(true);
+    }
+    public function takeDetailTour(Request $req)
+    {
+        $route = Route::where("to_id",$req->idTour)->first();
+        // img + label
+        $arrayImg = array();
+        $arrayLabel = array();
+        // label
+        $pieces = explode("|", $route->to_des);
+        $array = array();
+        for ($i=0; $i < count($pieces)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces[$i]);
+        }
+        foreach ($array as $ar) {
+            $findDes = Destination::where("de_remove",$ar)->first();
+            if($findDes->de_default=="0")
+            {
+                if($findDes->de_image!= "")
+                {
+                    $imageLocation = array(asset($findDes->de_image));
+                    array_push($arrayImg,$imageLocation);
+                    if(Session::has('website_language') && Session::get('website_language') == "vi")
+                    {
+                        $lang = Language::where("des_id",$findDes->de_remove)->where("language","vn")->first();
+                        array_push($arrayLabel,array($lang->de_name));
+                    }
+                    else
+                    {
+                        $lang = Language::where("des_id",$findDes->de_remove)->where("language","en")->first();
+                        array_push($arrayLabel,array($lang->de_name));
+                    }
+                }
+                else
+                {
+                    $imageLocation = array(asset('imgPlace/empty.png'));
+                    array_push($arrayImg,$imageLocation);
+                    if(Session::has('website_language') && Session::get('website_language') == "vi")
+                    {
+                        $lang = Language::where("des_id",$findDes->de_remove)->where("language","vn")->first();
+                        array_push($arrayLabel,array($lang->de_name));
+                    }
+                    else
+                    {
+                        $lang = Language::where("des_id",$findDes->de_remove)->where("language","en")->first();
+                        array_push($arrayLabel,array($lang->de_name));
+                    }
+                }
+            }
+        }
+        // start locat
+        if($route->to_startLocat != "")
+        {
+            $des = Destination::select("de_name")->where("de_remove",$route->to_startLocat)->first();
+            $startLocat = '<span data-id="'.$route->to_startLocat.'"><i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name.'</span>';
+        }
+        else
+            $startLocat = '<span class="badge badge-warning">Not available</span>';
+        $link_view_tour = route('user.editTour',[$route->to_id]);
+
+        return [$arrayImg,
+            $arrayLabel,
+            $route->to_name,
+            $startLocat,
+            $this->takeDetail($array),
+            date('d/m/Y h:i a', strtotime($route->to_starttime)),
+            date('d/m/Y h:i a', strtotime($route->to_endtime)),
+            date('d/m/Y', strtotime($route->to_startDay)),
+            $link_view_tour,
+            Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime))
+        ];
     }
 }

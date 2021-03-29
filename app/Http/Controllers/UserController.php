@@ -181,8 +181,8 @@ class UserController extends Controller
         $user = Auth::user();
         $route = new Route();
         $route->to_id_user = $user->us_id;
-        $route->to_starttime = $req->timeStart;
-        $route->to_endtime = $req->timeEnd;
+        $route->to_starttime = Carbon::parse($req->timeStart)->toDateTimeString();
+        $route->to_endtime = Carbon::parse($req->timeStart)->addSeconds($req->timeEnd);
         $route->to_comback = $req->to_comback;
         $route->to_optimized = $req->to_optimized;
         $route->to_name = $req->nameTour;

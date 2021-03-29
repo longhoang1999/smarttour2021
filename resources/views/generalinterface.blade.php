@@ -22,10 +22,12 @@
         <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
         <!-- css notlogin -->
         <link rel="stylesheet" href="{{asset('css/notlogin.css')}}">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <style>
-            .modaldetail_Place p{text-align: justify !important;}
-        </style>
+        <script type="text/javascript">
+            var duration;
+            var durationString;
+        </script>
     </head>
     <body id="page-top">
         <!-- Navigation-->
@@ -226,18 +228,34 @@
                                 <p class="font-weight-bold font-italic">Time start</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
-                                <p>{{date('h:i a', strtotime($route->to_starttime))}}</p>
+                                <p>{{date('d/m/Y h:i a', strtotime($route->to_starttime))}}</p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
                                 <p class="font-weight-bold font-italic">Time end</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 @if($route->to_endtime != "")
-                                    <p>{{date('h:i a', strtotime($route->to_endtime))}}</p>
+                                    <p>{{date('d/m/Y h:i a', strtotime($route->to_endtime))}}</p>
                                 @else
                                     <span class="badge badge-warning">Not available</span>
                                 @endif
                             </div>
+                            <div class="col-md-4 col-sm-6 col-12">
+                                <p class="font-weight-bold font-italic">Total tour time</p>
+                            </div>
+                            <div class="col-md-8 col-sm-6 col-12 total_time">
+                            </div>
+                            <?php 
+                                $total = Carbon\Carbon::parse($route->to_endtime)->diffInMinutes(Carbon\Carbon::parse($route->to_starttime));
+                             ?>
+                            <!-- js take total -->
+                            <script type="text/javascript">
+                                duration = moment.duration({{$total}}, 'minutes');
+                                durationString = duration.days() + 'd ' + duration.hours() + 'h ' + duration.minutes() + 'm';
+                                console.log(durationString);
+                                $("#modal_{{$value->sh_id}} .total_time").html(durationString);
+                            </script>
+                            <!-- /endis -->
                             <div class="col-md-4 col-sm-6 col-12">
                                 <p class="font-weight-bold font-italic">Comeback</p>
                             </div>
@@ -506,15 +524,15 @@
                                     @endif
                                     <!-- de_shortdes-->
                                     @if($value->de_shortdes != "")
-                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Shortdescription') }}:</span> {{$value->de_shortdes}}</p>
+                                        <p class="mb-5 text-justify"><span class="font-weight-bold">{{ trans('messages.Shortdescription') }}:</span> {{$value->de_shortdes}}</p>
                                     @else
-                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Shortdescription') }}:</span> {{ trans('messages.NoInformation') }}</p>
+                                        <p class="mb-5 text-justify"><span class="font-weight-bold">{{ trans('messages.Shortdescription') }}:</span> {{ trans('messages.NoInformation') }}</p>
                                     @endif
                                     <!-- de_description-->
                                     @if($value->de_description != "")
-                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Description') }}:</span> {{$value->de_description}}</p>
+                                        <p class="mb-5 text-justify"><span class="font-weight-bold">{{ trans('messages.Description') }}:</span> {{$value->de_description}}</p>
                                     @else
-                                        <p class="mb-5"><span class="font-weight-bold">{{ trans('messages.Description') }}:</span> {{ trans('messages.NoInformation') }}</p>
+                                        <p class="mb-5 text-justify"><span class="font-weight-bold">{{ trans('messages.Description') }}:</span> {{ trans('messages.NoInformation') }}</p>
                                     @endif
                                     <!-- de_duration -->
                                     @if($value->de_duration != "")

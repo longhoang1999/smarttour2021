@@ -11,6 +11,10 @@
     .startlocat_class{
       width: 10rem !important;
     }
+    #site_searchtour a {
+        background: lightblue !important;
+        color: #117964 !important;
+    }
   </style>
 @stop
 @section('content')
@@ -23,7 +27,7 @@
   <div id="main-page">
       <div class="left" id="sitebar">
           <ul>
-              <!-- <li id="site_history"><a href="#">Your tour history</a></li> -->
+              <li id="site_history"><a href="#" id="user_tour_history">Your tour history</a></li>
               <li id="site_searchtour"><a href="{{route('searchTour')}}">Search tour</a></li>
           </ul>
           <span id="site_searchTitle">--Search</span>
@@ -106,8 +110,8 @@
                         <div class="card-body">
                           <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">tour has the largest total time</div>
-                              <div class="h5 mb-0 font-weight-bold text-gray-800">99999 tours</div>
+                              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">tour has the largest total time (> 1day)</div>
+                              <div class="h5 mb-0 font-weight-bold text-gray-800">{{$votes_total_time}} tours</div>
                             </div>
                             <div class="col-auto">
                               <i class="fas fa-calendar-alt fa-2x text-primary"></i>
@@ -185,6 +189,8 @@
                   <span id="start_time"></span></p>
                   <p><span class="font-weight-bold font-italic">Endtime time: </span>
                   <span id="end_time"></span></p>
+                  <p><span class="font-weight-bold font-italic">Total tour time: </span>
+                  <span id="total_time"></span></p>
                   <p><span class="font-weight-bold font-italic">Date created: </span>
                   <span id="date_created"></span></p>
               </div>
@@ -355,6 +361,13 @@
 <script type="text/javascript">
     var listIdSearch = [];
     $(document).ready(function(){
+        $("#user_tour_history").click(function(){
+          @if(Auth::check())
+            $(this).attr("href","{{route('user.tourhistory')}}");
+          @else
+            $("#modalLogin").modal("show");
+          @endif
+        });
         // votess star
         @for($i = 1; $i<= 10; $i++)
           $("#div_Starrank_tour .star_{{$i}}").click(function(){
@@ -468,6 +481,34 @@
               }, 200);
               let $url_path = '{!! url('/') !!}';
               var routeOverStart = $url_path+"/searchThisMonth";
+              table.ajax.url( routeOverStart ).load();
+          });
+          $("#div_4").click(function(){
+              $(".AllClass_Table").show();
+              $("html, body").animate({
+                  scrollTop: $('.AllClass_Table').offset().top - '100'
+              }, 200);
+              let $url_path = '{!! url('/') !!}';
+              var routeOverStart = $url_path+"/searchForHighTotal";
+              table.ajax.url( routeOverStart ).load();
+          });
+
+          $("#site_max").click(function(){
+              $(".AllClass_Table").show();
+              $("html, body").animate({
+                  scrollTop: $('.AllClass_Table').offset().top - '100'
+              }, 200);
+              let $url_path = '{!! url('/') !!}';
+              var routeOverStart = $url_path+"/searchMaxTotal";
+              table.ajax.url( routeOverStart ).load();
+          });
+          $("#site_min").click(function(){
+              $(".AllClass_Table").show();
+              $("html, body").animate({
+                  scrollTop: $('.AllClass_Table').offset().top - '100'
+              }, 200);
+              let $url_path = '{!! url('/') !!}';
+              var routeOverStart = $url_path+"/searchMinTotal";
               table.ajax.url( routeOverStart ).load();
           });
           $("#site_thisMonth").click(function(){
@@ -591,7 +632,11 @@
                     $("#date_created").append(data[11]);
                     $("#link_view_tour").attr("href","");
                     $("#link_view_tour").attr("href",data[12]);
-                    
+
+                    $("#total_time").empty();
+                    var duration = moment.duration(data[13], 'minutes');
+                    var durationString = duration.days() + 'd ' + duration.hours() + 'h ' + duration.minutes() + 'm';
+                    $("#total_time").append(durationString);
                  }
             });
           });

@@ -84,10 +84,7 @@
     font-size: 23px;
     font-family: cursive;
 }
-#site_searchtour a{
-    background: lightblue !important;
-    color: #117964 !important;
-}
+
 #sitebar ul li a:hover{
     background: lightblue;
     text-decoration: none;

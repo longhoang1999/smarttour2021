@@ -133,51 +133,7 @@
 			  </div>
 			</div>
 			<!-- /modal -->
-			<!-- accModal -->
-			<style>
-				#text_img_person {
-				    width: 45%;
-				    height: 20rem;
-				    border-radius: 19rem;
-				    margin: auto;
-				}
-				img#default_img_person {
-				    width: 50%;
-				    margin: auto;
-				}
-				.text_content {
-				    font-weight: bold;
-				    margin-bottom: 2rem;
-				}
-				.btn_upload_person {
-				    width: 15%;
-				    margin: 1rem auto;
-				    background: #6c9aca;
-				    padding: .5rem 0;
-				    color: white;
-				    cursor: pointer;
-				    border-radius: 10px;
-				    display: none;
-				}
-				#file_name_person {
-				    display: none;
-				    margin: 0 auto;
-				}
-				#input_File_person, #input_fullName_person, #input_gender_person, #input_age_person, #btn_submitInfo_person {
-				    display: none;
-				}
-				.openChangePass_person{
-				    display: none;
-				}
-				.openClickHere_person {
-				    color: #bf1717;
-				    font-style: italic;
-				    cursor: pointer;
-				}
-				.openItems_person {
-				    display: none;
-				}
-			</style>	
+			<!-- accModal -->	
 			<div class="modal fade" id="accModal" tabindex="-1" role="dialog" aria-labelledby="personalModal" aria-hidden="true">
 			  <div class="modal-dialog modal-lg">
 			    <div class="modal-content">
@@ -261,7 +217,6 @@
 			        </form> 
 			      </div>
 			      <div class="modal-footer">
-			        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('messages.CloseWindow') }}</button>
 			        <button type="button" class="btn btn-success" id="btn_editInfo_person">{{ trans('messages.Editinformation') }}</button>
 			        <button type="button" class="btn btn-primary" id="btn_submitInfo_person">{{ trans('messages.SubmitEdit') }}</button>
 			      </div>

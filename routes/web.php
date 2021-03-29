@@ -52,17 +52,17 @@ Route::group(
 		Route::get("searchTourYouShared","ShareTourController@searchTourYouShared")->name('share.searchTourYouShared');
 		Route::get("searchMostVotes","ShareTourController@searchMostVotes")->name('share.searchMostVotes');
 		Route::get("searchThisMonth","ShareTourController@searchThisMonth")->name('share.searchThisMonth');
+		Route::get("searchForHighTotal","ShareTourController@searchForHighTotal")->name('share.searchForHighTotal');
+		Route::get("searchMaxTotal","ShareTourController@searchMaxTotal")->name('share.searchMaxTotal');
+		Route::get("searchMinTotal","ShareTourController@searchMinTotal")->name('share.searchMinTotal');
 		Route::get("searchLastMonth","ShareTourController@searchLastMonth")->name('share.searchLastMonth');
 		Route::get("searchAnyMonth/{date}","ShareTourController@searchAnyMonth")->name('share.searchAnyMonth');
-		
 		Route::post("takeDetailRoute","ShareTourController@takeDetailRoute")->name('share.takeDetailRoute');
 		Route::post("selectPlaceForType","ShareTourController@selectPlaceForType")->name('share.selectPlaceForType');
 		Route::post("selectTourForPlace","ShareTourController@selectTourForPlace")->name('share.selectTourForPlace');
 		Route::get("searchListPlace/{array}","ShareTourController@searchListPlace")->name('share.searchListPlace');
 	}
 );
-
-
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('logout','UserController@logout')->name('logout');
 Route::group(
@@ -79,7 +79,9 @@ Route::group(
 		Route::post("shareTour","UserController@shareTour")->name("user.shareTour");
 		Route::post("rating","ShareTourController@rating")->name("user.rating");
 		Route::get("editRoute/{id}","AdminController@editRoute")->name("user.editRoute");
-		
+		Route::get("tourhistory","ShareTourController@tourhistory")->name("user.tourhistory");
+		Route::get("showtourhistory","ShareTourController@showtourhistory")->name('share.showtourhistory');
+		Route::post("takeDetailTour","ShareTourController@takeDetailTour")->name('share.takeDetailTour');
 	}
 );
 Route::group(
