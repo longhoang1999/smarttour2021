@@ -49,7 +49,6 @@ function initMap(){
 		success: (result)=>{
 			locationsdata = result[0];
 			let data = result[1];
-			console.log(data);
 			$('#waypoints').select2({
 				data: data
 			});
@@ -262,7 +261,6 @@ function showMap(){
 			for(let i =0 ;i<options.length;i++){
 				if(!options[i].disabled){
 					options[i].selected = true;
-					console.log(options[i]);
 					$('#waypoints').select2();
 					break;
 				}
@@ -302,7 +300,6 @@ function showMap(){
 		for(let i =0 ;i<options.length;i++){
 			if(!options[i].disabled){
 				options[i].selected = true;
-				console.log(options[i]);
 				$('#waypoints').select2();
 				break;
 			}
@@ -688,6 +685,7 @@ function showMap(){
 		var legs = response.routes[0].legs;
 		for(var i=0;i<polylines.length;i++){
 			polylines[i].setMap(null);
+			polylines = []
 		}
 
 		for (i = 0; i < legs.length; i++) {
@@ -716,11 +714,9 @@ function showMap(){
 	function getandsettimeline(response){
 		timeline = [];
 		let tmp = document.querySelector("#time")._flatpickr.selectedDates[0];
-		console.log(document.querySelector("#time")._flatpickr.selectedDates[0]);
 		timeline.push(tmp);
 		if(startlocat != undefined && idToData(startlocat,"duration")!=0){
 			tmp = new Date(tmp.getTime() + idToData(startlocat,"duration")*1000);
-		console.log('here');
 			timeline.push(tmp);
 		}
 		for(var i = 0; i < response.length-1 ; i++){
@@ -1048,7 +1044,6 @@ function showMap(){
 	}
 
 	function processanddrawrouteclient(){ 
-	console.log(1); 
 		$('#overlay').show()
 		// if(disresponse == undefined){
 			idToData(null,'LatLngArr');
@@ -1065,7 +1060,6 @@ function showMap(){
 			//   allRoutePosible[i].unshift(0);
 			//   if($('#is-back').is(':checked')) allRoutePosible[i].push(0);
 			// }
-			console.log(2);
 			distanceRequest(distanceResponse);
 		// } else {
 		//   timealert();
@@ -1092,17 +1086,12 @@ function showMap(){
 
 	function distanceResponse(response,status){
 		disresponse = response;
-		console.log("123")
 		timealert();
 	}
 
 	function timealert(serverres){
-
-				console.log('here');
 		choosendur = (document.querySelector("#time-end")._flatpickr.selectedDates[0] - document.querySelector("#time")._flatpickr.selectedDates[0])/1000;
 		if(isNaN(choosendur)){
-
-				console.log('here');
 			bestWay();
 		} else {
 			var c;
@@ -1120,10 +1109,8 @@ function showMap(){
 					$("#timeAlert").modal("hide");
 					dello = 1;
 					if(serverres !== undefined){
-				console.log('here');
 						processanddrawrouteclient();
 					} else {
-				console.log('here');
 						bestWay();
 					}
 				});
@@ -2659,7 +2646,25 @@ function showMap(){
 		               }
 		           }
 		        });
-			})
+			});
+			$("#formRegister").submit(function(e){
+				e.preventDefault();
+
+			    var form = $(this);
+			    var url = form.attr('action');
+			    
+			    $.ajax({
+		           type: "POST",
+		           url: url,
+		           data: form.serialize(),
+		           success: function(data)
+		           {
+		           	   $("#modalRegis").modal("hide");
+		           	   $("#contentNotification").html("You have successfully registered");
+		               $("#notification").modal("show");
+		           }
+			    });
+			});
 		});
 		// input time
 		let todayDate = new Date();
@@ -2693,7 +2698,6 @@ function showMap(){
 					@for($j = 1 ; $j <= $i; $j++)
 							$("#div_Starrank_tour .star_{{$j}}").css("color","#ff9700");
 					@endfor
-					console.log($(this).attr("data-value"));
 					$("#star_Share").val($(this).attr("data-value"));
 			});
 		@endfor
@@ -2926,7 +2930,7 @@ function openTab(evt, tabName) {
 					</button>
 				</div>
 				<div class="modal-body">
-					<form action="{{route('register')}}" method="post">
+					<form action="{{route('register')}}" method="post" id="formRegister">
 							<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 							<div class="container-fluid">
 									<div class="row">

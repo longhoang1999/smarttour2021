@@ -694,7 +694,22 @@
                     $("#selectPlaces").empty();
                     data[0].forEach(myFunction);
                     function myFunction(item, index) {
-                      $("#selectPlaces").append('<option value="'+item+'">'+data[1][index]+'</option>');
+                      let check = false;
+                      listIdSearch.forEach(function(idSelectes){
+                        if(item == idSelectes)
+                        {
+                          check = true;
+                        }
+                      });
+                      if(check == true)
+                      {
+                        $("#selectPlaces").append('<option style="background:rgb(204,202,202)" disabled="" value="'+item+'">'+data[1][index]+'</option>');
+                        check = false;
+                      }
+                      else
+                      {
+                        $("#selectPlaces").append('<option value="'+item+'">'+data[1][index]+'</option>');
+                      }                      
                     }
                  }
             });
