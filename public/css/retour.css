@@ -255,3 +255,17 @@ header .slider div{width: 100%;min-height:40rem; }
   padding: 0;
   padding-top: .5rem;
 }
+.Update_img_tour {
+    width: 100%;
+    text-align: center;
+    background: #3e3eff;
+    padding: .5rem 0;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 2rem;
+}
+.Update_img_tour:hover {
+    background: #0b0b9f;
+}
+#img_input_Rank,.name_file_tour{display: none;}

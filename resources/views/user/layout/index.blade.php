@@ -24,7 +24,6 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" />
         <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>  
         <link rel="stylesheet" href="{{asset('css/notlogin.css')}}">
-        <link rel="stylesheet" href="{{asset('css/sharetour.css')}}">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script type="text/javascript">
@@ -52,6 +51,7 @@
         @include('user.layout.footer')
         @include('user.layout.modal')
 
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Third party plugin JS-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
@@ -66,8 +66,6 @@
         <!-- <script src="{{asset('js/Scripts/jquery-migrate-1.2.1.min.js')}}"></script>
         <script src="{{asset('js/Scripts/slick.min.js')}}"></script> -->
         <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-        <script type="text/javascript" src="{{ asset('datatables/js/jquery.dataTables.js') }}" ></script>
-        <script type="text/javascript" src="{{ asset('datatables/js/dataTables.bootstrap4.js') }}" ></script>
         <script type="text/javascript">
             $("#searchTour").click(function(){
                 location.replace("{{route('searchTour')}}");
@@ -81,7 +79,9 @@
             $("#searchScenicspots").click(function(){
                 location.replace("{{route('listPlaceForType',$id=0)}}");
             });
-
+            $("#seeFeedback").click(function(){
+                location.replace("{{route('viewShareFeedback')}}");
+            });
 
             $(".up_btn").click(function(){
                 $(".nav_more").slideUp("fast");
@@ -351,6 +351,11 @@
         @if(Auth::check())
         <script type="text/javascript">
             $(document).ready(function(){
+                @if(Auth::check())
+                    $("#comback_admin").click(function(){
+                        location.replace("{{route('admin.generalInfor')}}");
+                    });
+                @endif
                 $("#personalInfo").click(function(){
                     $("#personal").modal("show");
                 });

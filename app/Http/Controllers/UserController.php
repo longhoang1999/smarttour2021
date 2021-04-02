@@ -35,36 +35,57 @@ class UserController extends Controller
     {
         if(Auth::check())
         {
-            return redirect()->route("user.dashboard");
+            $user = Auth::user();
+            $route = Route::where('to_id_user',$user->us_id)->get();
+            session()->put('route',$route);
+            return view('user.dashboard',['fullName'=>$user->us_fullName]);
         }
         else
         {
-            if(Session::has('website_language') && Session::get('website_language') == "vi")
-            {
-                $lang = Language::where("language","vn")->inRandomOrder()->limit(10)->get();
-                foreach ($lang as $value) {
-                    $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
-                    $value["de_image"] = $des->de_image;
-                    $value["de_duration"] = $des->de_duration;
-                    $value["de_link"] = $des->de_link;
-                    $value["de_map"] = $des->de_map;
-                }
-                $shareTour = ShareTour::orderBy('number_star', 'DESC')->limit(6)->get();
-                return view("generalinterface",['des'=>$lang,'shareTour'=>$shareTour]);
-            }
-            else
-            {
-                $lang = Language::where("language","en")->inRandomOrder()->limit(10)->get();
-                foreach ($lang as $value) {
-                    $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
-                    $value["de_image"] = $des->de_image;
-                    $value["de_duration"] = $des->de_duration;
-                    $value["de_link"] = $des->de_link;
-                    $value["de_map"] = $des->de_map;
-                }
-                $shareTour = ShareTour::orderBy('number_star', 'DESC')->limit(6)->get();
-                return view("generalinterface",['des'=>$lang,'shareTour'=>$shareTour]);
-            }
+            return view('user.dashboard');
+        }
+    }
+    public function tour()
+    {
+        $shareTour = ShareTour::orderBy('numberReviews', 'DESC')->limit(6)->get();
+        if(Auth::check())
+        {
+            $user = Auth::user();
+            $route = Route::where('to_id_user',$user->us_id)->get();
+            session()->put('route',$route); 
+            return view('user.tour',['fullName'=>$user->us_fullName,'shareTour'=>$shareTour]);
+        }
+        else
+        {
+            return view('user.tour',['shareTour'=>$shareTour]);
+        }
+    }
+    public function place()
+    {
+        if(Session::has('website_language') && Session::get('website_language') == "vi")
+        {
+            $lang = Language::where("language","vn")->inRandomOrder()->limit(10)->get();
+        }
+        else
+        {
+            $lang = Language::where("language","en")->inRandomOrder()->limit(10)->get();
+        }
+        foreach ($lang as $value) {
+            $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
+            $value["de_image"] = $des->de_image;
+            $value["de_duration"] = $des->de_duration;
+            $value["de_link"] = $des->de_link;
+            $value["de_map"] = $des->de_map;
+        }
+
+        if(Auth::check())
+        {
+            $user = Auth::user();
+            return view('user.place',['fullName'=>$user->us_fullName,'des'=>$lang]);
+        }
+        else
+        {
+            return view('user.place',['des'=>$lang]);
         }
     }
     public function postLogin(Request $req)
@@ -111,45 +132,157 @@ class UserController extends Controller
             return back()->with("error","Đăng nhập không thành công");
         }
     }
-    public function dashboard()
+    public function postLoginAjax(Request $req)
     {
-        if(Session::has('website_language') && Session::get('website_language') == "vi")
+       $this->validate($req,[
+            'us_email'=>'required|email',
+            'us_password'=>'required|min:0|max:32',
+        ],[
+            'us_email.required' => 'Bạn phải nhập email',
+            'us_email.email' => 'Sai cấu chúc email',
+            'us_password.required' => "Bạn phải nhập mật khẩu",
+            'us_password.min' => "Mật khẩu quá ngắn",
+            'us_password.max' => "Mật khẩu quá dài"
+        ]);
+        $userCheckLock = User::where("us_email",$req->us_email)->first();
+        if(!empty($userCheckLock))
         {
-            $user = Auth::user();
-            $route = Route::where('to_id_user',$user->us_id)->get();
-            session()->put('route',$route);
-            $lang = Language::where("language","vn")->inRandomOrder()->limit(10)->get();
-            foreach ($lang as $value) {
-                $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
-                $value["de_image"] = $des->de_image;
-                $value["de_duration"] = $des->de_duration;
-                $value["de_link"] = $des->de_link;
-                $value["de_map"] = $des->de_map;
+            if($userCheckLock->us_lock == "1")
+            {
+                return [$result = "lock"];
             }
-            $shareTour = ShareTour::orderBy('numberReviews', 'DESC')->limit(6)->get();
-            return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang,'shareTour'=>$shareTour]);
+            else
+            {
+                if(Auth::attempt(['us_email'=>$req->us_email,'us_password'=>$req->us_password]))
+                {
+                    $user = Auth::user();
+                    if($user->us_type == "0")
+                    {
+                        return [$position = "user",$user->us_id];
+                    }
+                    else
+                    {
+                        return [$position = "admin",$user->us_id];
+                    }
+                }
+                else
+                {
+                    return [$result = "fail login"];
+                }
+            }
         }
         else
         {
+            return [$result = "fail login"];
+        } 
+    }
+    public function about()
+    {
+        if(Auth::check())
+        {
             $user = Auth::user();
-            $route = Route::where('to_id_user',$user->us_id)->get();
-            session()->put('route',$route);
-            $lang = Language::where("language","en")->inRandomOrder()->limit(10)->get();
-            foreach ($lang as $value) {
-                $des = Destination::select('de_image','de_duration','de_link','de_map')->where("de_remove",$value->des_id)->first();
-                $value["de_image"] = $des->de_image;
-                $value["de_duration"] = $des->de_duration;
-                $value["de_link"] = $des->de_link;
-                $value["de_map"] = $des->de_map;
-            }
-            $shareTour = ShareTour::orderBy('number_star', 'DESC')->limit(6)->get();
-            return view('dashboard',['fullName'=>$user->us_fullName,'des'=>$lang,'shareTour'=>$shareTour]);
+            return view('user.about',['fullName'=>$user->us_fullName]);
         }
+        else
+        {
+            return view('user.about');
+        }
+    }
+    public function viewfeedback()
+    {
+        if(Auth::check())
+        {
+            $user = Auth::user();
+            return view('user.feedback',['fullName'=>$user->us_fullName]);
+        }
+        else
+        {
+            return view('user.feedback');
+        }
+    }
+    public function dashboard()
+    {
+        $user = Auth::user();
+        $route = Route::where('to_id_user',$user->us_id)->get();
+        session()->put('route',$route);
+        return back()->with('fullName',$user->us_fullName);
+    }
+    public function searchPlaceSmart(Request $req)
+    {
+        $result = DB::select("select langplace.des_id,langplace.de_name,destination.de_image FROM langplace,destination WHERE langplace.language='vn' and langplace.de_name like '%".$req->key."%' and langplace.des_id=destination.de_remove ORDER BY RAND() limit 5");
+        return $result;
+    }
+    public function showDetailPlace($idplace)
+    {
+        if(Session::has('website_language') && Session::get('website_language') == "vi")
+            $lang = Language::where("language","vn")->where("des_id",$idplace)->first();
+        else
+            $lang = Language::where("language","en")->where("des_id",$idplace)->first();
+        $de = Destination::
+        select('de_lat','de_lng','de_duration','de_link','de_map','de_image')
+        ->where('de_remove',$idplace)
+        ->first();
+        $lang["de_lat"] = $de->de_lat;
+        $lang["de_lng"] = $de->de_lng;
+        $lang["de_link"] = $de->de_link;
+        $lang["de_image"] = $de->de_image;
+        $lang["de_map"] = $de->de_map;
+        $lang["de_duration"] = $de->de_duration;
+        
+        if(Auth::check())
+        {
+            $user = Auth::user();
+            return view('user.showplace',['fullName'=>$user->us_fullName,'lang'=>$lang]);
+        }
+        else
+        {
+            return view('user.showplace',['lang'=>$lang]);
+        }
+        
+    }
+    public function listPlaceForType($idtype)
+    {
+        $listPlace = Destination::select('de_remove')->where("de_default","0")->where("de_type",$idtype)->limit(10)->get();
+        foreach ($listPlace as $value) {
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+            {
+                $lang = Language::where("language","vn")->where("des_id",$value->de_remove)->first();
+                $value['de_name'] = $lang->de_name;
+            }
+            else{
+                $lang = Language::where("language","en")->where("des_id",$value->de_remove)->first();
+                $value['de_name'] = $lang->de_name;
+            }
+        }        
+        if(Auth::check())
+        {
+            $user = Auth::user();
+            return view('user.listplacetype',['fullName'=>$user->us_fullName,'listPlace'=>$listPlace,'idtype'=>$idtype]);
+        }
+        else
+        {
+            return view('user.listplacetype',['listPlace'=>$listPlace,'idtype'=>$idtype]);
+        }
+    }
+    public function loadPlaceInfo(Request $req)
+    {
+        if(Session::has('website_language') && Session::get('website_language') == "vi")
+            $lang = Language::where("language","vn")->where("des_id",$req->idPlace)->first();
+        else
+            $lang = Language::where("language","en")->where("des_id",$req->idPlace)->first();
+        $findDes = Destination::where("de_remove",$req->idPlace)->first();
+        if($findDes->de_image != "")
+            $lang['de_image'] = asset($findDes->de_image);
+        else $lang['de_image'] = "";
+        $lang['de_duration'] = intval($findDes->de_duration)/60/60;
+        $lang['de_link'] = $findDes->de_link;
+        $lang['de_map'] = $findDes->de_map;
+        return $lang; 
     }
     public function logout(){
         Auth::logout();
         session()->flush();
-        return redirect()->route('login');
+        return redirect()->route('login')->with("success","You have logged out successfully");
     }
     public function feedback(Request $req)
     {
@@ -218,7 +351,7 @@ class UserController extends Controller
             $route->to_startLocat = $req->val['de_id'];
         }
         $route->save();
-        return $route->to_id;
+        return [$route->to_id,$url = route('user.editTour',$route->to_id)];
     }
     public function shareTour(Request $req)
     {
@@ -490,7 +623,9 @@ class UserController extends Controller
                     {
                         $user->us_password = Hash::make($req->newpass);
                         $user->save();
-                        return redirect()->route('logout');
+                        Auth::logout();
+                        session()->flush();
+                        return redirect()->route('login')->with("success","You have successfully changed your password");
                     }
                     else return back()->with("success","Verify password is not correct");
                 }
@@ -586,5 +721,18 @@ class UserController extends Controller
             }
         }
         return [$array_2,$label,$objStartLocat,$nameStartLocat];
+    }
+    public function viewShareFeedback()
+    {
+        $feedback = Feedback::where("fb_share","1")->get();
+        if(Auth::check())
+        {
+            $user = Auth::user();
+            return view('user.viewfeedback',['fullName'=>$user->us_fullName,'feedback'=>$feedback]);
+        }
+        else
+        {
+            return view('user.viewfeedback',['feedback'=>$feedback]);
+        }
     }
 }

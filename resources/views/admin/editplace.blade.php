@@ -7,6 +7,9 @@
 	<link rel="stylesheet" href="{{asset('css/adminDashboard.css')}}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" />
   <link rel="stylesheet" href="{{asset('css/editPlace.css')}}">
+  <style>
+    .contents{color: white}
+  </style>
 @stop
 @section('content')
   @if ($message = Session::get('status'))

@@ -18,7 +18,7 @@
   </style>
 @stop
 @section('content')
-  <h2 id="page_title" lass="page-section-heading text-center text-uppercase text-secondary mb-0">search tour</h2>
+  <h2 id="page_title" lass="page-section-heading text-center text-uppercase text-secondary mb-0">{{ trans('newlang.searchtour') }}</h2>
   <div class="divider-custom">
       <div class="divider-custom-line"></div>
       <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
@@ -27,26 +27,26 @@
   <div id="main-page">
       <div class="left" id="sitebar">
           <ul>
-              <li id="site_history"><a href="#" id="user_tour_history">Your tour history</a></li>
-              <li id="site_searchtour"><a href="{{route('searchTour')}}">Search tour</a></li>
+              <li id="site_history"><a href="#" id="user_tour_history">{{ trans('newlang.tourhistory') }}</a></li>
+              <li id="site_searchtour"><a href="{{route('searchTour')}}">{{ trans('newlang.searchtour') }}</a></li>
           </ul>
-          <span id="site_searchTitle">--Search</span>
+          <span id="site_searchTitle">--{{ trans('newlang.Search') }}</span>
           <div id="content_search">
               @if(Auth::check())
-                <span id="site_youShared">Tour you shared</span>
+                <span id="site_youShared">{{ trans('newlang.tourShare') }}</span>
               @endif
-              <span id="site_highlyRated">Highly rated tours</span>
-              <span id="site_thisMonth">Tour this month</span>
-              <span id="site_lastMonth">Tour last month</span>
+              <span id="site_highlyRated">{{ trans('newlang.highRate') }}</span>
+              <span id="site_thisMonth">{{ trans('newlang.tourThisMonth') }}</span>
+              <span id="site_lastMonth">{{ trans('newlang.tourLastMonth') }}</span>
           </div>
-          <span id="site_selectMon">--Select month</span>
+          <span id="site_selectMon">--{{ trans('newlang.selectMonth') }}</span>
           <div id="content_select">
               <input type="month" id="fdate" name="fdate" class="form-control">
           </div>
-          <span id="site_total_time">--Total time</span>
+          <span id="site_total_time">--{{ trans('newlang.totalTime') }}</span>
           <div id="content_totalName">
-              <span id="site_max">Ascending</span>
-              <span id="site_min">Descending</span>
+              <span id="site_max">{{ trans('newlang.Ascending') }}</span>
+              <span id="site_min">{{ trans('newlang.Descending') }}</span>
           </div>
       </div>
 
@@ -59,7 +59,7 @@
                         <div class="card-body">
                           <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">number of tours over 8 <i class="fas fa-star text-warning"></i></div>
+                              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ trans('newlang.tourover') }}<i class="fas fa-star text-warning"></i></div>
                               <div class="h5 mb-0 font-weight-bold text-gray-800">{{$votes_over}} tours</div>
                             </div>
                             <div class="col-auto">
@@ -76,7 +76,7 @@
                         <div class="card-body">
                           <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">tour with the most votes (>=2)</div>
+                              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ trans('newlang.tourmostVotes') }} (>=2)</div>
                               <div class="h5 mb-0 font-weight-bold text-gray-800">{{$votes_number}} tours</div>
                             </div>
                             <div class="col-auto">
@@ -93,7 +93,7 @@
                         <div class="card-body">
                           <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">tours created this month</div>
+                              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ trans('newlang.tourCreateMonth') }}</div>
                               <div class="h5 mb-0 font-weight-bold text-gray-800">{{$thismonth}} tours</div>
                             </div>
                             <div class="col-auto">
@@ -110,7 +110,7 @@
                         <div class="card-body">
                           <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">tour has the largest total time (> 1day)</div>
+                              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ trans('newlang.largestTotal') }} (> 1day)</div>
                               <div class="h5 mb-0 font-weight-bold text-gray-800">{{$votes_total_time}} tours</div>
                             </div>
                             <div class="col-auto">
@@ -124,24 +124,24 @@
               </div>
           </div>
           <div id="search_advan">
-              <span class="search_advan_title font-italic">Advanced search</span><span class="openModalSearch">click here</span>
+              <span class="search_advan_title font-italic">{{ trans('newlang.advanSearch') }}</span><span class="openModalSearch">{{ trans('newlang.clickhere') }}</span>
           </div>
           <div class="AllClass_Table">
               <div class="AllClass_Table_title">
-                <p class="text-uppercase">tour information on request</p>
+                <p class="text-uppercase">{{ trans('newlang.tourRequest') }}</p>
               </div>
               <div class="AllClass_Table_content">
                   <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
                         <thead>
                         <tr>
-                            <th>{{ trans("admin.Order") }}</th>
+                            <th>{{ trans("newlang.Order") }}</th>
                             <th>ID</th>
-                            <th>Tour name</th>
-                            <th>Start Location</th>
-                            <th>Detail Places</th>
-                            <th>Average rating</th>
-                            <th>Votes</th>
-                            <th>Total time(hours)</th>
+                            <th>{{ trans('newlang.Tourname') }}</th>
+                            <th>{{ trans('newlang.startLocation') }}</th>
+                            <th>{{ trans('newlang.detailPlaces') }}</th>
+                            <th>{{ trans('newlang.averageRating') }}</th>
+                            <th>{{ trans('newlang.Votes') }}</th>
+                            <th>{{ trans('newlang.totalTime') }}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -150,7 +150,7 @@
               </div>
           </div>
           
-          <h5 class="font-italic font-weight-bold" id="detail_title">Tour Detail</h5>
+          <h5 class="font-italic font-weight-bold" id="detail_title">{{ trans('newlang.tourDetail') }}</h5>
           <div class="tour_infor">
               <div class="tour_infor_left slider autoplay">
               </div>
@@ -164,34 +164,34 @@
                       @else
                           data-target="#modalLogin"
                       @endif
-                      >Rating</button>
-                      <a href="#" id="link_view_tour" class="btn btn-info">View tour</a>
+                      >{{ trans('newlang.Rating') }}</button>
+                      <a href="#" id="link_view_tour" class="btn btn-info">{{ trans('newlang.viewTour') }}</a>
                   </div>
-                  <p id="p_votes"><span class="font-weight-bold font-italic">Your votes: </span>
+                  <p id="p_votes"><span class="font-weight-bold font-italic">{{ trans('newlang.Yourvotes') }}: </span>
                   <span id="text_votes"></span></p>
 
-                  <p><span class="font-weight-bold font-italic">Introduce: </span>
+                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.Introduce') }}: </span>
                   <span id="text_intro"></span></p>
 
-                  <p><span class="font-weight-bold font-italic">Average rating: </span>
+                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.averageRating') }}: </span>
                   <span id="text_avgRating"></span></p>
 
-                  <p><span class="font-weight-bold font-italic">Number of ratings: </span>
+                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.numberofRatings') }}: </span>
                   <span id="text_number_rates"></span></p>
 
-                  <p><span class="font-weight-bold font-italic">Start Location: </span>
+                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.startLocation') }}: </span>
                   <span id="startLocation"></span></p>
 
-                  <p class="font-weight-bold font-italic mb-0">Location:</p>
+                  <p class="font-weight-bold font-italic mb-0">{{ trans('newlang.Location') }}:</p>
                   <p id="detail_location"></p>
 
-                  <p><span class="font-weight-bold font-italic">Start time: </span>
+                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.startTime') }}: </span>
                   <span id="start_time"></span></p>
-                  <p><span class="font-weight-bold font-italic">Endtime time: </span>
+                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.endtimeTime') }}: </span>
                   <span id="end_time"></span></p>
-                  <p><span class="font-weight-bold font-italic">Total tour time: </span>
+                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.totalTourTime') }}: </span>
                   <span id="total_time"></span></p>
-                  <p><span class="font-weight-bold font-italic">Date created: </span>
+                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.dateCreated') }}: </span>
                   <span id="date_created"></span></p>
               </div>
           </div>
@@ -203,7 +203,7 @@
     <div class="modal-dialog modal-md" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Rating</h5>
+          <h5 class="modal-title" id="exampleModalLabel">{{ trans('newlang.Rating') }}</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -212,7 +212,7 @@
           <div class="container-fuild">
               <div class="row">
                 <div class="col-md-12 col-sm-12 col-12">
-                  <p class="font-weight-bold font-italic">Rating for your tour</p>
+                  <p class="font-weight-bold font-italic">{{ trans('newlang.ratingForTour') }}</p>
                 </div>
                 <div class="col-md-12 col-sm-12 col-12 mb-3" id="div_Starrank_tour">
                   <i class="fas fa-star star_1 fa-2x"  data-value="1" style="cursor: pointer;"></i>
@@ -231,7 +231,7 @@
             </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="btn_Rating">Rating</button>
+          <button type="button" class="btn btn-primary" id="btn_Rating">{{ trans('newlang.Rating') }}</button>
         </div>
       </div>
     </div>
@@ -243,42 +243,42 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="ModalSearchLabel">Search Tour</h5>
+          <h5 class="modal-title" id="ModalSearchLabel">{{ trans('newlang.searchtour') }}</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           <div style="display: flex;">
-              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Type of place</span> 
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('newlang.Typeofplace') }}</span> 
               <select id="selectType" class="form-control" style="width: 60%">
-                <option value="All">--All--</option>
-                <option value="0">Scenic spots</option>
-                <option value="1">Restaurant</option>
-                <option value="2">Hotel</option>
-                <option value="3">Schools</option>
-                <option value="4">--Other</option>
+                <option value="All">--{{ trans('newlang.All') }}--</option>
+                <option value="0">{{ trans('newlang.scenicSpots') }}</option>
+                <option value="1">{{ trans('newlang.Restaurant') }}</option>
+                <option value="2">{{ trans('newlang.Hotel') }}</option>
+                <option value="3">{{ trans('newlang.Schools') }}</option>
+                <option value="4">--{{ trans('newlang.Other') }}</option>
               </select>
           </div>
           <div style="display: flex;margin-top: 1.5rem">
-              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Places</span> 
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('newlang.Places') }}</span> 
               <select id="selectPlaces" class="form-control" style="width: 60%;margin-right: 2rem;">
-                <option hidden="">--Your choice--</option>
+                <option hidden="" value="">--Your choice--</option>
                 @foreach($lang as $la)
                   <option value="{{$la->des_id}}">{{$la->de_name}}</option>
                 @endforeach
               </select>
-              <button class="btn btn-primary" id="btn_add_place">Add Location</button>
+              <button class="btn btn-primary" id="btn_add_place">{{ trans('newlang.addLocation') }}</button>
           </div>
           <div class="list_location mt-4">
-            <p class="lead font-weight-bold font-italic">list of places you want to go</p>
+            <p class="lead font-weight-bold font-italic">{{ trans('newlang.listPlace') }}</p>
             <div class="list_content">
                 <!-- append content -->
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" id="btn_searchforlisst">Search Tour</button>
+          <button type="button" class="btn btn-success" id="btn_searchforlisst">{{ trans('newlang.searchtour') }}</button>
         </div>
       </div>
     </div>
@@ -289,13 +289,13 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="notFoundLabel">Tour not found</h5>
+          <h5 class="modal-title" id="notFoundLabel">{{ trans('newlang.Tournotfound') }}</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <span class="font-weight-bold font-italic text-danger">We are very sorry! The system cannot find a tour going through the locations you choose.</span>
+          <span class="font-weight-bold font-italic text-danger">{{ trans('newlang.weAreSorry') }}</span>
         </div>
       </div>
     </div>
@@ -306,15 +306,15 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Detail Place</h5>
+          <h5 class="modal-title" id="exampleModalLabel">{{ trans('newlang.DetailPlace') }}</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           <div class="opSelection">
-              <div class="showImage">Show image</div>
-              <div class="showMap">Show Map</div>
+              <div class="showImage">{{ trans('newlang.Showimage') }}</div>
+              <div class="showMap">{{ trans('newlang.Showmap') }}</div>
           </div>
           <div class="imgPlace mt-4 mb-4">
           </div>
@@ -322,30 +322,30 @@
           <div class="container-fuild">
               <div class="row">
                   <div class="col-md-4 col-sm-6 col-12 mb-4">
-                      <p class="font-weight-bold font-italic">Short description</p>
+                      <p class="font-weight-bold font-italic">{{ trans('newlang.shortDescription') }}</p>
                   </div>
                   <div class="col-md-8 col-sm-6 col-12 mb-4">
                       <p id="short"></p>
                   </div>
                   <div class="col-md-4 col-sm-6 col-12 mb-4">
-                      <p class="font-weight-bold font-italic">Description</p>
+                      <p class="font-weight-bold font-italic">{{ trans('newlang.Description') }}</p>
                   </div>
                   <div class="col-md-8 col-sm-6 col-12 mb-4">
                       <p id="description"></p>
                   </div>
                   <div class="col-md-4 col-sm-6 col-12 mb-4">
-                      <p class="font-weight-bold font-italic">Average travel time</p>
+                      <p class="font-weight-bold font-italic">{{ trans('newlang.averageTravelTime') }}</p>
                   </div>
                   <div class="col-md-8 col-sm-6 col-12 mb-4">
                       <p id="timeAvg"></p>
                   </div>
                   <div class="col-md-4 col-sm-6 col-12 mb-4">
-                      <p class="font-weight-bold font-italic">Link on google map</p>
+                      <p class="font-weight-bold font-italic">{{ trans('newlang.Linkongooglemap') }}</p>
                   </div>
                   <div class="col-md-8 col-sm-6 col-12 mb-4" id="linkMap">
                   </div>
                   <div class="col-md-4 col-sm-6 col-12 mb-4">
-                      <p class="font-weight-bold font-italic">Link on VR</p>
+                      <p class="font-weight-bold font-italic">{{ trans('newlang.LinkonVR') }}</p>
                   </div>
                   <div class="col-md-8 col-sm-6 col-12 mb-4" id="linkvr">
                   </div>
@@ -439,7 +439,7 @@
           $("#div_1").click(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({
-                  scrollTop: $('.AllClass_Table').offset().top - '100'
+                  scrollTop: $('.AllClass_Table').offset().top - '130'
               }, 200);
               let $url_path = '{!! url('/') !!}';
               var routeOverStart = $url_path+"/searchTourTable";
@@ -448,7 +448,7 @@
           $("#site_highlyRated").click(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({
-                  scrollTop: $('.AllClass_Table').offset().top - '100'
+                  scrollTop: $('.AllClass_Table').offset().top - '130'
               }, 200);
               let $url_path = '{!! url('/') !!}';
               var routeOverStart = $url_path+"/searchTourTable";
@@ -458,7 +458,7 @@
             $("#site_youShared").click(function(){
                 $(".AllClass_Table").show();
                 $("html, body").animate({
-                    scrollTop: $('.AllClass_Table').offset().top - '100'
+                    scrollTop: $('.AllClass_Table').offset().top - '130'
                 }, 200);
                 let $url_path = '{!! url('/') !!}';
                 var routeYouShared = $url_path+"/searchTourYouShared";
@@ -468,7 +468,7 @@
           $("#div_2").click(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({
-                  scrollTop: $('.AllClass_Table').offset().top - '100'
+                  scrollTop: $('.AllClass_Table').offset().top - '130'
               }, 200);
               let $url_path = '{!! url('/') !!}';
               var routeOverStart = $url_path+"/searchMostVotes";
@@ -477,7 +477,7 @@
           $("#div_3").click(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({
-                  scrollTop: $('.AllClass_Table').offset().top - '100'
+                  scrollTop: $('.AllClass_Table').offset().top - '130'
               }, 200);
               let $url_path = '{!! url('/') !!}';
               var routeOverStart = $url_path+"/searchThisMonth";
@@ -486,7 +486,7 @@
           $("#div_4").click(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({
-                  scrollTop: $('.AllClass_Table').offset().top - '100'
+                  scrollTop: $('.AllClass_Table').offset().top - '130'
               }, 200);
               let $url_path = '{!! url('/') !!}';
               var routeOverStart = $url_path+"/searchForHighTotal";
@@ -496,7 +496,7 @@
           $("#site_max").click(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({
-                  scrollTop: $('.AllClass_Table').offset().top - '100'
+                  scrollTop: $('.AllClass_Table').offset().top - '130'
               }, 200);
               let $url_path = '{!! url('/') !!}';
               var routeOverStart = $url_path+"/searchMaxTotal";
@@ -505,7 +505,7 @@
           $("#site_min").click(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({
-                  scrollTop: $('.AllClass_Table').offset().top - '100'
+                  scrollTop: $('.AllClass_Table').offset().top - '130'
               }, 200);
               let $url_path = '{!! url('/') !!}';
               var routeOverStart = $url_path+"/searchMinTotal";
@@ -514,7 +514,7 @@
           $("#site_thisMonth").click(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({
-                  scrollTop: $('.AllClass_Table').offset().top - '100'
+                  scrollTop: $('.AllClass_Table').offset().top - '130'
               }, 200);
               let $url_path = '{!! url('/') !!}';
               var routeOverStart = $url_path+"/searchThisMonth";
@@ -523,7 +523,7 @@
           $("#site_lastMonth").click(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({
-                  scrollTop: $('.AllClass_Table').offset().top - '100'
+                  scrollTop: $('.AllClass_Table').offset().top - '130'
               }, 200);
               let $url_path = '{!! url('/') !!}';
               var routeOverStart = $url_path+"/searchLastMonth";
@@ -532,7 +532,7 @@
           $("#fdate").change(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({
-                  scrollTop: $('.AllClass_Table').offset().top - '100'
+                  scrollTop: $('.AllClass_Table').offset().top - '130'
               }, 200);
               let $url_path = '{!! url('/') !!}';
               let date = $(this).val();
@@ -564,7 +564,7 @@
                       $("#ModalSearch").modal("hide");
                       $(".AllClass_Table").show();
                       $("html, body").animate({
-                          scrollTop: $('.AllClass_Table').offset().top - '100'
+                          scrollTop: $('.AllClass_Table').offset().top - '130'
                       }, 200);
                       var routeForPlace = $url_path+"/searchListPlace/"+data;
                       table.ajax.url( routeForPlace ).load();
@@ -603,7 +603,7 @@
                     $('.autoplay').slick(getSliderSettings());
                     // scroll to div
                     $("html, body").animate({
-                        scrollTop: $('#detail_title').offset().top - '100'
+                        scrollTop: $('#detail_title').offset().top - '130'
                     }, 200);
                     // set other
                     $("#name_tour").empty();
@@ -650,7 +650,7 @@
                     method:"POST",
                     data:{_token:_token,numberStar:numberStar,shareId:idShareTour},
                     success:function(data){ 
-                      alert("You have successfully evaluated");
+                      alert("{{ trans('newlang.ratingSuccess') }}");
                       location.reload();
                     }
               });
@@ -700,14 +700,49 @@
             });
         });
         $("#btn_add_place").click(function(){
-          $("#ModalSearch .modal-footer").css("display","flex");
-          $(".list_location").show();
-          listIdSearch.push($("#selectPlaces").val());
-          $(".list_content").append('<span class="mt-2" data-id = "'+$("#selectPlaces").val()+'"><i class="fas fa-street-view" style="color:#e74949;"></i>'+$( "#selectPlaces option:selected" ).text()+'<i class="fas fa-times remove_item"></i></span>');
+          if($("#selectPlaces").val() != "")
+          {
+            var attr = $('#selectPlaces option:selected').attr('disabled');
+            if (typeof attr === typeof undefined || attr === false) {
+              $("#ModalSearch .modal-footer").css("display","flex");
+              $(".list_location").show();
+              listIdSearch.push($("#selectPlaces").val());
+              $(".list_content").append('<span class="mt-2" data-id = "'+$("#selectPlaces").val()+'"><i class="fas fa-street-view" style="color:#e74949;"></i>  '+$( "#selectPlaces option:selected" ).text()+'<i class="fas fa-times remove_item"></i></span>');
+              $('#selectPlaces option:selected').attr("disabled","");
+              $('#selectPlaces option:selected').css("background","#c8c8c8");
+              for (var i = 0; i <= $('#selectPlaces option').length; i++) {
+                  let option = document.getElementById('selectPlaces')[i];
+                  if(option != undefined)
+                  {
+                    option.selected = false;
+                    if(option.value != "")
+                    {
+                      if(option.disabled == false)
+                      {
+                        option.selected = true;
+                        break;
+                      }
+                    }
+                  }
+                  else
+                  {
+                    alert("You have selected all locations");
+                  }
+              }
+            }
+            else
+            {
+              alert("You have chosen this location");
+            }
+          }
+          else
+          {
+            alert("Please select a location");
+          }
         });
         $(".list_content").on('click','span .remove_item',function(){
-          //alert($(this).parents().attr('data-id'));
           const index = listIdSearch.indexOf($(this).parent().attr('data-id'));
+          let dataId = $(this).parent().attr('data-id');
           if (index > -1) {
             listIdSearch.splice(index, 1);
           }
@@ -717,6 +752,16 @@
             $(".list_location").hide();
             $("#ModalSearch .modal-footer").hide();
           }
+          //remove disabled
+          $("#selectPlaces option").each(function() {
+              if($(this).val() == dataId)
+              {
+                $(this).removeAttr("disabled");
+                $(this).css("background","white");
+                //$("#selectPlaces").val(dataId);
+              }
+          });
+          //remove disabled
         });
       });
 </script>
@@ -764,24 +809,24 @@
                     if(data[4] != "")
                         $("#short").append(data[4]);
                     else
-                        $("#short").append('<span class="badge badge-warning">Not available</span>');
+                        $("#short").append("<span class='badge badge-warning'>{{ trans('newlang.Notavailable') }}</span>");
 
                     if(data[5] != "")
                         $("#description").append(data[5]);
                     else
-                        $("#description").append('<span class="badge badge-warning">Not available</span>');  
+                        $("#description").append("<span class='badge badge-warning'>{{ trans('newlang.Notavailable') }}</span>");  
 
                     $("#timeAvg").html(parseFloat(data[6])/60/60+" hours");
                     $("#linkMap").empty();
                     if(data[7] != null)
                         $("#linkMap").append('<a href="'+data[7]+'" target="_blank">Link here</a>');
                     else
-                        $("#linkMap").append('<span class="badge badge-warning">Not available</span>');
+                        $("#linkMap").append("<span class='badge badge-warning'>{{ trans('newlang.Notavailable') }}</span>");
                     $("#linkvr").empty();
                     if(data[8] != null)
                         $("#linkvr").append('<a href="'+data[8]+'" target="_blank">Link here</a>');
                     else
-                        $("#linkvr").append('<span class="badge badge-warning">Not available</span>');
+                        $("#linkvr").append("<span class='badge badge-warning'>{{ trans('newlang.Notavailable') }}</span>");
                     //vẽ map
                     deleteMarker();
                     let add = data[0]+","+data[1];
@@ -820,7 +865,7 @@
                     //đặt lại marker cào mảng để xóa
                     markers.push(staMarker);
                   } else {
-                    alert("Geocode was not successful for the following reason: " + status);
+                    alert("{{ trans('newlang.Geocode') }}: " + status);
                   }
                 });
             };

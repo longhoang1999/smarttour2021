@@ -41,6 +41,7 @@
 							</a>
 							<div class="user_content">
 								<p>{{ trans('admin.moreFunction') }}</p>
+								<a class="typePlace" href="{{route('admin.typePlace')}}">Type of Place</a>
 								<a class="addPlace" href="{{route('admin.addPlace')}}">{{ trans('admin.addPlace') }}</a>
 								<br>
 								<a class="editPlace" href="{{route('admin.editPlace')}}">{{ trans('admin.editPlace') }}</a>
@@ -62,7 +63,7 @@
 			<div class="container-fluid header">
 				<div class="row content">
 					<div class="input_group col-md-5">
-						<a href="{{route('user.dashboard')}}" target="_blank" class="btn btn-info">{{ trans('admin.Gotowebsite') }}</a>
+						<a href="{{route('login')}}" target="_blank" class="btn btn-info">{{ trans('admin.Gotowebsite') }}</a>
 					</div>
 					<div class="col-md-7 text-right">
 						<div id="div_admin" class="float-right">

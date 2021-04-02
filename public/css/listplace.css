@@ -1,0 +1,43 @@
+.list_content ul{padding: 0}
+.list_content ul li {
+    width: 100%;
+    text-align: center;
+    display: block;
+    background: #f2fcff;
+    height: 3rem;
+    line-height: 3rem;
+    border-bottom: 1px solid #dbdbdb;
+    font-family: cursive;
+    font-weight: bold;
+    color: #1abc9c;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    cursor: pointer;
+}
+.list_content ul li:hover{
+    background: lightblue !important;
+    color: white;
+}
+.list_title {
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 20px;
+    font-family: cursive;
+    background: lightblue;
+    color: #117964;
+    font-weight: bold;
+}
+.list_content ul li:first-child{
+    background: #cee0e5;
+}
+.div_detail{
+    display: flex;
+}
+.div_detail img{
+    max-width: 20rem;
+}
+.div_detail .item{
+    padding: 0 1rem;
+}

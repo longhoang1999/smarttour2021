@@ -29,12 +29,25 @@ Route::post("checkkey","UserController@checkkey")->name('checkkey');
 // Route::get("login","UserController@viewlogin")->name("viewlogin");
 Route::post("postLogin","UserController@postLogin")->name("postLogin");
 Route::post("register","UserController@register")->name("register");
+Route::post("postLoginAjax","UserController@postLoginAjax")->name("postLoginAjax");
 
 
 //Auth::routes();
 Route::group(
 	['middleware' => ['locale'] ],
 	function(){
+		//gronp view
+		Route::get("tour","UserController@tour")->name("tour");
+		Route::get("place","UserController@place")->name("place");
+		Route::get("about","UserController@about")->name("about");
+		Route::get("feedback","UserController@viewfeedback")->name("feedback");
+		Route::post("searchPlaceSmart","UserController@searchPlaceSmart")->name("searchPlaceSmart");
+		Route::get("showDetailPlace/{idplace}","UserController@showDetailPlace")->name("showDetailPlace");
+		Route::get("listPlaceForType/{idtype}","UserController@listPlaceForType")->name("listPlaceForType");
+		Route::post("loadPlaceInfo","UserController@loadPlaceInfo")->name("loadPlaceInfo");
+		Route::get("viewShareFeedback","UserController@viewShareFeedback")->name("viewShareFeedback");
+		
+
 		Route::get('maps/showmap','MapDirectController@showmap')->name('showmap');
 		Route::get('maps/processroute','MapDirectController@processroute')->name('processroute');
 		Route::get('maps/updpath','MapDirectController@updpath')->name('updpath');
@@ -139,6 +152,15 @@ Route::group(
 		Route::post("getEmail","AdminController@getEmail")->name("admin.getEmail");
 		Route::post("sendFeedback","AdminController@sendFeedback")->name("admin.sendFeedback");
 		Route::get("sharetourDelete/{id}","AdminController@sharetourDelete")->name("admin.sharetourDelete");
+		Route::get("typePlace","AdminController@typePlace")->name("admin.typePlace");
+		Route::get("showtypeplace","AdminController@showtypeplace")->name("admin.showtypeplace");
+		Route::get("showtypeplaceVn","AdminController@showtypeplaceVn")->name("admin.showtypeplaceVn");
+		Route::post("routeShowType","AdminController@routeShowType")->name("admin.routeShowType");
+		Route::post("fixNameType","AdminController@fixNameType")->name("admin.fixNameType");
+		Route::post("addtypeplace","AdminController@addtypeplace")->name("admin.addtypeplace");
+		Route::post("deleteTypePlace","AdminController@deleteTypePlace")->name("admin.deleteTypePlace");
+		Route::post("sharefeedback","AdminController@sharefeedback")->name("admin.sharefeedback");
+		
 	}
 );
 

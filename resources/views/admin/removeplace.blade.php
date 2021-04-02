@@ -11,6 +11,7 @@
         color: white;
     }
     .user_content{display: block;}
+    .contents{color: white}
     .user_content .removePlace{background: #eaecf4;}
     #link{overflow-x: auto;}
     #link, #link_vr {

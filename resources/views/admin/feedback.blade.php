@@ -38,6 +38,7 @@
                       <th>{{ trans("admin.FullName") }}</th>
                       <th>{{ trans("admin.Content") }}</th>
                       <th>{{ trans("admin.Star") }}</th>
+                      <th>Share feedback</th>
                       <th>{{ trans("admin.Actions") }}</th>
                   </tr>
                   </thead>
@@ -87,15 +88,18 @@
           </div>
         </div>
       </div>
+      <div class="modal-footer">
+        <button type="button" data-id="" data-function="" id="btn_shareFeedback" class="btn btn-success">Share feedback</button>
+      </div>
     </div>
   </div>
 </div>
 <!-- modal reply -->
-<div class="modal fade" id="modalAnswer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modalAnswer" tabindex="-1" role="dialog" aria-labelledby="modalAnswerLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">{{ trans('admin.Replytofeedback') }}</h5>
+        <h5 class="modal-title" id="modalAnswerLabel">{{ trans('admin.Replytofeedback') }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -147,16 +151,16 @@
   	<script>
     $(function() {
         var table = $('#Table_AllClass').DataTable({
-          "language": {
-          "emptyTable": "{{trans('admin.emptyTable')}}",
-          "sLengthMenu": "{{ trans('admin.showEntries') }}",
-          "search": "{{ trans('admin.search') }}",
-          "info": "{{ trans('admin.showingToOf') }}",
-          "paginate": {
-            "previous": "{{ trans('admin.previous') }}",
-            "next": "{{ trans('admin.next') }}"
-          }
-        },
+            "language": {
+            "emptyTable": "{{trans('admin.emptyTable')}}",
+            "sLengthMenu": "{{ trans('admin.showEntries') }}",
+            "search": "{{ trans('admin.search') }}",
+            "info": "{{ trans('admin.showingToOf') }}",
+            "paginate": {
+              "previous": "{{ trans('admin.previous') }}",
+              "next": "{{ trans('admin.next') }}"
+            }
+          },
           "order": [[ 1, 'asc' ]],
             processing: true,
             serverSide: true,
@@ -168,15 +172,34 @@
                 { data: 'fullName', name: 'fullName' },
                 { data: 'content', name: 'content' },
                 { data: 'star', name: 'star' },
+                { data: 'share', name: 'share' },
                 { data: 'action', name: 'action' },
                 ]
             });
           	table.on( 'draw.dt', function () {
-		    	var PageInfo = $('#Table_AllClass').DataTable().page.info();
-		         	table.column(0, { page: 'current' }).nodes().each( function (cell, i) {
-		            	cell.innerHTML = i + 1 + PageInfo.start;
-		        	} );
-			} );
+  		    	var PageInfo = $('#Table_AllClass').DataTable().page.info();
+  		         	table.column(0, { page: 'current' }).nodes().each( function (cell, i) {
+  		            	cell.innerHTML = i + 1 + PageInfo.start;
+  		        	});
+  			    });
+
+            $("#btn_shareFeedback").click(function(){
+              var $url_path = '{!! url('/') !!}';
+              var _token = $('meta[name="csrf-token"]').attr('content');
+              let idfeedback = $(this).attr("data-id");
+              let function_status = $(this).attr("data-function");
+              var routeShareFeedback=$url_path+"/sharefeedback";
+              $.ajax({
+                  url:routeShareFeedback,
+                  method:"POST",
+                  data:{_token:_token,idfeedback:idfeedback,function_status:function_status},
+                  success:function(data){ 
+                    $("#exampleModal").modal("hide");
+                    var routeReload = $url_path+"/showAllFeedback";
+                    table.ajax.url( routeReload ).load();
+                 }
+              });
+            });
         });
     </script>
     <script type="text/javascript">
@@ -199,8 +222,24 @@
                     $(".textFullName").append(data[1]);
                     $(".textContent").append(data[2]);
                     $(".textStar").append(data[3]);
+                    if(data[4] == "0")
+                    {
+                      $("#btn_shareFeedback").removeClass("btn-danger");
+                      $("#btn_shareFeedback").addClass("btn-success");
+                      $("#btn_shareFeedback").html("Share feedback");
+                      $("#btn_shareFeedback").attr("data-id",recipient);
+                      $("#btn_shareFeedback").attr("data-function","share");
+                    }
+                    else
+                    {
+                      $("#btn_shareFeedback").removeClass("btn-success");
+                      $("#btn_shareFeedback").addClass("btn-danger");
+                      $("#btn_shareFeedback").html("Feedback retrieval");
+                      $("#btn_shareFeedback").attr("data-id",recipient);
+                      $("#btn_shareFeedback").attr("data-function","withdraw");
+                    }
                }
-          });
+            });
         });
       $('#modalAnswer').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget)

@@ -47,9 +47,36 @@ class MapDirectController {
 			$des  = (object) array('place_id'=> $value ->de_id,'de_name' => $value->de_name,'location' =>$latlng,'de_duration'=>$value->de_duration,'de_link'=>$value->de_link,'de_description'=>$value->de_description);
 			array_push($destination,$des);
 		}
-		return $destination;
+		// thẻ select 2
+		$typePlace = array();
+		$info_type0 = array('id'=>'0','text'=>'Scenic spots','children' => $this->findTypePlace(0));
+		$info_type1 = array('id'=>'1','text'=>'Restaurant','children' => $this->findTypePlace(1));
+		$info_type2 = array('id'=>'2','text'=>'Hotel','children' => $this->findTypePlace(2));
+		$info_type3 = array('id'=>'3','text'=>'Schools','children' => $this->findTypePlace(3));
+		$info_type4 = array('id'=>'4','text'=>'Other','children' => $this->findTypePlace(4));
+		array_push($typePlace,$info_type0,$info_type1,$info_type2,$info_type3,$info_type4);
+		return [$destination,$typePlace];
 	}
-
+	public function findTypePlace($type)
+	{
+	    $des = Destination::where("de_default","0")->where("de_type",$type)->get();
+	    $linePlace = array();
+	    foreach ($des as $value) {
+	    	if(Session::has('website_language') && Session::get('website_language') == "vi")
+	    	{
+	    		$lang = Language::where("language","vn")->where("des_id",$value->de_remove)->first();
+	    		$idAndPlace = array('id' => $lang->des_id, 'text' => $lang->de_name);
+	    		array_push($linePlace,$idAndPlace);
+	    	}
+	    	else
+	    	{
+	    		$lang = Language::where("language","en")->where("des_id",$value->de_remove)->first();
+	    		$idAndPlace = array('id' => $lang->des_id, 'text' => $lang->de_name);
+	    		array_push($linePlace,$idAndPlace);
+	    	}
+	    }
+	    return $linePlace;
+	}
 	public function calroute($arr){
 		$tmptotal = 0;
 		$tmparr = array();

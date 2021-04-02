@@ -14,6 +14,9 @@ use App\Models\Language;
 use App\Models\Path;
 use App\Models\ShareTour;
 use App\Models\Uservotes;
+use App\Models\TypePlace;
+use App\Models\Langtype;
+
 
 use PHPMailer;
 use Session;
@@ -194,6 +197,15 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'share',
+                function ($feedback) {
+                    if($feedback->fb_share == "0")
+                        return "<span class='badge badge-warning'>No share</span>";
+                    else
+                        return "<span class='badge badge-success'>Sharing</span>";
+                }
+            )
+            ->addColumn(
                 'action',
                 function ($feedback) {
                     $action = '<button class="btn btn-sm btn-info btn-block" data-id="'.$feedback->fb_id.'" data-toggle="modal" data-target="#exampleModal">'.trans("admin.Detail").'</button>';
@@ -201,7 +213,7 @@ class AdminController extends Controller
                     return $action;
                 }
             )
-            ->rawColumns(['stt','email','fullName','action'])
+            ->rawColumns(['stt','email','fullName','action','share'])
             ->make(true);
     }
     public function getEmail(Request $req)
@@ -259,7 +271,7 @@ class AdminController extends Controller
     {
     	$feedback = Feedback::where('fb_id',$id)->first();
     	$user = User::where('us_id',$feedback->fb_us_id)->first();
-    	return [$user->us_email,$user->us_fullName,$feedback->content,$feedback->star];
+    	return [$user->us_email,$user->us_fullName,$feedback->content,$feedback->star,$feedback->fb_share];
     }
     public function addPlace()
     {
@@ -1460,63 +1472,77 @@ class AdminController extends Controller
     }
     public function editTour($id)
     {
-        $route = Route::where("to_id",$id)->first();
-        // treo
-        $pieces_2 = explode("|", $route->to_des);
-        $array = array();
-        for ($i=0; $i < count($pieces_2)-1; $i++) {
-            $array = Arr::add($array, $i ,$pieces_2[$i]);
-        }
-        $latlng_new = array();
-        $dename_new = array();
-        $placeId_new = array();
-        $duration_new = array();
-        $j = 0;
-        foreach ($array as $value) {
-            $desCheck = Destination::where("de_remove",$value)->first();
-            if($desCheck->de_default == "1")
-            {
-                $latlng = (object)array('lat' => $desCheck->de_lat, 'lng' => $desCheck->de_lng);
-                $latlng_new = Arr::add($latlng_new, $j ,$latlng);
-                $dename_new = Arr::add($dename_new, $j ,$desCheck->de_name);
-                $placeId_new = Arr::add($placeId_new, $j ,$desCheck->de_remove);
-                $duration_new = Arr::add($duration_new, $j ,$desCheck->de_duration);
-                $j++;
-            }
-        }
-        if($route->to_startLocat != "")        
+        if(Auth::check())
         {
-            $des = Destination::where("de_remove",$route->to_startLocat)->first();
-            $latlng_start = (object)array('lat' => $des->de_lat, 'lng' => $des->de_lng);
-            $dename_start = $des->de_name;
-            $placeId_start =  $des->de_remove;
-            $duration_start = $des->de_duration;
+            $route = Route::where("to_id",$id)->first();
+            if(Auth::user()->us_type == "1" || Auth::user()->us_id == $route->to_id_user)
+            {
+                // treo
+                $pieces_2 = explode("|", $route->to_des);
+                $array = array();
+                for ($i=0; $i < count($pieces_2)-1; $i++) {
+                    $array = Arr::add($array, $i ,$pieces_2[$i]);
+                }
+                $latlng_new = array();
+                $dename_new = array();
+                $placeId_new = array();
+                $duration_new = array();
+                $j = 0;
+                foreach ($array as $value) {
+                    $desCheck = Destination::where("de_remove",$value)->first();
+                    if($desCheck->de_default == "1")
+                    {
+                        $latlng = (object)array('lat' => $desCheck->de_lat, 'lng' => $desCheck->de_lng);
+                        $latlng_new = Arr::add($latlng_new, $j ,$latlng);
+                        $dename_new = Arr::add($dename_new, $j ,$desCheck->de_name);
+                        $placeId_new = Arr::add($placeId_new, $j ,$desCheck->de_remove);
+                        $duration_new = Arr::add($duration_new, $j ,$desCheck->de_duration);
+                        $j++;
+                    }
+                }
+                if($route->to_startLocat != "")        
+                {
+                    $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                    $latlng_start = (object)array('lat' => $des->de_lat, 'lng' => $des->de_lng);
+                    $dename_start = $des->de_name;
+                    $placeId_start =  $des->de_remove;
+                    $duration_start = $des->de_duration;
+                }
+                else
+                {
+                    $latlng_start = "";
+                    $dename_start = "";
+                    $placeId_start =  "";
+                    $duration_start = "";
+                }
+                //$user = Auth::user();
+                return view('recommend_tour',[
+                    'startLocat'=>$route->to_startLocat,
+                    'to_des'=>$route->to_des,
+                    'to_starttime'=>$route->to_starttime,
+                    'to_endtime'=>$route->to_endtime,
+                    'to_comback'=>$route->to_comback,
+                    'to_optimized'=>$route->to_optimized,
+                    'id'=>$id,
+                    'latlng_new' => $latlng_new,
+                    'dename_new' => $dename_new,
+                    'placeId_new' => $placeId_new,
+                    'duration_new' => $duration_new,
+                    'latlng_start' => $latlng_start,
+                    'dename_start' => $dename_start,
+                    'placeId_start' => $placeId_start,
+                    'duration_start' => $duration_start,
+                ]);
+            }
+            else
+            {
+                return view('error.404');
+            }
         }
         else
         {
-            $latlng_start = "";
-            $dename_start = "";
-            $placeId_start =  "";
-            $duration_start = "";
+            return view('error.404');
         }
-        //$user = Auth::user();
-        return view('recommend_tour',[
-            'startLocat'=>$route->to_startLocat,
-            'to_des'=>$route->to_des,
-            'to_starttime'=>$route->to_starttime,
-            'to_endtime'=>$route->to_endtime,
-            'to_comback'=>$route->to_comback,
-            'to_optimized'=>$route->to_optimized,
-            'id'=>$id,
-            'latlng_new' => $latlng_new,
-            'dename_new' => $dename_new,
-            'placeId_new' => $placeId_new,
-            'duration_new' => $duration_new,
-            'latlng_start' => $latlng_start,
-            'dename_start' => $dename_start,
-            'placeId_start' => $placeId_start,
-            'duration_start' => $duration_start,
-        ]);
     }
     public function editRoute(Request $req,$id)
     {
@@ -1598,5 +1624,132 @@ class AdminController extends Controller
             $new_route->to_startLocat = $req->val['de_id'];
         }
         $new_route->save();
+    }
+    public function typePlace()
+    {
+        $user = Auth::user();
+        return view('admin.typeplace',['us_fullName'=>$user->us_fullName]);
+    }
+    public function showtypeplace()
+    {
+        $typePlace = TypePlace::get();
+        return DataTables::of($typePlace)
+            ->addColumn(
+                'stt',
+                function ($typePlace) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'DateCreated',
+                function ($typePlace) {
+                    return date("d/m/Y", strtotime($typePlace->dateCreated));
+                }
+            )
+            ->addColumn(
+                'nametype',
+                function ($typePlace) {
+                    $langtype = Langtype::where("language","en")->where("type_id",$typePlace->id)->first();
+                    return $langtype->nametype;
+                }
+            )
+            ->addColumn(
+                'actions',
+                function ($typePlace) {
+                    $actions = '<button class="btn btn-block btn-warning btn-sm" data-id="'.$typePlace->id.'" data-toggle="modal" data-target="#modaEditType">'.trans("admin.Edit").'</button>';
+                    if($typePlace->totalPlace == "0")
+                        $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-id="'.$typePlace->id.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','DateCreated','actions','nametype'])
+            ->make(true);
+    }
+    public function showtypeplaceVn()
+    {
+        $typePlace = TypePlace::get();
+        return DataTables::of($typePlace)
+            ->addColumn(
+                'stt',
+                function ($typePlace) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'DateCreated',
+                function ($typePlace) {
+                    return date("d/m/Y", strtotime($typePlace->dateCreated));
+                }
+            )
+            ->addColumn(
+                'nametype',
+                function ($typePlace) {
+                    $langtype = Langtype::where("language","vn")->where("type_id",$typePlace->id)->first();
+                    return $langtype->nametype;
+                }
+            )
+            ->addColumn(
+                'actions',
+                function ($typePlace) {
+                    $actions = '<button class="btn btn-block btn-warning btn-sm" data-id="'.$typePlace->id.'" data-toggle="modal" data-target="#modaEditType">'.trans("admin.Edit").'</button>';
+                    if($typePlace->totalPlace == "0")
+                        $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-id="'.$typePlace->id.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','DateCreated','actions','nametype'])
+            ->make(true);
+    }
+    public function routeShowType(Request $req)
+    {
+        $langtype = Langtype::where("type_id",$req->id)->where("language",$req->lang)->first();
+        return $langtype->nametype;
+    }
+    public function fixNameType(Request $req)
+    {
+        $langtype = Langtype::where("type_id",$req->idtype)->where("language",$req->lang)->first();
+        $langtype->nametype =$req->nametype;
+        $langtype->save();
+        return $status = "success";
+    }
+    public function addtypeplace(Request $req)
+    {
+        $typeplace = new TypePlace();
+        $typeplace->save();
+        $langtypeVN = new Langtype();
+        $langtypeVN->type_id = $typeplace->id;
+        $langtypeVN->language = "vn";
+        $langtypeVN->nametype = $req->nametypeVn;
+        $langtypeVN->save();
+        $langtypeEN = new Langtype();
+        $langtypeEN->type_id = $typeplace->id;
+        $langtypeEN->language = "en";
+        $langtypeEN->nametype = $req->nametypeEn;
+        $langtypeEN->save();
+        return $status = "success";
+    }
+    public function deleteTypePlace(Request $req)
+    {
+        $typePlace = TypePlace::where("id",$req->id)->first();
+        if($typePlace->totalPlace == "0")
+        {
+            $langtype = Langtype::where("type_id",$req->id)->get();
+            foreach ($langtype as $value) {
+                $value->delete();
+            }
+            $typePlace->delete();
+        }
+    }
+    public function sharefeedback(Request $req)
+    {
+        $findFeedback = Feedback::where("fb_id",$req->idfeedback)->first();
+        if($req->function_status == "share")
+            $findFeedback->fb_share = "1";
+        else if($req->function_status == "withdraw")
+            $findFeedback->fb_share = "0";
+        $findFeedback->save();
+        return $status = "success";
     }
 }
