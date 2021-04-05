@@ -48,6 +48,7 @@ function initMap(){
 		},
 		success: (result)=>{
 			locationsdata = result[0];
+			console.log(result[1]);
 			let data = result[1];
 			$('#waypoints').select2({
 				data: data
@@ -685,8 +686,8 @@ function showMap(){
 		var legs = response.routes[0].legs;
 		for(var i=0;i<polylines.length;i++){
 			polylines[i].setMap(null);
-			polylines = []
 		}
+		polylines = [];
 
 		for (i = 0; i < legs.length; i++) {
 			(i>=5&&i%5 == 0)?index = 4:((startlocat != undefined)?index = (i%5)-1:index = (i%5));
@@ -1575,8 +1576,8 @@ function showMap(){
 			this.span.style.top = (position.y)  -15+ 'px';
 		}
 	});
-	<?php use Illuminate\Support\Arr;
-				use App\Models\Destination; 
+	<?php 	use Illuminate\Support\Arr;
+			use App\Models\Destination; 
 	?>
 	@if(!isset($to_des))
 		$("#btnSaveNameTour").click(function(){
@@ -1703,6 +1704,7 @@ function showMap(){
 			}
 		});
 	@else
+		//edit tour
 		$("#btnSaveNameTour").click(function(){
 			let nameTour = $('input[name="nameTour"]').val();
 			if(nameTour == "")
@@ -2602,15 +2604,16 @@ function showMap(){
 <script type="text/javascript">
 	$(document).ready(function(){
 		$("#saveTour").click(function(){
+			let _token = $('meta[name="csrf-token"]').attr('content');					
 			//loginForm
 			$(".loginForm").submit(function(e){
 				e.preventDefault();
 				let form = $(this);
-			    var url = "{{route('postLoginAjax')}}";
+			    var url = form.attr("action");
 			    $.ajax({
 		           type: "POST",
 		           url: url,
-		           data: form.serialize(),
+		           data: {_token:_token,typeLogin:"modal",us_email:$(".loginForm input[name=us_email]").val(),us_password:$(".loginForm input[name=us_password]").val()},
 		           success: function(data)
 		           {
 		               if(data == "lock")

@@ -276,17 +276,39 @@ class AdminController extends Controller
     public function addPlace()
     {
     	$user = Auth::user();
-        return view('admin.addplace',['us_fullName'=>$user->us_fullName]);
+        $typeplace = TypePlace::get();
+        foreach ($typeplace as $value) {
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                $langtype = Langtype::where("type_id",$value->id)->where("language","vn")->first();
+            else
+                $langtype = Langtype::where("type_id",$value->id)->where("language","en")->first();
+            $value['nametype'] = $langtype->nametype;
+        }
+
+        $typeplace_add = TypePlace::get();
+        foreach ($typeplace_add as $value) {
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                $langtype = Langtype::where("type_id",$value->id)->where("language","vn")->first();
+            else
+                $langtype = Langtype::where("type_id",$value->id)->where("language","en")->first();
+            $value['nametype'] = $langtype->nametype;
+        }
+        foreach ($typeplace_add as $key => $value) {
+            if($value->status == "1")
+                $typeplace_add->forget($key);
+        }
+        return view('admin.addplace',['us_fullName'=>$user->us_fullName,'typeplace'=>$typeplace,'typeplace_add'=>$typeplace_add]);
     }
     public function showDestination()
     {
         $destination = Language::where("language","en")->get();
             foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type')->where("de_remove",$value->des_id)->first();
                 $value["de_remove"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_duration"] = $des->de_duration;
+                $value["de_type"] = $des->de_type;
             }
         return DataTables::of($destination)
         	->addColumn(
@@ -304,52 +326,13 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
-                'actions',
+                'status',
                 function ($destination) {
-                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
-                    return $actions;
-                }
-            )
-            ->rawColumns(['stt','duration','actions'])
-            ->make(true);
-    }
-    public function showDestinationType($type,$lang)
-    {
-        $findType = Destination::where("de_type",$type)->get();
-        $array=array();
-        $i=1;
-        foreach ($findType as $value) {
-            $array = Arr::add($array, $i ,$value->de_remove);
-            $i++;
-        }
-        if($lang == "en")
-        {
-            $destination = Language::whereIn("des_id",$array)->where("language","en")->get();
-        }
-        else
-        {
-            $destination = Language::whereIn("des_id",$array)->where("language","vn")->get();
-        }
-            foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
-                $value["de_remove"] = $des->de_remove;
-                $value["de_lat"] = $des->de_lat;
-                $value["de_lng"] = $des->de_lng;
-                $value["de_duration"] = $des->de_duration;
-            }
-        return DataTables::of($destination)
-            ->addColumn(
-                'stt',
-                function ($destination) {
-                    $stt = "";
-                    return $stt;
-                }
-            )
-            ->addColumn(
-                'duration',
-                function ($destination) {
-                    $duration = floatval($destination->de_duration)/60/60;
-                    return $duration;
+                    $findType = TypePlace::where("id",$destination->de_type)->first();
+                    if($findType->status == "0")
+                        return '<span class="badge badge-success">Admin</span>';
+                    else
+                        return '<span class="badge badge-warning">User</span>';
                 }
             )
             ->addColumn(
@@ -359,18 +342,19 @@ class AdminController extends Controller
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','duration','actions'])
+            ->rawColumns(['stt','duration','actions','status'])
             ->make(true);
     }
     public function showDestinationVN ()
     {
         $destination = Language::where("language","vn")->get();
             foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type')->where("de_remove",$value->des_id)->first();
                 $value["de_remove"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_duration"] = $des->de_duration;
+                $value["de_type"] = $des->de_type;
             }
         return DataTables::of($destination)
             ->addColumn(
@@ -388,24 +372,36 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'status',
+                function ($destination) {
+                    $findType = TypePlace::where("id",$destination->de_type)->first();
+                    if($findType->status == "0")
+                        return '<span class="badge badge-success">Admin</span>';
+                    else
+                        return '<span class="badge badge-warning">User</span>';
+                }
+            )
+            ->addColumn(
                 'actions',
                 function ($destination) {
                     $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','duration','actions'])
+            ->rawColumns(['stt','duration','actions','status'])
             ->make(true);
     }
     public function showDestinationEditVN ()
     {
         $destination = Language::where("language","vn")->get();
             foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type','de_default')->where("de_remove",$value->des_id)->first();
                 $value["de_remove"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_duration"] = $des->de_duration;
+                $value["de_type"] = $des->de_type;
+                $value["de_default"] = $des->de_default;
             }
         return DataTables::of($destination)
             ->addColumn(
@@ -423,14 +419,24 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'status',
+                function ($destination) {
+                    $findType = TypePlace::where("id",$destination->de_type)->first();
+                    if($findType->status == "0")
+                        return '<span class="badge badge-success">Admin</span>';
+                    else
+                        return '<span class="badge badge-warning">User</span>';
+                }
+            )
+            ->addColumn(
                 'actions',
                 function ($destination) {
                     $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
-                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalEdit">'.trans("admin.Edit").'</button>';
+                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-typeplace="'.$destination->de_default.'" data-toggle="modal" data-target="#modalEdit">'.trans("admin.Edit").'</button>';
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','duration','actions'])
+            ->rawColumns(['stt','duration','actions','status'])
             ->make(true);
         
     }
@@ -438,13 +444,20 @@ class AdminController extends Controller
     {
     	$randomletter = substr(str_shuffle("abcdefghijklmnopqrstuvwxyz0123456789QAZXSWEDCRFVTGBYHNUJMIKLPO"), 0, 27);
     	$destination = new Destination();
+        $destination->de_name = $req->de_name_vn;
+        $destination->de_description = $req->de_description_vn;
+        $destination->de_shortdes = $req->de_shortdes_vn;
     	$destination->de_id = $randomletter;
     	$destination->de_remove = $randomletter;
     	$destination->de_name = $req->de_name_vn;
     	$destination->de_lat = $req->de_lat;
     	$destination->de_lng = $req->de_lng;
         $destination->de_type = $req->typePlace;
-        
+        //total Place
+        $typeplace = TypePlace::where("id",$req->typePlace)->first();
+        $typeplace->totalPlace = intval($typeplace->totalPlace) + 1;
+        $typeplace->save();
+        $destination->de_default = "0";
         $destination->de_map = $req->de_map;
     	$destination->de_link = $req->de_link;
     	$destination->de_duration = floatval($req->de_duration)*60*60;
@@ -559,25 +572,55 @@ class AdminController extends Controller
     public function editPlace()
     {
     	$user = Auth::user();
-        return view('admin.editplace',['us_fullName'=>$user->us_fullName]);
+        $typeplace = TypePlace::get();
+        foreach ($typeplace as $value) {
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                $langtype = Langtype::where("type_id",$value->id)->where("language","vn")->first();
+            else
+                $langtype = Langtype::where("type_id",$value->id)->where("language","en")->first();
+            $value['nametype'] = $langtype->nametype;
+        }
+        $typeplace_edit = TypePlace::get();
+        foreach ($typeplace_edit as $value) {
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                $langtype = Langtype::where("type_id",$value->id)->where("language","vn")->first();
+            else
+                $langtype = Langtype::where("type_id",$value->id)->where("language","en")->first();
+            $value['nametype'] = $langtype->nametype;
+        }
+        foreach ($typeplace_edit as $key => $value) {
+            if($value->status == "1")
+                $typeplace_edit->forget($key);
+        }
+        return view('admin.editplace',['us_fullName'=>$user->us_fullName,'typeplace'=>$typeplace,'typeplace_edit'=>$typeplace_edit]);
     }
     public function removePlace()
     {
     	$user = Auth::user();
-        return view('admin.removeplace',['us_fullName'=>$user->us_fullName]);
+        $typeplace = TypePlace::get();
+        foreach ($typeplace as $value) {
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                $langtype = Langtype::where("type_id",$value->id)->where("language","vn")->first();
+            else
+                $langtype = Langtype::where("type_id",$value->id)->where("language","en")->first();
+            $value['nametype'] = $langtype->nametype;
+        }
+        return view('admin.removeplace',['us_fullName'=>$user->us_fullName,'typeplace'=>$typeplace]);
     }
     public function showDestinationRemove()
     {
         $destination = Language::where("language","en")->get();
             foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type','de_default')->where("de_remove",$value->des_id)->first();
                 $value["de_remove"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_duration"] = $des->de_duration;
+                $value["de_type"] = $des->de_type;
+                $value["de_default"] = $des->de_default;
             }
         return DataTables::of($destination)
-        	->addColumn(
+            ->addColumn(
                 'stt',
                 function ($destination) {
                     $stt = "";
@@ -592,6 +635,16 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'status',
+                function ($destination) {
+                    $findType = TypePlace::where("id",$destination->de_type)->first();
+                    if($findType->status == "0")
+                        return '<span class="badge badge-success">Admin</span>';
+                    else
+                        return '<span class="badge badge-warning">User</span>';
+                }
+            )
+            ->addColumn(
                 'actions',
                 function ($destination) {
                     $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
@@ -599,33 +652,43 @@ class AdminController extends Controller
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','duration','actions'])
+            ->rawColumns(['stt','duration','actions','status'])
             ->make(true);
     }
     public function showDestinationRemoveType($type,$lang)
     {
-        $findType = Destination::where("de_type",$type)->get();
-        $array=array();
-        $i=1;
-        foreach ($findType as $value) {
-            $array = Arr::add($array, $i ,$value->de_remove);
-            $i++;
-        }
-        if($lang == "en")
+        $typeplace = TypePlace::where("id",$type)->first();
+        if($typeplace->status == "0")
         {
-            $destination = Language::whereIn("des_id",$array)->where("language","en")->get();
-        }
-        else
-        {
-            $destination = Language::whereIn("des_id",$array)->where("language","vn")->get();
-        }
+            $findType = Destination::where("de_type",$type)->get();
+            $array=array();
+            $i=1;
+            foreach ($findType as $value) {
+                $array = Arr::add($array, $i ,$value->de_remove);
+                $i++;
+            }
+            if($lang == "en")
+            {
+                $destination = Language::whereIn("des_id",$array)->where("language","en")->get();
+            }
+            else
+            {
+                $destination = Language::whereIn("des_id",$array)->where("language","vn")->get();
+            }
             foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type','de_default')->where("de_remove",$value->des_id)->first();
                 $value["de_remove"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_duration"] = $des->de_duration;
+                $value["de_type"] = $des->de_type;
+                $value["de_default"] = $des->de_default;
             }
+        }
+        else
+        {
+            $destination = Destination::where("de_type",$type)->get();
+        }
         return DataTables::of($destination)
             ->addColumn(
                 'stt',
@@ -642,6 +705,16 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'status',
+                function ($destination) {
+                    $findType = TypePlace::where("id",$destination->de_type)->first();
+                    if($findType->status == "0")
+                        return '<span class="badge badge-success">Admin</span>';
+                    else
+                        return '<span class="badge badge-warning">User</span>';
+                }
+            )
+            ->addColumn(
                 'actions',
                 function ($destination) {
                     $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
@@ -649,18 +722,19 @@ class AdminController extends Controller
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','duration','actions'])
+            ->rawColumns(['stt','duration','actions','status'])
             ->make(true);
     }
     public function showDestinationRemoveVN()
     {
         $destination = Language::where("language","vn")->get();
             foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type')->where("de_remove",$value->des_id)->first();
                 $value["de_remove"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_duration"] = $des->de_duration;
+                $value["de_type"] = $des->de_type;
             }
         return DataTables::of($destination)
             ->addColumn(
@@ -675,6 +749,16 @@ class AdminController extends Controller
                 function ($destination) {
                     $duration = floatval($destination->de_duration)/60/60;
                     return $duration;
+                }
+            )
+            ->addColumn(
+                'status',
+                function ($destination) {
+                    $findType = TypePlace::where("id",$destination->de_type)->first();
+                    if($findType->status == "0")
+                        return '<span class="badge badge-success">Admin</span>';
+                    else
+                        return '<span class="badge badge-warning">User</span>';
                 }
             )
             ->addColumn(
@@ -685,75 +769,130 @@ class AdminController extends Controller
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','duration','actions'])
+            ->rawColumns(['stt','duration','actions','status'])
             ->make(true);
     }
     public function showDetail(Request $req,$remove,$lang)
     {
-        if($lang == "en")
+        $de = Destination::where("de_remove",$remove)->first();
+        $typeplace = TypePlace::where("id",$de->de_type)->first();
+        if($typeplace->status == "0")
         {
-            $des = Language::where("language","en")->where("des_id",$remove)->first();
-            $de = Destination::where("de_remove",$remove)->first();
-            if(!empty($des) && !empty($de))
+            if($lang == "en")
             {
-                if($de->de_image != "")
+                $des = Language::where("language","en")->where("des_id",$remove)->first();
+                if(!empty($des) && !empty($de))
                 {
-                    $image = asset($de->de_image);
+                    if($de->de_image != "")
+                    {
+                        $image = asset($de->de_image);
+                    }
+                    else $image="";
+                    $duration = floatval($de->de_duration)/60/60;
+                    $langtype = Langtype::where("type_id",$typeplace->id)->where("language","en")->first();
+                    return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype];
                 }
-                else $image="";
-                $duration = floatval($de->de_duration)/60/60;
-                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type];
-            }
-            else
-            {
-                return "Can not find data";
-            }
-            
-        }
-        else if($lang == "vn")
-        {
-            $des = Language::where("language","vn")->where("des_id",$remove)->first();
-            $de = Destination::where("de_remove",$remove)->first();
-            if(!empty($des) && !empty($de))
-            {
-                if($de->de_image != "")
+                else
                 {
-                    $image = asset($de->de_image);
+                    return "Can not find data";
                 }
-                else $image="";
-                $duration = floatval($de->de_duration)/60/60;
-                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type];
+                
             }
-            else
+            else if($lang == "vn")
             {
-                return "Can not find data";
+                $des = Language::where("language","vn")->where("des_id",$remove)->first();
+                if(!empty($des) && !empty($de))
+                {
+                    if($de->de_image != "")
+                    {
+                        $image = asset($de->de_image);
+                    }
+                    else $image="";
+                    $duration = floatval($de->de_duration)/60/60;
+                    $langtype = Langtype::where("type_id",$typeplace->id)->where("language","vn")->first();
+                    return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype];
+                }
+                else
+                {
+                    return "Can not find data";
+                }
             }
-        }
-    }
-    public function showDestinationEditType($type,$lang)
-    {
-        $findType = Destination::where("de_type",$type)->get();
-        $array=array();
-        $i=1;
-        foreach ($findType as $value) {
-            $array = Arr::add($array, $i ,$value->de_remove);
-            $i++;
-        }
-        if($lang == "en")
-        {
-            $destination = Language::whereIn("des_id",$array)->where("language","en")->get();
         }
         else
         {
-            $destination = Language::whereIn("des_id",$array)->where("language","vn")->get();
+            if($lang == "en")
+            {
+                if(!empty($de))
+                {
+                    if($de->de_image != "")
+                    {
+                        $image = asset($de->de_image);
+                    }
+                    else $image="";
+                    $duration = floatval($de->de_duration)/60/60;
+                    $langtype = Langtype::where("type_id",$typeplace->id)->where("language","en")->first();
+                    return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype];
+                }
+                else
+                {
+                    return "Can not find data";
+                }
+                
+            }
+            else if($lang == "vn")
+            {
+                if(!empty($de))
+                {
+                    if($de->de_image != "")
+                    {
+                        $image = asset($de->de_image);
+                    }
+                    else $image="";
+                    $duration = floatval($de->de_duration)/60/60;
+                    $langtype = Langtype::where("type_id",$typeplace->id)->where("language","vn")->first();
+                    return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype];
+                }
+                else
+                {
+                    return "Can not find data";
+                }
+            }
         }
+    }
+    public function showDestinationType($type,$lang)
+    {
+        $typeplace = TypePlace::where("id",$type)->first();
+        if($typeplace->status == "0")
+        {
+            $findType = Destination::where("de_type",$type)->get();
+            $array=array();
+            $i=1;
+            foreach ($findType as $value) {
+                $array = Arr::add($array, $i ,$value->de_remove);
+                $i++;
+            }
+            if($lang == "en")
+            {
+                $destination = Language::whereIn("des_id",$array)->where("language","en")->get();
+            }
+            else
+            {
+                $destination = Language::whereIn("des_id",$array)->where("language","vn")->get();
+            }
             foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type')->where("de_remove",$value->des_id)->first();
                 $value["de_remove"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_duration"] = $des->de_duration;
+                $value["de_type"] = $des->de_type;
             }
+        }
+        else
+        {
+            $destination = Destination::where("de_type",$type)->get();
+        }
+        
         return DataTables::of($destination)
             ->addColumn(
                 'stt',
@@ -770,14 +909,93 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'status',
+                function ($destination) {
+                    $findType = TypePlace::where("id",$destination->de_type)->first();
+                    if($findType->status == "0")
+                        return '<span class="badge badge-success">Admin</span>';
+                    else
+                        return '<span class="badge badge-warning">User</span>';
+                }
+            )
+            ->addColumn(
                 'actions',
                 function ($destination) {
                     $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
-                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalEdit">'.trans("admin.Edit").'</button>';
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','duration','actions'])
+            ->rawColumns(['stt','duration','actions','status'])
+            ->make(true);
+    }
+    public function showDestinationEditType($type,$lang)
+    {
+        $typeplace = TypePlace::where("id",$type)->first();
+        if($typeplace->status == "0")
+        {
+            $findType = Destination::where("de_type",$type)->get();
+            $array=array();
+            $i=1;
+            foreach ($findType as $value) {
+                $array = Arr::add($array, $i ,$value->de_remove);
+                $i++;
+            }
+            if($lang == "en")
+            {
+                $destination = Language::whereIn("des_id",$array)->where("language","en")->get();
+            }
+            else
+            {
+                $destination = Language::whereIn("des_id",$array)->where("language","vn")->get();
+            }
+            foreach ($destination as $value) {
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type','de_default')->where("de_remove",$value->des_id)->first();
+                $value["de_remove"] = $des->de_remove;
+                $value["de_lat"] = $des->de_lat;
+                $value["de_lng"] = $des->de_lng;
+                $value["de_duration"] = $des->de_duration;
+                $value["de_type"] = $des->de_type;
+                $value["de_default"] = $des->de_default;
+            }
+        }
+        else
+        {
+            $destination = Destination::where("de_type",$type)->get();
+        }
+        return DataTables::of($destination)
+            ->addColumn(
+                'stt',
+                function ($destination) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'duration',
+                function ($destination) {
+                    $duration = floatval($destination->de_duration)/60/60;
+                    return $duration;
+                }
+            )
+            ->addColumn(
+                'status',
+                function ($destination) {
+                    $findType = TypePlace::where("id",$destination->de_type)->first();
+                    if($findType->status == "0")
+                        return '<span class="badge badge-success">Admin</span>';
+                    else
+                        return '<span class="badge badge-warning">User</span>';
+                }
+            )
+            ->addColumn(
+                'actions',
+                function ($destination) {
+                    $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
+                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-typeplace="'.$destination->de_default.'" data-toggle="modal" data-target="#modalEdit">'.trans("admin.Edit").'</button>';
+                    return $actions;
+                }
+            )
+            ->rawColumns(['stt','duration','actions','status'])
             ->make(true);
     }
     public function placeDelete($remove)
@@ -834,11 +1052,13 @@ class AdminController extends Controller
     {
         $destination = Language::where("language","en")->get();
             foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type','de_default')->where("de_remove",$value->des_id)->first();
                 $value["de_remove"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_duration"] = $des->de_duration;
+                $value["de_type"] = $des->de_type;
+                $value["de_default"] = $des->de_default;
             }
         return DataTables::of($destination)
         	->addColumn(
@@ -856,23 +1076,63 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'status',
+                function ($destination) {
+                    $findType = TypePlace::where("id",$destination->de_type)->first();
+                    if($findType->status == "0")
+                        return '<span class="badge badge-success">Admin</span>';
+                    else
+                        return '<span class="badge badge-warning">User</span>';
+                }
+            )
+            ->addColumn(
                 'actions',
                 function ($destination) {
                     $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
-                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalEdit">'.trans("admin.Edit").'</button>';
+                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-typeplace="'.$destination->de_default.'" data-toggle="modal" data-target="#modalEdit">'.trans("admin.Edit").'</button>';
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','duration','actions'])
+            ->rawColumns(['stt','duration','actions','status'])
             ->make(true);
     }
-    public function showDetailEdit($remove,$lang)
+    public function showDetailEdit(Request $req,$remove,$lang)
     {   
         if($lang == "en")
         {
-            $des = Language::where("language","en")->where("des_id",$remove)->first();
             $de = Destination::where("de_remove",$remove)->first();
-            if(!empty($des) && !empty($de))
+            if($de->de_default == "0")
+            {
+                $des = Language::where("language","en")->where("des_id",$remove)->first();
+                if(!empty($des) && !empty($de))
+                {
+                    if($de->de_image != "")
+                    {
+                        $image = asset($de->de_image);
+                    }
+                    else $image="";
+                    $duration = floatval($de->de_duration)/60/60;
+                    $langtype = Langtype::select("nametype")->where("type_id",$de->de_type)->where("language","en")->first();
+                    return [$des->de_name,
+                        $de->de_lng,
+                        $de->de_lat,
+                        $des->de_description,
+                        $des->de_shortdes,
+                        $duration,
+                        $de->de_link,
+                        $de->de_map,
+                        $image,
+                        $de->de_type,
+                        $langtype->nametype,
+                        $de->de_default
+                    ];
+                }
+                else
+                {
+                    return "Can not find data";
+                }
+            }
+            else
             {
                 if($de->de_image != "")
                 {
@@ -880,19 +1140,34 @@ class AdminController extends Controller
                 }
                 else $image="";
                 $duration = floatval($de->de_duration)/60/60;
-                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type];
-            }
-            else
-            {
-                return "Can not find data";
+                $langtype = Langtype::select("nametype")->where("type_id",$de->de_type)->where("language","en")->first();
+                return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type,$langtype->nametype,$de->de_default];
             }
             
         }
         else if($lang == "vn")
         {
-            $des = Language::where("language","vn")->where("des_id",$remove)->first();
             $de = Destination::where("de_remove",$remove)->first();
-            if(!empty($des) && !empty($de))
+            $des = Language::where("language","vn")->where("des_id",$remove)->first();
+            if($de->de_default == "0")
+            {
+                if(!empty($des) && !empty($de))
+                {
+                    if($de->de_image != "")
+                    {
+                        $image = asset($de->de_image);
+                    }
+                    else $image="";
+                    $duration = floatval($de->de_duration)/60/60;
+                    $langtype = Langtype::select("nametype")->where("type_id",$de->de_type)->where("language","vn")->first();
+                    return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type,$langtype->nametype,$de->de_default];
+                }
+                else
+                {
+                    return "Can not find data";
+                }
+            }
+            else
             {
                 if($de->de_image != "")
                 {
@@ -900,69 +1175,116 @@ class AdminController extends Controller
                 }
                 else $image="";
                 $duration = floatval($de->de_duration)/60/60;
-                return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type];
-            }
-            else
-            {
-                return "Can not find data";
+                $langtype = Langtype::select("nametype")->where("type_id",$de->de_type)->where("language","vn")->first();
+                return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type,$langtype->nametype,$de->de_default];
             }
         }
     }
     public function formEditPlace(Request $req,$remove,$lang)
     {
-        if($lang == "en")
+        if($req->de_default == "0")
         {
-            $des = Language::where("language","en")->where("des_id",$remove)->first();
-            $de = Destination::where("de_remove",$remove)->first();
-            if(!empty($des) && !empty($de))
+            if($lang == "en")
             {
-                $des->de_name=$req->placeName;
-                $des->de_description=$req->description;
-                $des->de_shortdes=$req->shortdes;
-                $des->save();
-                $de->de_duration= floatval($req->duration)*60*60;
-                $de->de_lat=$req->latitude_edit;
-                $de->de_type=$req->type;
-                $de->de_lng=$req->longitude_edit;
-                $de->de_map=$req->link_edit;
-                $de->de_link=$req->de_link;
-                if($req->file('image'))
+                $des = Language::where("language","en")->where("des_id",$remove)->first();
+                $de = Destination::where("de_remove",$remove)->first();
+                if(!empty($des) && !empty($de))
                 {
-                    $image = $req->file('image');
-                    File::delete(public_path($de->de_image));
-                    $picName = time().'.'.$image->getClientOriginalExtension();
-                    $image->move(public_path('imgPlace/'), $picName);
-                    $de->de_image='imgPlace/'.$picName;
+                    $des->de_name=$req->placeName;
+                    $des->de_description=$req->description;
+                    $des->de_shortdes=$req->shortdes;
+                    $des->save();
+                    $de->de_duration= floatval($req->duration)*60*60;
+                    $de->de_lat=$req->latitude_edit;
+                    $de->de_lng=$req->longitude_edit;
+                    $de->de_map=$req->link_edit;
+                    $de->de_link=$req->de_link;
+                    if(isset($req->type))
+                    {
+                        if($de->de_type != $req->type)
+                        {
+                            $typeplace = TypePlace::where("id",$de->de_type)->first();
+                            $typeplace->totalPlace = intval($typeplace->totalPlace) - 1;
+                            $typeplace->save();
+                            $typeplace_new = TypePlace::where("id",$req->type)->first();
+                            $typeplace_new->totalPlace = intval($typeplace_new->totalPlace) + 1;
+                            $typeplace_new->save();
+                            $de->de_type=$req->type;
+                        }
+                    }
+                    if($req->file('image'))
+                    {
+                        $image = $req->file('image');
+                        File::delete(public_path($de->de_image));
+                        $picName = time().'.'.$image->getClientOriginalExtension();
+                        $image->move(public_path('imgPlace/'), $picName);
+                        $de->de_image='imgPlace/'.$picName;
+                    }
+                    $de->save();
                 }
-                $de->save();
+            }
+            else if($lang == "vn")
+            {
+                $des = Language::where("language","vn")->where("des_id",$remove)->first();
+                $de = Destination::where("de_remove",$remove)->first();
+                if(!empty($des) && !empty($de))
+                {
+                    $des->de_name=$req->placeName;
+                    $des->de_description=$req->description;
+                    $des->de_shortdes=$req->shortdes;
+                    $des->save();
+                    $de->de_name = $req->placeName;
+                    $de->de_duration= floatval($req->duration)*60*60;
+                    $de->de_lat=$req->latitude_edit;
+                    $de->de_lng=$req->longitude_edit;
+                    $de->de_map=$req->link_edit;
+                    $de->de_link=$req->de_link;
+                    if(isset($req->type))
+                    {
+                        if($de->de_type != $req->type)
+                        {
+                            $typeplace = TypePlace::where("id",$de->de_type)->first();
+                            $typeplace->totalPlace = intval($typeplace->totalPlace) - 1;
+                            $typeplace->save();
+                            $typeplace_new = TypePlace::where("id",$req->type)->first();
+                            $typeplace_new->totalPlace = intval($typeplace_new->totalPlace) + 1;
+                            $typeplace_new->save();
+                            $de->de_type=$req->type;
+                        }
+                    }
+                    if($req->file('image'))
+                    {
+                        $image = $req->file('image');
+                        File::delete(public_path($de->de_image));
+                        $picName = time().'.'.$image->getClientOriginalExtension();
+                        $image->move(public_path('imgPlace/'), $picName);
+                        $de->de_image='imgPlace/'.$picName;
+                    }
+                    $de->save();
+                }
             }
         }
-        else if($lang == "vn")
+        else
         {
-            $des = Language::where("language","vn")->where("des_id",$remove)->first();
             $de = Destination::where("de_remove",$remove)->first();
-            if(!empty($des) && !empty($de))
+            $de->de_name=$req->placeName;
+            $de->de_description=$req->description;
+            $de->de_shortdes=$req->shortdes;
+            $de->de_duration= floatval($req->duration)*60*60;
+            $de->de_lat=$req->latitude_edit;
+            $de->de_lng=$req->longitude_edit;
+            $de->de_map=$req->link_edit;
+            $de->de_link=$req->de_link;
+            if($req->file('image'))
             {
-                $des->de_name=$req->placeName;
-                $des->de_description=$req->description;
-                $des->de_shortdes=$req->shortdes;
-                $des->save();
-                $de->de_name = $req->placeName;
-                $de->de_duration= floatval($req->duration)*60*60;
-                $de->de_lat=$req->latitude_edit;
-                $de->de_lng=$req->longitude_edit;
-                $de->de_map=$req->link_edit;
-                $de->de_link=$req->de_link;
-                if($req->file('image'))
-                {
-                    $image = $req->file('image');
-                    File::delete(public_path($de->de_image));
-                    $picName = time().'.'.$image->getClientOriginalExtension();
-                    $image->move(public_path('imgPlace/'), $picName);
-                    $de->de_image='imgPlace/'.$picName;
-                }
-                $de->save();
+                $image = $req->file('image');
+                File::delete(public_path($de->de_image));
+                $picName = time().'.'.$image->getClientOriginalExtension();
+                $image->move(public_path('imgPlace/'), $picName);
+                $de->de_image='imgPlace/'.$picName;
             }
+            $de->save();
+
         }
     	return back()->with("status","You have successfully corrected");
     }
@@ -970,10 +1292,10 @@ class AdminController extends Controller
     {
     	$user = Auth::user();
     	$totalAcc = User::where("us_type","0")->count();
-    	$totalDes = Destination::count();
-    	$totalFeedback = Feedback::count();
+    	$totalDes = Destination::where("de_default","0")->count();
+    	$totalTour = Route::count();
     	$avgStar = Feedback::avg('star');
-        return view('admin.generalinfor',['us_fullName'=>$user->us_fullName,'totalAcc'=>$totalAcc,'totalDes'=>$totalDes,'totalFeedback'=>$totalFeedback,'avgStar'=>$avgStar]);
+        return view('admin.generalinfor',['us_fullName'=>$user->us_fullName,'totalAcc'=>$totalAcc,'totalDes'=>$totalDes,'totalTour'=>$totalTour,'avgStar'=>$avgStar]);
     }
     public function updatePath(Request $req)
     {
@@ -1581,6 +1903,8 @@ class AdminController extends Controller
             $des->de_duration = $req->val['de_duration'];
             $des->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
             $des->de_default = "1";
+            $findType = TypePlace::select("id")->where("status","1")->first();
+            $des->de_type = $findType->id;
             $des->save();
         }
 
@@ -1613,6 +1937,8 @@ class AdminController extends Controller
                 $desNewPlace->de_duration = $value['de_duration'];
                 $desNewPlace->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
                 $desNewPlace->de_default = "1";
+                $findType = TypePlace::select("id")->where("status","1")->first();
+                $desNewPlace->de_type = $findType->id;
                 $desNewPlace->save();
                 $desId = $desId.$value['de_id']."|";
                 $i++;
@@ -1648,6 +1974,15 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'status',
+                function ($typePlace) {
+                    if($typePlace->status == "1")
+                        return "<span class='badge badge-danger'>Can not delete</span>";
+                    else if($typePlace->status == "0")
+                        return "<span class='badge badge-success'>Can edit</span>";
+                }
+            )
+            ->addColumn(
                 'nametype',
                 function ($typePlace) {
                     $langtype = Langtype::where("language","en")->where("type_id",$typePlace->id)->first();
@@ -1658,12 +1993,15 @@ class AdminController extends Controller
                 'actions',
                 function ($typePlace) {
                     $actions = '<button class="btn btn-block btn-warning btn-sm" data-id="'.$typePlace->id.'" data-toggle="modal" data-target="#modaEditType">'.trans("admin.Edit").'</button>';
-                    if($typePlace->totalPlace == "0")
-                        $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-id="'.$typePlace->id.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
+                    if($typePlace->status == "0")
+                    {
+                        if($typePlace->totalPlace == "0")
+                            $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-id="'.$typePlace->id.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
+                    }
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','DateCreated','actions','nametype'])
+            ->rawColumns(['stt','DateCreated','actions','nametype','status'])
             ->make(true);
     }
     public function showtypeplaceVn()
@@ -1684,6 +2022,15 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'status',
+                function ($typePlace) {
+                    if($typePlace->status == "1")
+                        return "<span class='badge badge-danger'>Không thể xóa</span>";
+                    else if($typePlace->status == "0")
+                        return "<span class='badge badge-success'>Có thể chỉnh sửa</span>";
+                }
+            )
+            ->addColumn(
                 'nametype',
                 function ($typePlace) {
                     $langtype = Langtype::where("language","vn")->where("type_id",$typePlace->id)->first();
@@ -1699,7 +2046,7 @@ class AdminController extends Controller
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','DateCreated','actions','nametype'])
+            ->rawColumns(['stt','DateCreated','actions','nametype','status'])
             ->make(true);
     }
     public function routeShowType(Request $req)

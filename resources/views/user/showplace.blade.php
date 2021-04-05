@@ -30,6 +30,7 @@
                     </div>
                 </div>
                 <div class="col-lg-7 mx-auto">
+                    <p><span class="font-weight-bold">Type Place: </span><span class="font-italic">{{$lang->nametype}}</span></p>
                     <p><span class="font-weight-bold">Short description: </span><span class="font-italic">{{$lang->de_shortdes}}</span></p>
                     <p><span class="font-weight-bold">Description: </span><span class="font-italic">{{$lang->de_description}}</span></p>
                     <p><span class="font-weight-bold">Average travel time: </span><span class="font-italic">{{intval($lang->de_duration)/60/60}} hours</span></p>

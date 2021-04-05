@@ -29,7 +29,6 @@ Route::post("checkkey","UserController@checkkey")->name('checkkey');
 // Route::get("login","UserController@viewlogin")->name("viewlogin");
 Route::post("postLogin","UserController@postLogin")->name("postLogin");
 Route::post("register","UserController@register")->name("register");
-Route::post("postLoginAjax","UserController@postLoginAjax")->name("postLoginAjax");
 
 
 //Auth::routes();

@@ -6,6 +6,8 @@ use App\Http\Requests;
 use Illuminate\Http\Request;
 use App\Models\Language;
 use App\Models\Destination;
+use App\Models\TypePlace;
+use App\Models\Langtype;
 use Session;
 use DB;
 class MapDirectController {
@@ -49,12 +51,18 @@ class MapDirectController {
 		}
 		// thẻ select 2
 		$typePlace = array();
-		$info_type0 = array('id'=>'0','text'=>'Scenic spots','children' => $this->findTypePlace(0));
-		$info_type1 = array('id'=>'1','text'=>'Restaurant','children' => $this->findTypePlace(1));
-		$info_type2 = array('id'=>'2','text'=>'Hotel','children' => $this->findTypePlace(2));
-		$info_type3 = array('id'=>'3','text'=>'Schools','children' => $this->findTypePlace(3));
-		$info_type4 = array('id'=>'4','text'=>'Other','children' => $this->findTypePlace(4));
-		array_push($typePlace,$info_type0,$info_type1,$info_type2,$info_type3,$info_type4);
+		$totalType = TypePlace::where("status","0")->count();
+		$type = TypePlace::select("id")->where("status","0")->get();
+
+		for($i = 0; $i < $totalType; $i++)
+		{
+			if(Session::has('website_language') && Session::get('website_language') == "vi")
+				$langType = Langtype::where("type_id",$type[$i]->id)->where("language","vn")->first();
+			else
+				$langType = Langtype::where("type_id",$type[$i]->id)->where("language","en")->first();
+			${"info_type" . $i} = array('id'=>$i,'text'=>$langType->nametype,'children' => $this->findTypePlace($type[$i]->id));
+			array_push($typePlace,${"info_type" . $i});
+		}
 		return [$destination,$typePlace];
 	}
 	public function findTypePlace($type)

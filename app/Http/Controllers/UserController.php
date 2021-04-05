@@ -13,6 +13,8 @@ use App\Models\Destination;
 use App\Models\ShareTour;
 use App\Models\Language;
 use App\Models\Uservotes;
+use App\Models\TypePlace;
+use App\Models\Langtype;
 use Session;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -100,81 +102,75 @@ class UserController extends Controller
     		'us_password.min' => "Mật khẩu quá ngắn",
     		'us_password.max' => "Mật khẩu quá dài"
     	]);
-        $userCheckLock = User::where("us_email",$req->us_email)->first();
-        if(!empty($userCheckLock))
+        //check modal
+        if(isset($req->typeLogin) && $req->typeLogin == "modal")
         {
-            if($userCheckLock->us_lock == "1")
+            $userCheckLock = User::where("us_email",$req->us_email)->first();
+            if(!empty($userCheckLock))
             {
-                return back()->with("error","Tài khoản của bạn đang bị khóa");
-            }
-            else
-            {
-                if(Auth::attempt(['us_email'=>$req->us_email,'us_password'=>$req->us_password]))
+                if($userCheckLock->us_lock == "1")
                 {
-                    $user = Auth::user();
-                    if($user->us_type == "0")
-                    {
-                        return redirect()->route('user.dashboard');
-                    }
-                    else
-                    {
-                        return redirect()->route('admin.generalInfor');
-                    }
+                    return [$result = "lock"];
                 }
                 else
                 {
-                    return back()->with("error","Đăng nhập không thành công");
-                }
-            }
-        }
-        else
-        {
-            return back()->with("error","Đăng nhập không thành công");
-        }
-    }
-    public function postLoginAjax(Request $req)
-    {
-       $this->validate($req,[
-            'us_email'=>'required|email',
-            'us_password'=>'required|min:0|max:32',
-        ],[
-            'us_email.required' => 'Bạn phải nhập email',
-            'us_email.email' => 'Sai cấu chúc email',
-            'us_password.required' => "Bạn phải nhập mật khẩu",
-            'us_password.min' => "Mật khẩu quá ngắn",
-            'us_password.max' => "Mật khẩu quá dài"
-        ]);
-        $userCheckLock = User::where("us_email",$req->us_email)->first();
-        if(!empty($userCheckLock))
-        {
-            if($userCheckLock->us_lock == "1")
-            {
-                return [$result = "lock"];
-            }
-            else
-            {
-                if(Auth::attempt(['us_email'=>$req->us_email,'us_password'=>$req->us_password]))
-                {
-                    $user = Auth::user();
-                    if($user->us_type == "0")
+                    if(Auth::attempt(['us_email'=>$req->us_email,'us_password'=>$req->us_password]))
                     {
-                        return [$position = "user",$user->us_id];
+                        $user = Auth::user();
+                        if($user->us_type == "0")
+                        {
+                            return [$position = "user",$user->us_id];
+                        }
+                        else
+                        {
+                            return [$position = "admin",$user->us_id];
+                        }
                     }
                     else
                     {
-                        return [$position = "admin",$user->us_id];
+                        return [$result = "fail login"];
                     }
                 }
-                else
-                {
-                    return [$result = "fail login"];
-                }
             }
+            else
+            {
+                return [$result = "fail login"];
+            } 
         }
         else
         {
-            return [$result = "fail login"];
-        } 
+            $userCheckLock = User::where("us_email",$req->us_email)->first();
+            if(!empty($userCheckLock))
+            {
+                if($userCheckLock->us_lock == "1")
+                {
+                    return back()->with("error","Tài khoản của bạn đang bị khóa");
+                }
+                else
+                {
+                    if(Auth::attempt(['us_email'=>$req->us_email,'us_password'=>$req->us_password]))
+                    {
+                        $user = Auth::user();
+                        if($user->us_type == "0")
+                        {
+                            return redirect()->route('user.dashboard');
+                        }
+                        else
+                        {
+                            return redirect()->route('admin.generalInfor');
+                        }
+                    }
+                    else
+                    {
+                        return back()->with("error","Đăng nhập không thành công");
+                    }
+                }
+            }
+            else
+            {
+                return back()->with("error","Đăng nhập không thành công");
+            }
+        }    
     }
     public function about()
     {
@@ -214,21 +210,31 @@ class UserController extends Controller
     }
     public function showDetailPlace($idplace)
     {
-        if(Session::has('website_language') && Session::get('website_language') == "vi")
-            $lang = Language::where("language","vn")->where("des_id",$idplace)->first();
-        else
-            $lang = Language::where("language","en")->where("des_id",$idplace)->first();
         $de = Destination::
-        select('de_lat','de_lng','de_duration','de_link','de_map','de_image')
+        select('de_lat','de_lng','de_duration','de_link','de_map','de_image','de_type')
         ->where('de_remove',$idplace)
         ->first();
+
+        if(Session::has('website_language') && Session::get('website_language') == "vi")
+        {
+            $lang = Language::where("language","vn")->where("des_id",$idplace)->first();
+            $findType = TypePlace::where("id",$de->de_type)->first();
+            $langplace = Langtype::select("nametype")->where("language","vn")->where("type_id",$findType->id)->first();
+        }
+        else
+        {
+            $lang = Language::where("language","en")->where("des_id",$idplace)->first();
+            $findType = TypePlace::where("id",$de->de_type)->first();
+            $langplace = Langtype::select("nametype")->where("language","en")->where("type_id",$findType->id)->first();
+        }
+        
         $lang["de_lat"] = $de->de_lat;
         $lang["de_lng"] = $de->de_lng;
         $lang["de_link"] = $de->de_link;
         $lang["de_image"] = $de->de_image;
         $lang["de_map"] = $de->de_map;
         $lang["de_duration"] = $de->de_duration;
-        
+        $lang["nametype"] = $langplace->nametype;
         if(Auth::check())
         {
             $user = Auth::user();
@@ -253,15 +259,20 @@ class UserController extends Controller
                 $lang = Language::where("language","en")->where("des_id",$value->de_remove)->first();
                 $value['de_name'] = $lang->de_name;
             }
-        }        
+        }   
+        $typeName = TypePlace::where("id",$idtype)->first();
+        if(Session::has('website_language') && Session::get('website_language') == "vi")
+            $langType = Langtype::select("nametype")->where("language","vn")->where("type_id",$typeName->id)->first();
+        else
+            $langType = Langtype::select("nametype")->where("language","en")->where("type_id",$typeName->id)->first();
         if(Auth::check())
         {
             $user = Auth::user();
-            return view('user.listplacetype',['fullName'=>$user->us_fullName,'listPlace'=>$listPlace,'idtype'=>$idtype]);
+            return view('user.listplacetype',['fullName'=>$user->us_fullName,'listPlace'=>$listPlace,'langType'=>$langType->nametype]);
         }
         else
         {
-            return view('user.listplacetype',['listPlace'=>$listPlace,'idtype'=>$idtype]);
+            return view('user.listplacetype',['listPlace'=>$listPlace,'langType'=>$langType->nametype]);
         }
     }
     public function loadPlaceInfo(Request $req)
@@ -309,6 +320,8 @@ class UserController extends Controller
             $des->de_duration = $req->val['de_duration'];
             $des->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
             $des->de_default = "1";
+            $findType = TypePlace::select("id")->where("status","1")->first();
+            $des->de_type = $findType->id;
             $des->save();
         }
         $user = Auth::user();
@@ -340,6 +353,9 @@ class UserController extends Controller
                 $desNewPlace->de_duration = $value['de_duration'];
                 $desNewPlace->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
                 $desNewPlace->de_default = "1";
+                //find type place has de_default
+                $findType = TypePlace::select("id")->where("status","1")->first();
+                $desNewPlace->de_type = $findType->id;
                 $desNewPlace->save();
                 $desId = $desId.$value['de_id']."|";
                 $i++;

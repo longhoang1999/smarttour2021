@@ -18,6 +18,7 @@
     .border-left-success {border-top: 3px solid green;}
     .border-left-info {border-top: 3px solid #17b6dd;}
     .border-left-warning {border-top: 3px solid #ffc107;}
+    #div_one,#div_two,#div_three,#div_four {cursor: pointer;}
   </style>
 @stop
 @section('content')
@@ -30,7 +31,7 @@
   <div class="container-fluid">
     <div class="row">
           <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card border-left-primary shadow h-100 py-2" id="div_one">
               <div class="card-body">
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
@@ -46,7 +47,7 @@
           </div>
 
           <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
+            <div class="card border-left-success shadow h-100 py-2" id="div_two">
               <div class="card-body">
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
@@ -61,7 +62,7 @@
             </div>
           </div>
           <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
+            <div class="card border-left-info shadow h-100 py-2" id="div_three">
               <div class="card-body">
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
@@ -86,15 +87,15 @@
           </div>
 
           <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card border-left-warning shadow h-100 py-2" id="div_four">
               <div class="card-body">
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ trans('admin.totalFeedback') }}</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{$totalFeedback}} {{ trans('admin.feedback') }}</div>
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">The number of tours in the system</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{$totalTour}} tours</div>
                   </div>
                   <div class="col-auto">
-                    <i class="far fa-comments fa-2x text-feedback"></i>
+                    <i class="fas fa-route fa-2x text-feedback"></i>
                   </div>
                 </div>
               </div>
@@ -119,16 +120,28 @@
     <script src="{{asset('js/Chart.min.js')}}"></script>
     <script>
     $(document).ready(function(){
+        $("#div_one").click(function(){
+          location.replace("{{route('admin.dashboard')}}");
+        });
+        $("#div_two").click(function(){
+          location.replace("{{route('admin.addPlace')}}");
+        });
+        $("#div_three").click(function(){
+          location.replace("{{route('admin.feedback')}}");
+        });
+        $("#div_four").click(function(){
+          location.replace("{{route('admin.history')}}");
+        });
         new Chart(document.getElementById("chart"),{
         type: 'bar',
         data: {
           labels: [
-            '{{ trans("admin.chartTotalAcc") }}','{{ trans("admin.chartTotalPlace") }}','{{ trans("admin.StarAvg") }}','{{ trans("admin.chartTotalFeedback") }}'
+            '{{ trans("admin.chartTotalAcc") }}','{{ trans("admin.chartTotalPlace") }}','{{ trans("admin.StarAvg") }}','Total number of tours'
           ],
           datasets: [{ 
               label: '{{ trans("admin.Generalinformation") }}',
               data: [
-                '{{$totalAcc}}','{{$totalDes}}','{{number_format((float)$avgStar, 2, '.', '')}}','{{$totalFeedback}}'
+                '{{$totalAcc}}','{{$totalDes}}','{{number_format((float)$avgStar, 2, '.', '')}}','{{$totalTour}}'
               ],
           
               backgroundColor:["rgba(255, 99, 132,0.7)","rgba(54, 162, 235,0.7)","rgba(16,167,69,0.7)","rgba(255, 94, 62,0.7)"],

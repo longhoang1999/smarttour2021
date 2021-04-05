@@ -11,15 +11,7 @@
         <div class="container">
             <!-- Contact Section Heading-->
             <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">
-            @if($idtype == "2")
-                Hotel
-            @elseif($idtype == "1")
-                Restaurant
-            @elseif($idtype == "0")
-                Scenic spots
-            @elseif($idtype == "3")   
-                Schools
-            @endif
+            {{$langType}}
             </h2>
             <!-- Icon Divider-->
             <div class="divider-custom">
@@ -32,15 +24,7 @@
                 <div class="col-lg-3 mx-auto">
                     <div class="list">
                         <div class="list_title">
-                            @if($idtype == "2")
-                                Hotel
-                            @elseif($idtype == "1")
-                                Restaurant
-                            @elseif($idtype == "0")
-                                Scenic spots
-                            @elseif($idtype == "3")   
-                                Schools
-                            @endif
+                            {{$langType}}
                         </div>
                         <div class="list_content">
                             <ul>
@@ -61,15 +45,7 @@
                         </div>
                         <div class="contentItem item">
                             <p class="text-justify"><span class="font-weight-bold">
-                                @if($idtype == "2")
-                                    Hotel
-                                @elseif($idtype == "1")
-                                    Restaurant
-                                @elseif($idtype == "0")
-                                    Scenic spots
-                                @elseif($idtype == "3")   
-                                    Schools
-                                @endif
+                                {{$langType}}
                                 name: 
                             </span><span class="font-italic" id="placeName"></span></p>
                             <p class="text-justify"><span class="font-weight-bold">Short description: </span>

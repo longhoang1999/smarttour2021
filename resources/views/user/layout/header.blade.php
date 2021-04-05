@@ -1,3 +1,9 @@
+<style>
+    .box-header:hover a{
+        color: white;
+        text-decoration: none;
+    }
+</style>
 <div class="fixed-top">
     <!-- Navigation-->
     <nav class="navbar navbar-expand-lg bg-secondary text-uppercase " id="mainNav">
@@ -57,15 +63,28 @@
             <div class="box-header" id="searchTour">
                 <i class="fas fa-search"></i> Search Tour
             </div>
-            <div class="box-header" id="searchHotel">
-                <i class="fas fa-building"></i> Hotel
+            <?php 
+                use App\Models\TypePlace; 
+                use App\Models\Langtype;
+                $randomType = TypePlace::where("status","<>","1")->inRandomOrder()->limit(3)->get();
+                foreach ($randomType as $value) {
+                    if(Session::has('website_language') && Session::get('website_language') == "vi")
+                    {
+                        $findLang = Langtype::select("nametype")->where("language","vn")->where("type_id",$value->id)->first();
+                        $value['nametype'] = $findLang->nametype;
+                    }
+                    else
+                    {
+                        $findLang = Langtype::select("nametype")->where("language","en")->where("type_id",$value->id)->first();
+                        $value['nametype'] = $findLang->nametype;
+                    }
+                }
+            ?>
+            @foreach($randomType as $value)
+            <div class="box-header">
+                <a href="{{route('listPlaceForType',$value->id)}}"><i class="fas fa-map-marker-alt"></i> {{$value->nametype}}</a>
             </div>
-            <div class="box-header" id="searchRestaurant">
-                <i class="fas fa-utensils"></i> Restaurant
-            </div>
-            <div class="box-header" id="searchScenicspots">
-                <i class="fab fa-redhat"></i> Scenic spots
-            </div>
+            @endforeach
             <div class="box-header" id="seeFeedback">
                 <i class="fas fa-comments"></i> Feedback
             </div>

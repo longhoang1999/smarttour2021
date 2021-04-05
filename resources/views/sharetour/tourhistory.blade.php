@@ -18,6 +18,7 @@
     .AllClass_Table {
         display: block;
     }
+    p{margin: 0}
   </style>
 @stop
 @section('content')
@@ -109,6 +110,12 @@
           <div id="map" class="mt-4 mb-4"></div>
           <div class="container-fuild">
               <div class="row">
+                  <div class="col-md-4 col-sm-6 col-12 mb-4">
+                      <p class="font-weight-bold font-italic">Type of Place</p>
+                  </div>
+                  <div class="col-md-8 col-sm-6 col-12 mb-4">
+                      <p id="typePlace"></p>
+                  </div>
                   <div class="col-md-4 col-sm-6 col-12 mb-4">
                       <p class="font-weight-bold font-italic">Short description</p>
                   </div>
@@ -317,14 +324,16 @@
                     {
                         $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='location with no photo'></a>");
                     }
+                    $("#typePlace").empty();
+                    $("#typePlace").append(data[9]);
                     $("#short").empty();
                     $("#description").empty();
-                    if(data[4] != "")
+                    if(data[4] != null)
                         $("#short").append(data[4]);
                     else
                         $("#short").append('<span class="badge badge-warning">Not available</span>');
 
-                    if(data[5] != "")
+                    if(data[5] != null)
                         $("#description").append(data[5]);
                     else
                         $("#description").append('<span class="badge badge-warning">Not available</span>');  

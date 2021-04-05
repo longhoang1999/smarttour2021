@@ -14,6 +14,8 @@ use App\Models\Destination;
 use App\Models\ShareTour;
 use App\Models\Language;
 use App\Models\Uservotes;
+use App\Models\TypePlace;
+use App\Models\Langtype;
 
 use Session;
 use Carbon\Carbon;
@@ -80,30 +82,42 @@ class ShareTourController extends Controller
 	        {
 	        	$lang = Language::where("language","vn")->where("des_id",$req->des_id)->first();
 	        	$des = Destination::where("de_remove",$req->des_id)->first();
+                $typePlace = TypePlace::where("id",$des->de_type)->first();
+                $langType = Langtype::select('nametype')->where("language","vn")->where("type_id",$typePlace->id)->first();
 	        	$de_lat = $des->de_lat;
 	        	$de_lng = $des->de_lng;
 	        	$de_name = $lang->de_name;
 	        	$short = $lang->de_shortdes;
 	        	$description = $lang->de_description;
+                $type = $langType->nametype;
 	        }
 	        else
 	        {
 	        	$lang = Language::where("language","en")->where("des_id",$req->des_id)->first();
 	        	$des = Destination::where("de_remove",$req->des_id)->first();
+                $typePlace = TypePlace::where("id",$des->de_type)->first();
+                $langType = Langtype::select('nametype')->where("language","en")->where("type_id",$typePlace->id)->first();
 	        	$de_lat = $des->de_lat;
 	        	$de_lng = $des->de_lng;
 	        	$de_name = $lang->de_name;
 	        	$short = $lang->de_shortdes;
 	        	$description = $lang->de_description;
+                $type = $langType->nametype;
 	        }
 	    }
 	    else
 	    {
+            $typePlace = TypePlace::where("id",$checkDes->de_type)->first();
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                $langType = Langtype::select('nametype')->where("language","vn")->where("type_id",$typePlace->id)->first();
+            else
+                $langType = Langtype::select('nametype')->where("language","en")->where("type_id",$typePlace->id)->first();
 	    	$de_lat = $checkDes->de_lat;
         	$de_lng = $checkDes->de_lng;
         	$de_name = $checkDes->de_name;
-        	$short = "";
-        	$description = "";
+        	$short = $checkDes->de_shortdes;
+        	$description = $checkDes->de_description;
+            $type = $langType->nametype;
 	    }
 	    if($checkDes->de_image != "")
 	    {
@@ -113,7 +127,7 @@ class ShareTourController extends Controller
 	    {
 	    	$image="";
 	    }
-	    return [$de_lat,$de_lng,$de_name,$image,$short,$description,$checkDes->de_duration,$checkDes->de_map,$checkDes->de_link];
+	    return [$de_lat,$de_lng,$de_name,$image,$short,$description,$checkDes->de_duration,$checkDes->de_map,$checkDes->de_link,$type];
     }
     // public function loadmore($type)
     // {

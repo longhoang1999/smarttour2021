@@ -10,6 +10,10 @@
   <style type="text/css">
     textarea{min-height: 15rem;}
     .contents{color: white}
+    .img-fluid{
+      width: 100%;
+      max-height: 20rem !important;
+    }
   </style>
 @stop
 @section('content')
@@ -37,11 +41,9 @@
               <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Type of place</span> 
               <select id="selectType" class="form-control" style="width: 40%">
                 <option value="All">--All--</option>
-                <option value="0">Scenic spots</option>
-                <option value="1">Restaurant</option>
-                <option value="2">Hotel</option>
-                <option value="3">Schools</option>
-                <option value="4">--Other</option>
+                @foreach($typeplace as $type)
+                  <option value="{{$type->id}}">{{$type->nametype}}</option>
+                @endforeach
               </select>
             </div>
             <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
@@ -52,6 +54,7 @@
                       <th>{{ trans('admin.Longitude') }}</th>
                       <th>{{ trans('admin.Latitude') }}</th>
                       <th>{{ trans('admin.Duration') }} ({{ trans('admin.hours') }})</th>
+                      <th>Created by</th>
                       <th>{{ trans('admin.Actions') }}</th>
                   </tr>
                   </thead>
@@ -111,7 +114,7 @@
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Shortdes') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
-              <p class="text-right pb-3" id="shortdes"></p>
+              <p class="text-justify pb-3" id="shortdes"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Duration') }} ({{ trans('admin.hours') }})</p>
@@ -218,11 +221,9 @@
               <div style="display: flex; margin-top: 1.5rem">
                 <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Type of place</span> 
                 <select id="selectType_add" class="form-control" style="width: 40%" name="typePlace">
-                  <option value="0">Scenic spots</option>
-                  <option value="1">Restaurant</option>
-                  <option value="2">Hotel</option>
-                  <option value="3">Schools</option>
-                  <option value="4">--Other</option>
+                  @foreach($typeplace_add as $type)
+                  <option value="{{$type->id}}">{{$type->nametype}}</option>
+                  @endforeach
                 </select>
               </div>
               <div class="form-group">
@@ -312,6 +313,7 @@
                 { data: 'de_lng', name: 'de_lng' },
                 { data: 'de_lat', name: 'de_lat' },
                 { data: 'duration', name: 'duration' },
+                { data: 'status', name: 'status' },
                 { data: 'actions', name: 'actions' },
                 ]
             });
@@ -387,9 +389,19 @@
                   $("#description").html(data[3]);
                   $("#shortdes").html(data[4]);
                   $("#duration").html(data[5]);
-                  if(data[6] != "")
+                  if(data[6] != null)
                   {
+                    $("#link_vr").html("Link here");
+                    $("#link_vr").css("color","blue");
+                    $("#link_vr").attr("target","_blank");
                     $("#link_vr").attr("href",data[6]);
+                  }
+                  else
+                  {
+                    $("#link_vr").attr("href","#");
+                    $("#link_vr").html("Not available");
+                    $("#link_vr").css("color","#ffa200");
+                    $("#link_vr").removeAttr("target");
                   }
                   if(data[7] != "")
                   {
@@ -399,17 +411,12 @@
                   {
                     $("#placeImage").append('<a data-fancybox="gallery" href="'+data[8]+'"><img class="img-fluid rounded mb-5" style="width:100%;" src="'+data[8]+'" alt=""></a>');
                   }
+                  else
+                  {
+                    $("#placeImage").append('<a data-fancybox="gallery" href="{{asset("imgPlace/empty.png")}}"><img class="img-fluid rounded mb-5" style="width:100%;" src="{{asset("imgPlace/empty.png")}}" alt=""></a>');
+                  }
                   $("#placeType").empty();
-                  if(data[9] == "0")
-                    $("#placeType").append('<span class="badge badge-success">Scenic spots</span>');
-                  else if(data[9] == "1")
-                    $("#placeType").append('<span class="badge badge-success">Restaurant</span>');
-                  else if(data[9] == "2")
-                    $("#placeType").append('<span class="badge badge-success">Hotel</span>');
-                  else if(data[9] == "3")
-                    $("#placeType").append('<span class="badge badge-success">Schools</span>');
-                  else if(data[9] == "4")
-                    $("#placeType").append('<span class="badge badge-success">--Other</span>');
+                  $("#placeType").append('<span class="badge badge-success">'+data[9]+'</span>');
                 }
              }
         });
@@ -456,7 +463,7 @@
           directionsService = new google.maps.DirectionsService();
           map.addListener('click',function(evt){
             var staMarker = new google.maps.Marker({
-              label: 'Your start location',
+              label: 'Your location',
             });
             staMarker.setMap(map);
             staMarker.setPosition(evt.latLng);

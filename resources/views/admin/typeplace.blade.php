@@ -39,6 +39,7 @@
                       <th>Name type</th>
                       <th>Total Place</th>
                       <th>Date created</th>
+                      <th>Status</th>
                       <th>{{ trans("admin.Actions") }}</th>
                   </tr>
                   </thead>
@@ -145,6 +146,7 @@
                 { data: 'nametype', name: 'nametype' },
                 { data: 'totalPlace', name: 'totalPlace' },
                 { data: 'DateCreated', name: 'DateCreated' },
+                { data: 'status', name: 'status' },
                 { data: 'actions', name: 'actions' },
                 ]
             });

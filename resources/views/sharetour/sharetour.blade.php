@@ -4,6 +4,9 @@
 @parent   
 @stop
 @section('header_styles')  
+    <style>
+        p{margin: 0}
+    </style>
 @stop
 @section('content')
     <?php use App\Models\Destination; use App\Models\Language;use App\Models\Uservotes;use Illuminate\Support\Facades\Auth;?>
@@ -104,8 +107,8 @@
                     <span class="total_time"></span></p>
                     <!-- js take total -->
                     <script type="text/javascript">
-                        let duration = moment.duration({{$total}}, 'minutes');
-                        let durationString = duration.days() + 'd ' + duration.hours() + 'h ' + duration.minutes() + 'm';
+                        var duration = moment.duration({{$total}}, 'minutes');
+                        var durationString = duration.days() + 'd ' + duration.hours() + 'h ' + duration.minutes() + 'm';
                         console.log(durationString);
                         $(".total_time").html(durationString);
                     </script>
@@ -137,6 +140,12 @@
             <div id="map" class="mt-4 mb-4"></div>
             <div class="container-fuild">
                 <div class="row">
+                    <div class="col-md-4 col-sm-6 col-12 mb-4">
+                        <p class="font-weight-bold font-italic">Type of Place</p>
+                    </div>
+                    <div class="col-md-8 col-sm-6 col-12 mb-4">
+                        <p id="typePlace"></p>
+                    </div>
                     <div class="col-md-4 col-sm-6 col-12 mb-4">
                         <p class="font-weight-bold font-italic">Short description</p>
                     </div>
@@ -300,33 +309,6 @@
             $("#comback_admin").click(function(){
                 location.replace("{{route('admin.generalInfor')}}");
             });
-            //đổi ngôn ngữ
-            $("#Lan_VN").click(function(){
-                let $url_path = '{!! url('/') !!}';
-                let _token = $('meta[name="csrf-token"]').attr('content');
-                let routeLangVN=$url_path+"/langVN";
-                $.ajax({
-                      url:routeLangVN,
-                      method:"POST",
-                      data:{_token:_token},
-                      success:function(data){ 
-                        location.reload();
-                     }
-                });
-            });
-            $("#Lan_EN").click(function(){
-                let $url_path = '{!! url('/') !!}';
-                let _token = $('meta[name="csrf-token"]').attr('content');
-                let routeLangVN=$url_path+"/langEN";
-                $.ajax({
-                      url:routeLangVN,
-                      method:"POST",
-                      data:{_token:_token},
-                      success:function(data){ 
-                        location.reload();
-                     }
-                });
-            });
         });
     </script>
     <script type="text/javascript">
@@ -389,14 +371,15 @@
                                 {
                                     $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='location with no photo'></a>");
                                 }
+                                $("#typePlace").empty();
+                                $("#typePlace").append(data[9]);
                                 $("#short").empty();
                                 $("#description").empty();
-                                if(data[4] != "")
+                                if(data[4] != null)
                                     $("#short").append(data[4]);
                                 else
                                     $("#short").append('<span class="badge badge-warning">Not available</span>');
-
-                                if(data[5] != "")
+                                if(data[5] != null)
                                     $("#description").append(data[5]);
                                 else
                                     $("#description").append('<span class="badge badge-warning">Not available</span>');  
@@ -442,14 +425,16 @@
                             {
                                 $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='location with no photo'></a>");
                             }
+                            $("#typePlace").empty();
+                            $("#typePlace").append(data[9]);
                             $("#short").empty();
                             $("#description").empty();
-                            if(data[4] != "")
+                            if(data[4] != null)
                                 $("#short").append(data[4]);
                             else
                                 $("#short").append('<span class="badge badge-warning">Not available</span>');
 
-                            if(data[5] != "")
+                            if(data[5] != null)
                                 $("#description").append(data[5]);
                             else
                                 $("#description").append('<span class="badge badge-warning">Not available</span>');  

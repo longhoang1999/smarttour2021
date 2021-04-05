@@ -70,15 +70,6 @@
             $("#searchTour").click(function(){
                 location.replace("{{route('searchTour')}}");
             });
-            $("#searchHotel").click(function(){
-                location.replace("{{route('listPlaceForType',$id=2)}}");
-            });
-            $("#searchRestaurant").click(function(){
-                location.replace("{{route('listPlaceForType',$id=1)}}");
-            });
-            $("#searchScenicspots").click(function(){
-                location.replace("{{route('listPlaceForType',$id=0)}}");
-            });
             $("#seeFeedback").click(function(){
                 location.replace("{{route('viewShareFeedback')}}");
             });

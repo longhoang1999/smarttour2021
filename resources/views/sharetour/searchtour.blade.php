@@ -15,6 +15,10 @@
         background: lightblue !important;
         color: #117964 !important;
     }
+    #div_1,#div_2,#div_3,#div_4{
+      cursor: pointer;
+    }
+    p{margin: 0}
   </style>
 @stop
 @section('content')
@@ -54,8 +58,8 @@
           <div class="container-fluid">
               <div class="row">
                     <!-- khối 1 -->
-                    <div class="col-xl-3 col-md-6 mb-4 div_parent" id="div_1">
-                      <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="col-xl-3 col-md-6 mb-4 div_parent">
+                      <div class="card border-left-primary shadow h-100 py-2" id="div_1">
                         <div class="card-body">
                           <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -71,8 +75,8 @@
                     </div>
                     <!-- khối 1 -->
                     <!-- khối 2 -->
-                    <div class="col-xl-3 col-md-6 mb-4 div_parent" id="div_2">
-                      <div class="card border-left-success shadow h-100 py-2">
+                    <div class="col-xl-3 col-md-6 mb-4 div_parent">
+                      <div class="card border-left-success shadow h-100 py-2" id="div_2">
                         <div class="card-body">
                           <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -88,8 +92,8 @@
                     </div>
                     <!-- khối 2 -->
                     <!-- khối 3 -->
-                    <div class="col-xl-3 col-md-6 mb-4 div_parent" id="div_3">
-                      <div class="card border-left-info shadow h-100 py-2">
+                    <div class="col-xl-3 col-md-6 mb-4 div_parent">
+                      <div class="card border-left-info shadow h-100 py-2" id="div_3">
                         <div class="card-body">
                           <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -105,8 +109,8 @@
                     </div>
                     <!-- khối 3 -->
                     <!-- khối 4 -->
-                    <div class="col-xl-3 col-md-6 mb-4 div_parent" id="div_4">
-                      <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="col-xl-3 col-md-6 mb-4 div_parent">
+                      <div class="card border-left-warning shadow h-100 py-2" id="div_4">
                         <div class="card-body">
                           <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -321,6 +325,12 @@
           <div id="map" class="mt-4 mb-4"></div>
           <div class="container-fuild">
               <div class="row">
+                  <div class="col-md-4 col-sm-6 col-12 mb-4">
+                      <p class="font-weight-bold font-italic">Type of Place</p>
+                  </div>
+                  <div class="col-md-8 col-sm-6 col-12 mb-4">
+                      <p id="typePlace"></p>
+                  </div>
                   <div class="col-md-4 col-sm-6 col-12 mb-4">
                       <p class="font-weight-bold font-italic">{{ trans('newlang.shortDescription') }}</p>
                   </div>
@@ -819,14 +829,16 @@
                     {
                         $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='location with no photo'></a>");
                     }
+                    $("#typePlace").empty();
+                    $("#typePlace").append(data[9]);
                     $("#short").empty();
                     $("#description").empty();
-                    if(data[4] != "")
+                    if(data[4] != null)
                         $("#short").append(data[4]);
                     else
                         $("#short").append("<span class='badge badge-warning'>{{ trans('newlang.Notavailable') }}</span>");
 
-                    if(data[5] != "")
+                    if(data[5] != null)
                         $("#description").append(data[5]);
                     else
                         $("#description").append("<span class='badge badge-warning'>{{ trans('newlang.Notavailable') }}</span>");  
