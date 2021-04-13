@@ -30,15 +30,15 @@
         </div>
         <div class="AllClass_Table_content">
             <div style="display: flex;">
-              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Language shown</span> 
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('admin.languageShown') }}</span> 
               <select id="selectLang" class="form-control" style="width: 40%">
                 <option hidden="">--Your choice--</option>
-                <option selected="" value="en">English</option>
-                <option value="vn">Tiếng việt</option>
+                <option selected="" value="en">{{ trans('admin.EN') }}</option>
+                <option value="vn">{{ trans('admin.VN') }}</option>
               </select>
             </div>
             <div style="display: flex; margin-top: 1.5rem">
-              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Type of place</span> 
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('admin.typeOfPlace') }}</span> 
               <select id="selectType" class="form-control" style="width: 40%">
                 <option value="All">--All--</option>
                 @foreach($typeplace as $type)
@@ -54,7 +54,7 @@
                       <th>{{ trans('admin.Longitude') }}</th>
                       <th>{{ trans('admin.Latitude') }}</th>
                       <th>{{ trans('admin.Duration') }} ({{ trans('admin.hours') }})</th>
-                      <th>Created by</th>
+                      <th>{{ trans('admin.Createdby') }}</th>
                       <th>{{ trans('admin.Actions') }}</th>
                   </tr>
                   </thead>
@@ -83,7 +83,7 @@
               <p class="text-justify pb-3" id="placeName"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Type of place</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.typeOfPlace') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6 text-justify" id="placeType">
             </div>
@@ -169,14 +169,14 @@
         <div class="AllClass_Table_content">
             <form action="{{route('admin.postaddPlace')}}" method="post" id="formAddPlace" enctype="multipart/form-data">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-              <h4 class="font-weight-bold font-italic text-primary text-uppercase">-- information describing the location</h4>
+              <h4 class="font-weight-bold font-italic text-primary text-uppercase">-- {{ trans('admin.inforDescribe') }}</h4>
 
               <div style="display: flex;">
-                <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Language selection</span> 
+                <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('admin.languageShown') }}</span> 
                 <select id="selectLang_add" class="form-control" style="width: 40%">
                   <option hidden="">--Your choice--</option>
-                  <option selected="" value="en">English</option>
-                  <option value="vn">Tiếng việt</option>
+                  <option selected="" value="en">{{ trans('admin.EN') }}</option>
+                  <option value="vn">{{ trans('admin.VN') }}</option>
                 </select>
               </div>
               <style>
@@ -217,9 +217,9 @@
                 </div>
               </div>
 
-              <h4 class="font-weight-bold font-italic text-primary text-uppercase">-- information about coordinates and other information</h4>
+              <h4 class="font-weight-bold font-italic text-primary text-uppercase">-- {{ trans('admin.otherInfo') }}</h4>
               <div style="display: flex; margin-top: 1.5rem">
-                <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Type of place</span> 
+                <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('admin.typeOfPlace') }}</span> 
                 <select id="selectType_add" class="form-control" style="width: 40%" name="typePlace">
                   @foreach($typeplace_add as $type)
                   <option value="{{$type->id}}">{{$type->nametype}}</option>

@@ -320,7 +320,11 @@ class UserController extends Controller
             $des->de_duration = $req->val['de_duration'];
             $des->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
             $des->de_default = "1";
-            $findType = TypePlace::select("id")->where("status","1")->first();
+            // plus
+            $findType = TypePlace::select("id","totalPlace")->where("status","1")->first();
+            $findType->totalPlace = intval($findType->totalPlace) + 1;
+            $findType->save();
+            //type des
             $des->de_type = $findType->id;
             $des->save();
         }
@@ -333,8 +337,13 @@ class UserController extends Controller
         $route->to_optimized = $req->to_optimized;
         $route->to_name = $req->nameTour;
         $route->to_startDay = date('Y-m-d', strtotime(Carbon::now()));
+        if(!empty($req->val))
+        {
+            $route->to_startLocat = $req->val['de_id'];
+        }
         $i=0;
         $desId = "";
+        $duration = "";
         foreach ($req->tmparr as  $value) {
             if(empty($value['de_default']))
             {
@@ -353,19 +362,20 @@ class UserController extends Controller
                 $desNewPlace->de_duration = $value['de_duration'];
                 $desNewPlace->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
                 $desNewPlace->de_default = "1";
+                // plus
+                $findType = TypePlace::select("id","totalPlace")->where("status","1")->first();
+                $findType->totalPlace = intval($findType->totalPlace) + 1;
+                $findType->save();
                 //find type place has de_default
-                $findType = TypePlace::select("id")->where("status","1")->first();
                 $desNewPlace->de_type = $findType->id;
                 $desNewPlace->save();
                 $desId = $desId.$value['de_id']."|";
                 $i++;
             }
+            $duration = $duration.$value['de_duration']."|";
         }
         $route->to_des = $desId;
-        if(!empty($req->val))
-        {
-            $route->to_startLocat = $req->val['de_id'];
-        }
+        $route->to_duration = $duration;
         $route->save();
         return [$route->to_id,$url = route('user.editTour',$route->to_id)];
     }
@@ -394,88 +404,165 @@ class UserController extends Controller
     }
     public function register(Request $req)
     {
-        $this->validate($req,[
-            'email'=>'required|email',
-            'password'=>'required|min:0|max:32',
-            'confirm' =>'required|min:0|max:32',
-            'fullname' => 'required',
-            'age' => 'required',
-        ],[
-            'email.required'=>'Bạn chưa nhập email',
-            'email.email'=>'Sai cấu chúc email',
-            'password.required'=>'Bạn chưa nhập password',
-            'password.min'=>'Password không được nhỏ hơn 0 kí tự',
-            'password.max'=>'Password không được lớn hơn 32 kí tự',
-            'confirm.required'=>'Bạn chưa nhập password',
-            'confirm.min'=>'Password không được nhỏ hơn 0 kí tự',
-            'confirm.max'=>'Password không được lớn hơn 32 kí tự',
-            'fullname.required' =>"Bạn chưa nhập họ tên",
-            'age.required' => "Bạn chưa nhập tuổi"
-        ]);
-        if($req->password != $req->confirm)
+        if(isset($req->checkmodal) && $req->checkmodal=="modal")
         {
-            return back()->with("error","Xác nhận mật khẩu sai");
-        }
-        else
-        {
-            $checkEmail = User::where("us_email",$req->email)->first();
-            if(empty($checkEmail))
+            if($req->email == "" || $req->password == "" || $req->confirm == "" || $req->fullname == "" || $req->age == "")
             {
-                $user = new User();
-                $user->us_email = $req->email;
-                $user->us_password  = Hash::make($req->password);
-                $user->us_fullName = $req->fullname;
-                $user->us_gender = $req->gender;
-                $user->us_age = $req->age;
-                $user->us_type = "0";
-                $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                $user->us_code = substr(str_shuffle($permitted_chars), 0, 20); 
-                $path = public_path().'/uploadUsers/' . $user->us_code;
-                File::makeDirectory( $path,0777,true);
-                $user->save();
-                //gửi mail
-                require_once '../app/Providers/PHPMailer/PHPMailerAutoload.php'; 
-                $mail = new PHPMailer();
-                $mail->isSMTP();
-                $mail->SMTPSecure = 'tls';
-                $mail->SMTPAuth = true;
-                
-                $mail->SMTPOptions = array(
-                    'ssl' => array(
-                        'verify_peer' => false,
-                        'verify_peer_name' => false,
-                        'allow_self_signed' => true
-                    )
-                );
-                $mail->CharSet = 'UTF-8';
-                $mail->Host = 'smtp.gmail.com';
-                $mail->Port = 587;
-                $mail->Username = 'longhoanghai8499@gmail.com';
-                $mail->Password = 'shikatori142922188aA';
-                $mail->isHTML(true);
-                $mail->setFrom('system@gmail.com', 'Tour Advce System');
-                $mail->addAddress($user->us_email, 'User');
-                $mail->Subject = 'The message confirms you have successfully registered!';
-
-                $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                $maso= substr(str_shuffle($permitted_chars), 0, 6);
-                $user->us_checkEmail = $maso;
-                $user->save();
-                $str='
-                <h2>The message confirms you have successfully registered!</h2>
-                <small>(This is an automated message. Please do not reply)</small>
-                <h4>To verify your email please click the button below</h4>
-                <p>Email information: '.$user->us_email.'</p>
-                <p>Full name information: '.$user->us_fullName.'</p>
-                <p>Verification: <a href="'.route('checkEmail',['id' => $user->us_id,'key'=>$user->us_checkEmail]).'" style="background: #9a46f5;color: white;padding: .5rem 1rem;text-decoration:none;cursor:pointer;border-radius:15px">Verification</a> </p>
-                ';
-                $mail->Body = $str;
-                $mail->send();
-                return back()->with("success","Đăng ký thành công");
+                return $notification = "If you enter missing information, please review";
             }
             else
             {
-                return back()->with("error","Tài khoản email đã tồn tại");
+                if($req->password != $req->confirm)
+                {
+                    return $notification = "incorrect password";
+                }
+                else
+                {
+                    $checkEmail = User::where("us_email",$req->email)->first();
+                    if(empty($checkEmail))
+                    {
+                        $user = new User();
+                        $user->us_email = $req->email;
+                        $user->us_password  = Hash::make($req->password);
+                        $user->us_fullName = $req->fullname;
+                        $user->us_gender = $req->gender;
+                        $user->us_age = $req->age;
+                        $user->us_type = "0";
+                        $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                        $user->us_code = substr(str_shuffle($permitted_chars), 0, 20); 
+                        $path = public_path().'/uploadUsers/' . $user->us_code;
+                        File::makeDirectory( $path,0777,true);
+                        //gửi mail
+                        require_once '../app/Providers/PHPMailer/PHPMailerAutoload.php'; 
+                        $mail = new PHPMailer();
+                        $mail->isSMTP();
+                        $mail->SMTPSecure = 'tls';
+                        $mail->SMTPAuth = true;
+                        
+                        $mail->SMTPOptions = array(
+                            'ssl' => array(
+                                'verify_peer' => false,
+                                'verify_peer_name' => false,
+                                'allow_self_signed' => true
+                            )
+                        );
+                        $mail->CharSet = 'UTF-8';
+                        $mail->Host = 'smtp.gmail.com';
+                        $mail->Port = 587;
+                        $mail->Username = 'longhoanghai8499@gmail.com';
+                        $mail->Password = 'shikatori142922188aA';
+                        $mail->isHTML(true);
+                        $mail->setFrom('system@gmail.com', 'Tour Advce System');
+                        $mail->addAddress($user->us_email, 'User');
+                        $mail->Subject = 'The message confirms you have successfully registered!';
+
+                        $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                        $maso= substr(str_shuffle($permitted_chars), 0, 6);
+                        $user->us_checkEmail = $maso;
+                        $user->save();
+                        $str='
+                        <h2>The message confirms you have successfully registered!</h2>
+                        <small>(This is an automated message. Please do not reply)</small>
+                        <h4>To verify your email please click the button below</h4>
+                        <p>Email information: '.$user->us_email.'</p>
+                        <p>Full name information: '.$user->us_fullName.'</p>
+                        <p>Verification: <a href="'.route('checkEmail',['id' => $user->us_id,'key'=>$user->us_checkEmail]).'" style="background: #9a46f5;color: white;padding: .5rem 1rem;text-decoration:none;cursor:pointer;border-radius:15px">Verification</a> </p>
+                        ';
+                        $mail->Body = $str;
+                        $mail->send();
+                        return $notification = "true";
+                    }
+                    else
+                    {
+                        return $notification = "Email account already exists";
+                    }
+                }
+            }
+        }
+        else
+        {
+            $this->validate($req,[
+                'email'=>'required|email',
+                'password'=>'required|min:0|max:32',
+                'confirm' =>'required|min:0|max:32',
+                'fullname' => 'required',
+                'age' => 'required',
+            ],[
+                'email.required'=>'Bạn chưa nhập email',
+                'email.email'=>'Sai cấu chúc email',
+                'password.required'=>'Bạn chưa nhập password',
+                'password.min'=>'Password không được nhỏ hơn 0 kí tự',
+                'password.max'=>'Password không được lớn hơn 32 kí tự',
+                'confirm.required'=>'Bạn chưa nhập password',
+                'confirm.min'=>'Password không được nhỏ hơn 0 kí tự',
+                'confirm.max'=>'Password không được lớn hơn 32 kí tự',
+                'fullname.required' =>"Bạn chưa nhập họ tên",
+                'age.required' => "Bạn chưa nhập tuổi"
+            ]);
+            if($req->password != $req->confirm)
+            {
+                return back()->with("error","Xác nhận mật khẩu sai");
+            }
+            else
+            {
+                $checkEmail = User::where("us_email",$req->email)->first();
+                if(empty($checkEmail))
+                {
+                    $user = new User();
+                    $user->us_email = $req->email;
+                    $user->us_password  = Hash::make($req->password);
+                    $user->us_fullName = $req->fullname;
+                    $user->us_gender = $req->gender;
+                    $user->us_age = $req->age;
+                    $user->us_type = "0";
+                    $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    $user->us_code = substr(str_shuffle($permitted_chars), 0, 20); 
+                    $path = public_path().'/uploadUsers/' . $user->us_code;
+                    File::makeDirectory( $path,0777,true);
+                    //gửi mail
+                    require_once '../app/Providers/PHPMailer/PHPMailerAutoload.php'; 
+                    $mail = new PHPMailer();
+                    $mail->isSMTP();
+                    $mail->SMTPSecure = 'tls';
+                    $mail->SMTPAuth = true;
+                    
+                    $mail->SMTPOptions = array(
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    );
+                    $mail->CharSet = 'UTF-8';
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->Port = 587;
+                    $mail->Username = 'longhoanghai8499@gmail.com';
+                    $mail->Password = 'shikatori142922188aA';
+                    $mail->isHTML(true);
+                    $mail->setFrom('system@gmail.com', 'Tour Advce System');
+                    $mail->addAddress($user->us_email, 'User');
+                    $mail->Subject = 'The message confirms you have successfully registered!';
+
+                    $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    $maso= substr(str_shuffle($permitted_chars), 0, 6);
+                    $user->us_checkEmail = $maso;
+                    $user->save();
+                    $str='
+                    <h2>The message confirms you have successfully registered!</h2>
+                    <small>(This is an automated message. Please do not reply)</small>
+                    <h4>To verify your email please click the button below</h4>
+                    <p>Email information: '.$user->us_email.'</p>
+                    <p>Full name information: '.$user->us_fullName.'</p>
+                    <p>Verification: <a href="'.route('checkEmail',['id' => $user->us_id,'key'=>$user->us_checkEmail]).'" style="background: #9a46f5;color: white;padding: .5rem 1rem;text-decoration:none;cursor:pointer;border-radius:15px">Verification</a> </p>
+                    ';
+                    $mail->Body = $str;
+                    $mail->send();
+                    return back()->with("success","Đăng ký thành công");
+                }
+                else
+                {
+                    return back()->with("error","Tài khoản email đã tồn tại");
+                }
             }
         }
     }

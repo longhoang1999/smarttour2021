@@ -29,7 +29,7 @@
         </div>
         <div class="AllClass_Table_content">
             <div style="display: flex;">
-              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Language shown</span> 
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('admin.languageShown') }}</span> 
               <select id="selectLang" class="form-control" style="width: 40%">
                 <option hidden="">--Your choice--</option>
                 <option selected="" value="en">English</option>

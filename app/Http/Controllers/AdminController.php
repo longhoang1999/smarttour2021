@@ -1799,7 +1799,6 @@ class AdminController extends Controller
             $route = Route::where("to_id",$id)->first();
             if(Auth::user()->us_type == "1" || Auth::user()->us_id == $route->to_id_user)
             {
-                // treo
                 $pieces_2 = explode("|", $route->to_des);
                 $array = array();
                 for ($i=0; $i < count($pieces_2)-1; $i++) {
@@ -1818,9 +1817,14 @@ class AdminController extends Controller
                         $latlng_new = Arr::add($latlng_new, $j ,$latlng);
                         $dename_new = Arr::add($dename_new, $j ,$desCheck->de_name);
                         $placeId_new = Arr::add($placeId_new, $j ,$desCheck->de_remove);
-                        $duration_new = Arr::add($duration_new, $j ,$desCheck->de_duration);
                         $j++;
                     }
+                }
+                ////// lỗi ----------------------------
+                //diuration
+                $pieces_3 = explode("|", $route->to_duration);
+                for ($i=0; $i < count($pieces_3)-1; $i++) {
+                    $duration_new = Arr::add($duration_new, $i ,$pieces_3[$i]);
                 }
                 if($route->to_startLocat != "")        
                 {
@@ -1837,7 +1841,6 @@ class AdminController extends Controller
                     $placeId_start =  "";
                     $duration_start = "";
                 }
-                //$user = Auth::user();
                 return view('recommend_tour',[
                     'startLocat'=>$route->to_startLocat,
                     'to_des'=>$route->to_des,
@@ -1875,6 +1878,10 @@ class AdminController extends Controller
         {
             $des = Destination::where("de_remove",$route->to_startLocat)->first();
             $des->delete();
+            //subtract
+            $findType = TypePlace::select("id","totalPlace")->where("status","1")->first();
+            $findType->totalPlace = intval($findType->totalPlace) - 1;
+            $findType->save();
         }
         $pieces = explode("|", $route->to_des);
         $array = array();
@@ -1886,6 +1893,10 @@ class AdminController extends Controller
             if($checkDes->de_default == "1")
             {
                 $checkDes->delete();
+                //subtract
+                $findType = TypePlace::select("id","totalPlace")->where("status","1")->first();
+                $findType->totalPlace = intval($findType->totalPlace) - 1;
+                $findType->save();
             }
         }
         //$route->delete();
@@ -1904,6 +1915,11 @@ class AdminController extends Controller
             $des->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
             $des->de_default = "1";
             $findType = TypePlace::select("id")->where("status","1")->first();
+            // plus
+            $findType = TypePlace::select("id","totalPlace")->where("status","1")->first();
+            $findType->totalPlace = intval($findType->totalPlace) + 1;
+            $findType->save();
+            //type des
             $des->de_type = $findType->id;
             $des->save();
         }
@@ -1917,8 +1933,14 @@ class AdminController extends Controller
         $new_route->to_optimized = $req->to_optimized;
         $new_route->to_name = $req->nameTour;
         $new_route->to_startDay = date('Y-m-d', strtotime(Carbon::now()));
+
+        if(!empty($req->val))
+        {
+            $route->to_startLocat = $req->val['de_id'];
+        }
         $i=0;
         $desId = "";
+        $duration = "";
         foreach ($req->tmparr as  $value) {
             if(empty($value['de_default']))
             {
@@ -1937,18 +1959,20 @@ class AdminController extends Controller
                 $desNewPlace->de_duration = $value['de_duration'];
                 $desNewPlace->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
                 $desNewPlace->de_default = "1";
-                $findType = TypePlace::select("id")->where("status","1")->first();
+                // plus
+                $findType = TypePlace::select("id","totalPlace")->where("status","1")->first();
+                $findType->totalPlace = intval($findType->totalPlace) + 1;
+                $findType->save();
+                //find type place has de_default
                 $desNewPlace->de_type = $findType->id;
                 $desNewPlace->save();
                 $desId = $desId.$value['de_id']."|";
                 $i++;
             }
+            $duration = $duration.$value['de_duration']."|";
         }
         $new_route->to_des = $desId;
-        if(!empty($req->val))
-        {
-            $new_route->to_startLocat = $req->val['de_id'];
-        }
+        $new_route->to_duration = $duration;
         $new_route->save();
     }
     public function typePlace()

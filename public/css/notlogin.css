@@ -122,3 +122,11 @@ form .txt_field{
     border: none;
     outline: none;
 }
+#set-dur-panel b{
+    font-size: 16px;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    cursor: pointer;
+}

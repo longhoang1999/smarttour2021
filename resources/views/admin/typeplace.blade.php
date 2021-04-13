@@ -18,28 +18,28 @@
 @stop
 @section('content')
 <!-- privious  tour-->
-	<div class="title"><p class="text-uppercase">Information about place types</p></div>
+	<div class="title"><p class="text-uppercase">{{ trans('admin.inforType') }}</p></div>
 	<div class="AllClass_Table">
         <div class="AllClass_Table_title">
-          <p>Information about place types</p>
+          <p>{{ trans('admin.inforType') }}</p>
         </div>
         <div class="AllClass_Table_content">
-            <button class="btn btn-info" data-toggle="modal" data-target="#addnewtype">Add new place type</button>
+            <button class="btn btn-info" data-toggle="modal" data-target="#addnewtype">{{ trans('admin.addPlace') }}</button>
             <div style="display: flex; margin:1rem 0;">
-              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Language shown</span> 
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('admin.languageShown') }}</span> 
               <select id="selectLang" class="form-control" style="width: 40%">
-                <option selected="" value="en">English</option>
-                <option value="vn">Tiếng việt</option>
+                <option selected="" value="en">{{ trans('admin.EN') }}</option>
+                <option value="vn">{{ trans('admin.VN') }}</option>
               </select>
             </div>
             <table class="table table-bordered table-striped" id="Table_AllClass" style="margin: 10px 0;">
                   <thead>
                   <tr>
                       <th>{{ trans("admin.Order") }}</th>
-                      <th>Name type</th>
-                      <th>Total Place</th>
-                      <th>Date created</th>
-                      <th>Status</th>
+                      <th>{{ trans("admin.nameType") }}</th>
+                      <th>{{ trans("admin.totalPlace") }}</th>
+                      <th>{{ trans("admin.datecreated") }}</th>
+                      <th>{{ trans("admin.status") }}</th>
                       <th>{{ trans("admin.Actions") }}</th>
                   </tr>
                   </thead>
@@ -53,20 +53,20 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addnewtypeLabel">Add new type place</h5>
+          <h5 class="modal-title" id="addnewtypeLabel">{{ trans('admin.addPlace') }}</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <form action="{{route('admin.addtypeplace')}}" method="post" id="addTypePlace">
           <div class="modal-body">
-            <label for="inputEN">Name type (English)</label>
-            <input type="text" class="form-control" id="inputEN" name="nametypeEn" required="" placeholder="Name type">
-            <label for="inputVN">Name type (Vietnamese)</label>
-            <input type="text" class="form-control" id="inputVN" name="nametypeVn" required="" placeholder="Name type">
+            <label for="inputEN">{{ trans("admin.nameType") }} ({{ trans('admin.EN') }})</label>
+            <input type="text" class="form-control" id="inputEN" name="nametypeEn" required="" placeholder="{{ trans('admin.nameType') }}">
+            <label for="inputVN">{{ trans("admin.nameType") }} ({{ trans('admin.VN') }})</label>
+            <input type="text" class="form-control" id="inputVN" name="nametypeVn" required="" placeholder="{{ trans('admin.nameType') }}">
           </div>
           <div class="modal-footer">
-            <input type="submit" class="btn btn-primary" value="Add type">
+            <input type="submit" class="btn btn-primary" value="{{ trans('admin.addType') }}">
           </div>
         </form>
       </div>
@@ -78,7 +78,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modaEditTypeLabel">Edit Name Type</h5>
+          <h5 class="modal-title" id="modaEditTypeLabel">{{ trans('admin.editType') }}</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -86,11 +86,11 @@
         <form action="{{route('admin.fixNameType')}}" method="post" id="fixNameType">
           <input type="hidden" id="inputId" name="idtype">
           <div class="modal-body">
-            <label for="inputName">Name Type</label>
-            <input type="text" placeholder="Name Type" required="" name="nametype" id="inputName" class="form-control">
+            <label for="inputName">{{ trans("admin.nameType") }}</label>
+            <input type="text" placeholder="{{ trans('admin.nameType') }}" required="" name="nametype" id="inputName" class="form-control">
           </div>
           <div class="modal-footer">
-            <input type="submit" class="btn btn-success" value="Edit">
+            <input type="submit" class="btn btn-success" value="{{ trans('admin.Edit') }}">
           </div>
         </form>
       </div>
@@ -101,16 +101,16 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalDeleteLabel">Delete Place Type</h5>
+          <h5 class="modal-title" id="modalDeleteLabel">{{ trans("admin.deletePlace") }}</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <p class="text-danger">Do you really want to delete?</p>
+          <p class="text-danger">{{ trans("admin.reallyDelete") }}</p>
         </div>
         <div class="modal-footer">
-          <button type="button" data-id="" id="btn-delete" class="btn btn-danger">Delete</button>
+          <button type="button" data-id="" id="btn-delete" class="btn btn-danger">{{ trans("admin.Delete") }}</button>
         </div>
       </div>
     </div>

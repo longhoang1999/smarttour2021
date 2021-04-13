@@ -41,7 +41,7 @@
 							</a>
 							<div class="user_content">
 								<p>{{ trans('admin.moreFunction') }}</p>
-								<a class="typePlace" href="{{route('admin.typePlace')}}">Type of Place</a>
+								<a class="typePlace" href="{{route('admin.typePlace')}}">{{ trans('admin.typeOfPlace') }}</a>
 								<a class="addPlace" href="{{route('admin.addPlace')}}">{{ trans('admin.addPlace') }}</a>
 								<br>
 								<a class="editPlace" href="{{route('admin.editPlace')}}">{{ trans('admin.editPlace') }}</a>

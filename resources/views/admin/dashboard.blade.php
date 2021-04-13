@@ -147,7 +147,6 @@
               </div>
               <div class="modal-footer">
                 <input type="submit" class="btn btn-primary" value="{{ trans('admin.CreateAccount') }}" id="btn_submit_add">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('admin.Close') }}</button>
               </div>
             </form>
           </div>
@@ -291,11 +290,11 @@
                 ]
             });
           	table.on( 'draw.dt', function () {
-		    	var PageInfo = $('#Table_AllClass').DataTable().page.info();
-		         	table.column(0, { page: 'current' }).nodes().each( function (cell, i) {
-		            	cell.innerHTML = i + 1 + PageInfo.start;
-		        	} );
-			} );
+		    	      var PageInfo = $('#Table_AllClass').DataTable().page.info();
+  		         	table.column(0, { page: 'current' }).nodes().each( function (cell, i) {
+  		            	cell.innerHTML = i + 1 + PageInfo.start;
+  		        	});
+			      });
         });
     </script>
     <script type="text/javascript">

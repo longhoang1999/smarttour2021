@@ -10,7 +10,7 @@
 		 <!-- AIzaSyBgbjwIY5Q1eZ-Ejqur0a8avEQWowfA39s -->
 		 <!-- AIzaSyAxKKPlkGTldh2wdUBvILN6kdFO1lHYSg4 -->
 		<link rel="stylesheet" type="text/css" href="{{ asset('css/map.css')}}">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">	
 		<script src="https://use.fontawesome.com/releases/v5.15.1/js/all.js" crossorigin="anonymous"></script>
 		<script type="text/javascript">
 var locationsdata = [],// All data of location 
@@ -48,7 +48,7 @@ function initMap(){
 		},
 		success: (result)=>{
 			locationsdata = result[0];
-			console.log(result[1]);
+			//console.log(result[1]);
 			let data = result[1];
 			$('#waypoints').select2({
 				data: data
@@ -85,6 +85,12 @@ function showMap(){
 		}
 	});
 
+	$('#set-dur-input').durationPicker({
+		onChanged: function (value, isInitializing) {
+			$('#set-dur-panel').attr('data-id');
+			idToData($('#set-dur-panel').attr('data-id'),'setDur',value);
+		}
+	});
 
 	function GeocoderService(LatLng,callback){
 		let geocoder = new google.maps.Geocoder();
@@ -98,18 +104,17 @@ function showMap(){
 		clickMarker.setMap(map);
 		clickMarker.setPosition(response[0].geometry.location);
 		newPlaceId = response[0].place_id;
-
+		$('#set-dur-panel').attr('data-id',response[0].place_id);
 		// if($('#your-start').is(':visible') || $('.list-item').length){
 		$('#set-dur-panel').show();
-		if(startlocat == undefined){
+		if($('#your-start').attr('data-clsclk') == 1){
 			$('#set-dur-input').data('durationPicker').setValue(0);
-			$('#set-dur-panel').val(0);
 		} else {
 			$('#set-dur-input').data('durationPicker').setValue(3600);
-			$('#set-dur-panel').val(3600);
 		}
 		
-			// $('#set-dur-panel').val(response[0].place_id);
+		
+
 		// }
 		locationsdata.push({
 			de_name: response[0].formatted_address,
@@ -118,6 +123,8 @@ function showMap(){
 			de_duration: 3600,
 			de_default: 1
 		})
+		$('#set-dur-panel')[0].firstElementChild.innerHTML = `How long would you like to stay in ${idToData($('#set-dur-panel').attr('data-id'),'text')}`;
+		$('#set-dur-panel').attr('title',`How long would you like to stay in ${idToData($('#set-dur-panel').attr('data-id'),'text')}`);
 		customLabel(clickMarker,response[0].place_id);
 	
 		//add new location option in select 
@@ -244,7 +251,15 @@ function showMap(){
 			$('#your-start')[0].innerHTML = 'Click here to add start location'
 		}
 
-		idToData($("#waypoints").find(":selected").val(),"setDur",$('#set-dur-panel').val());
+		
+		let settime = parseInt(idToData($("#waypoints").find(":selected").val(),'duration'));
+		$('#set-dur-panel').show();
+		$('#set-dur-panel').attr('data-id',$("#waypoints").find(":selected").val());
+		$('#set-dur-input').data('durationPicker').setValue(settime);
+
+		$('#set-dur-panel')[0].firstElementChild.innerHTML = `How long would you like to stay in ${idToData($('#set-dur-panel').attr('data-id'),'text')}`;
+		$('#set-dur-panel').attr('title',`How long would you like to stay in ${idToData($('#set-dur-panel').attr('data-id'),'text')}`);
+
 		//Add the start location
 		if(startlocat == undefined && !$('.list-item').length &&clickMarker !=undefined || datastrtlocat == 1){
 			document.getElementById('your-start').setAttribute('data-strtlocat',2);
@@ -289,8 +304,7 @@ function showMap(){
 		}
 		locationContainerHeight('add'); 
 		updateRoute();
-		$('#get-route').show();
-		$('#set-dur-panel').hide(); 
+		$('#get-route').show(); 
 		locatsList.push($("#waypoints").find(":selected").val());
 		addLoText();
 		sortlocats();
@@ -546,8 +560,9 @@ function showMap(){
 						return locationsdata[i].de_description;
 					break;
 				case 'setDur':
-					if (id == locationsdata[i].place_id && locationsdata[i].de_default != undefined){
+					if (id == locationsdata[i].place_id){
 						locationsdata[i].de_duration = parseInt(value); 
+						console.log(locationsdata[i]);
 					}
 					break;
 				default: break;
@@ -745,8 +760,6 @@ function showMap(){
 		for(let i= 0;i<response.length;i++){
 			let infoWindow = new google.maps.InfoWindow();
 			let content = 
-			'<p>- This route duration: '+response[i].duration.text+'</p>'+
-			'<p>- This route distance: '+response[i].distance.text+'</p>'+
 			'<p>- Total time: '+converttime('duration')+'</p>'+
 			'<p>- Total distance: '+totaldistance+'</p>';
 
@@ -1629,7 +1642,6 @@ function showMap(){
 						de_default: idToData(ele,'default')
 					})
 				})
-
 				$.ajax({
 							url:routeDetail,
 							method:"get",
@@ -1731,7 +1743,6 @@ function showMap(){
 					to_optimized="0";
 				}
 				else{
-					// to_optimized = $('input[name="durdis"]').val();
 					to_optimized = "1";
 				}
 				let tmparr = [];
@@ -1806,6 +1817,19 @@ function showMap(){
 						<?php $dem++; ?>
 				@endforeach
 		@endif
+		// $array  $duration_new
+		// gán lại duration cho locationsdata
+		@for($i=0 ; $i < count($array) ; $i++)
+			for(let a=0; a<locationsdata.length; a++)
+			{
+				if ("{{$array[$i]}}" == locationsdata[a].place_id){
+					locationsdata[a].de_duration = parseInt("{{$duration_new[$i]}}"); 
+					break;
+				}
+			}
+		@endfor
+
+		console.log(locationsdata);
 		@if( $latlng_start != "")
 			locationsdata.push({
 					de_name: "{{$dename_start}}",
@@ -2391,7 +2415,7 @@ function showMap(){
 										<div class="col-md-4 col-sm-6 col-6"><p class="text_content">{{ trans('messages.Age') }}</p></div>
 										<div class="col-md-8 col-sm-6 col-6" id="text_age"></div>
 										<div class="col-md-8 col-sm-6 col-6" id="input_age">
-												<input type="number" placeholder="Enter your age" class="form-control" name="age">
+												<input type="number" placeholder="Enter your age" class="form-control" name="age" min="0" max="100">
 										</div>
 										<!-- pass -->
 
@@ -2651,20 +2675,49 @@ function showMap(){
 		        });
 			});
 			$("#formRegister").submit(function(e){
+				$("#btn_Registration").hide();
 				e.preventDefault();
-
+				$("input[name=checkmodal]").val("modal")
 			    var form = $(this);
 			    var url = form.attr('action');
-			    
+			    console.log(form.serialize());
 			    $.ajax({
 		           type: "POST",
 		           url: url,
 		           data: form.serialize(),
 		           success: function(data)
 		           {
-		           	   $("#modalRegis").modal("hide");
-		           	   $("#contentNotification").html("You have successfully registered");
-		               $("#notification").modal("show");
+		           		$("#btn_Registration").show();
+		           		if(data == "true")
+		           		{
+		           		   $("#modalRegis").modal("hide");
+			           	   $("#contentNotification").html("You have successfully registered");
+			               $("#notification").modal("show");
+			               $('#notification').on('hidden.bs.modal', function (e) {
+			               		$("#modalRegis").modal("hide");
+			               		$("#modalLogin").modal("show");
+			               		$("#modalLogin input[name=us_email]").val($("#modalRegis input[name=email]").val());
+			               		$("#modalLogin input[name=us_password]").val($("#modalRegis input[name=password]").val());
+			               		$("#modalRegis input[name=email]").val("");
+			               		$("#modalRegis input[name=password]").val("");
+			               		$("#modalRegis input[name=confirm]").val("");
+			               		$("#modalRegis input[name=fullname]").val("");
+			               		$("#modalRegis input[name=fullname]").val("");
+			               		$("#modalRegis select[name=gender]").val("Male");
+			               		$("#modalRegis input[name=age]").val("");
+						   });
+
+		           		}
+		           		else
+		           		{
+		           		   $("#modalRegis").modal("hide");
+		           		   $("#contentNotification").html(data);
+			               $("#notification").modal("show");
+			               $('#notification').on('hidden.bs.modal', function (e) {
+			               		$("#modalRegis").modal("show");
+						   })
+		           		}
+		           	   
 		           }
 			    });
 			});
@@ -2721,20 +2774,13 @@ function showMap(){
 		});
 		@if(Auth::check())
 			$("#saveTour").click(function(){
-					$("#enterNameTour").modal("show");
+				$("#enterNameTour").modal("show");
 			});
 		@else
 			$("#saveTour").click(function(){
-					$("#modalLogin").modal("show");
+				$("#modalLogin").modal("show");
 			});
-		@endif
-		
-		$('#set-dur-input').durationPicker({
-			onChanged: function (value, isInitializing) {
-				$('#set-dur-panel').val(value);
-		}
-		}); 
-		
+		@endif		
 		$(".menu_title_start").click(function(){
 			location.replace("{{route('user.maps')}}");
 		});
@@ -2935,6 +2981,7 @@ function openTab(evt, tabName) {
 				<div class="modal-body">
 					<form action="{{route('register')}}" method="post" id="formRegister">
 							<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+							<input type="hidden" name="checkmodal" value="">
 							<div class="container-fluid">
 									<div class="row">
 											<div class="col-md-3 col-sm-6 col-6 mb-3">
@@ -2974,13 +3021,13 @@ function openTab(evt, tabName) {
 													<p class="text-left font-weight-bold">{{ trans('messages.Age') }}</p>
 											</div>
 											<div class="col-md-9 col-sm-6 col-6 mb-3">
-													<input type="number" class="form-control" placeholder="{{ trans('messages.Age') }}" name="age" required="">
+													<input type="number" class="form-control" placeholder="{{ trans('messages.Age') }}" name="age" required="" min="0" max="100">
 											</div>
 									</div>
 							</div>
 							<hr>
 							<div class="div_btn_register">
-									<input type="submit" class="btn btn-primary" value="{{ trans('messages.Registration') }}">
+									<input type="submit" class="btn btn-primary" value="{{ trans('messages.Registration') }}" id="btn_Registration">
 									<p id="p_backLogin">{{ trans('messages.youHaveAcc') }} <span class="backFormLogin">{{ trans('messages.Login') }}</span></p>
 							</div>
 					</form>

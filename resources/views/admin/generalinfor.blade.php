@@ -91,7 +91,7 @@
               <div class="card-body">
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">The number of tours in the system</div>
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ trans('admin.numberTours') }}</div>
                     <div class="h5 mb-0 font-weight-bold text-gray-800">{{$totalTour}} tours</div>
                   </div>
                   <div class="col-auto">

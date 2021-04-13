@@ -141,7 +141,7 @@
                         <p class="text-left font-weight-bold">{{ trans('messages.Age') }}</p>
                     </div>
                     <div class="col-md-9 col-sm-6 col-6 mb-3">
-                        <input type="number" class="form-control" placeholder="{{ trans('messages.Age') }}" name="age" required="">
+                        <input type="number" class="form-control" placeholder="{{ trans('messages.Age') }}" name="age" required="" min="1" max="100">
                     </div>
                 </div>
             </div>
@@ -262,7 +262,7 @@
                     <div class="col-md-4 col-sm-6 col-6"><p class="text_content">{{ trans('messages.Age') }}</p></div>
                     <div class="col-md-8 col-sm-6 col-6" id="text_age"></div>
                     <div class="col-md-8 col-sm-6 col-6" id="input_age">
-                        <input type="number" placeholder="Enter your age" class="form-control" name="age">
+                        <input type="number" placeholder="Enter your age" class="form-control" name="age" min="0" max="100">
                     </div>
                     <!-- pass -->
 
