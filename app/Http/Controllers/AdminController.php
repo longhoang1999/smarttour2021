@@ -1900,8 +1900,24 @@ class AdminController extends Controller
             }
         }
         //$route->delete();
+        if($req->options == "no")
+        {
+            $findShare = ShareTour::where("sh_to_id",$id)->first();
+            if($findShare->image != "")
+            {
+                File::delete(public_path($findShare->image));
+            }
+            if(!empty($findShare))
+            {
+                $findUserVotes = Uservotes::where("sh_id",$findShare->sh_id)->get();
+                foreach ($findUserVotes as $value) {
+                    $value->delete();
+                }
+                $findShare->delete();
+            }
+        }
+        
         // thêm mới
-        $user = Auth::user();
         if(!empty($req->val))
         {
             $des = new Destination();
@@ -1936,7 +1952,7 @@ class AdminController extends Controller
 
         if(!empty($req->val))
         {
-            $route->to_startLocat = $req->val['de_id'];
+            $new_route->to_startLocat = $req->val['de_id'];
         }
         $i=0;
         $desId = "";
@@ -1973,7 +1989,55 @@ class AdminController extends Controller
         }
         $new_route->to_des = $desId;
         $new_route->to_duration = $duration;
+        $new_route->to_star = $req->star;
         $new_route->save();
+        //share tour
+        if($req->options == "yes")
+        {
+            $findShare = ShareTour::where("sh_to_id",$id)->first();
+            if(empty($findShare))
+            {
+                $share = new ShareTour();
+                $share->sh_to_id = $new_route->to_id;
+                $share->number_star = $req->star;
+                $share->content = $req->recommend;
+                $share->numberReviews = "1";
+                $share->save();
+
+                $uservotes = new Uservotes();
+                $uservotes->sh_id = $share->sh_id;
+                $uservotes->us_id = Auth::user()->us_id;
+                $uservotes->vote_number = $req->star;
+                $uservotes->save();
+                //gán Share id
+                $share_ID = $share->sh_id;
+            }
+            else
+            {
+                $findUserVotes = Uservotes::where("sh_id",$findShare->sh_id)->where('us_id',Auth::user()->us_id)->first();
+                $findUserVotes->vote_number = $req->star;
+                $findUserVotes->save();
+
+                $allVote = Uservotes::where("sh_id",$findShare->sh_id)->get();
+                $all_user_votes = $allVote->count();
+                $allStart = "0";
+                foreach ($allVote as $value) {
+                    $allStart += floatval($value->vote_number);
+                }
+                $findShare->number_star = floatval($allStart/$all_user_votes);
+                $findShare->content = $req->recommend;
+                $findShare->numberReviews = $all_user_votes;
+                $findShare->save();
+                //gán Share id
+                $share_ID = $findShare->sh_id;
+            }
+        }
+
+        if($req->options == "yes")
+            $shareId = $share_ID;
+        else
+            $shareId = "";
+        return [$req->options,$shareId,$new_route->to_id,$url = route('user.editTour',$new_route->to_id)];
     }
     public function typePlace()
     {

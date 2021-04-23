@@ -13,7 +13,7 @@ return [
     'totalTime' => 'Tổng thời gian',
     'Ascending' => 'Tăng dần',
     'Descending' => 'Giảm dần',
-    'tourover' => 'Tour trên 8 sao',
+    'tourover' => 'Tour trên 4 sao',
     'tourmostVotes' => 'Tour số lượng đánh giá cao',
     'tourCreateMonth' => 'Tour tạo trong tháng này',
     'largestTotal' => 'Tour có tổng thời gian lớn nhất',

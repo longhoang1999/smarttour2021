@@ -31,13 +31,11 @@
             var durationString;
         </script>
         <style>
-            body{padding-top: 3rem;}
-            section{
-                min-height: 40rem;
-            }
-            #mainNav{
-                padding-top: 0.5rem !important;
-                padding-bottom: 0.5rem !important;
+            body{
+                background: url("{{asset('images/vhl.jpeg')}}");
+                background-size: cover;
+                background-repeat: no-repeat;
+                position: relative;
             }
         </style>
         <!--page level css-->
@@ -67,6 +65,20 @@
         <script src="{{asset('js/Scripts/slick.min.js')}}"></script> -->
         <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
         <script type="text/javascript">
+            $(window).scroll(function(){
+                var aTop = $('#mainNav').height();
+                if($(this).scrollTop() >= aTop){
+                    $('.up_btn').trigger('click');
+                    $('#mainNav').css("border-bottom","1px solid #efe1e1");
+                    $("#mainNav").removeClass("change-background");
+                }
+                else
+                {
+                    $('#mainNav').css("border-bottom","1px solid white");
+                    $('.show_btn').trigger('click');
+                    $("#mainNav").addClass("change-background");
+                }
+            });
             $("#searchTour").click(function(){
                 location.replace("{{route('searchTour')}}");
             });

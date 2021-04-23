@@ -13,7 +13,7 @@ return [
     'totalTime' => 'Total time',
     'Ascending' => 'Ascending',
     'Descending' => 'Descending',
-    'tourover' => 'number of tours over 8',
+    'tourover' => 'number of tours over 4',
     'tourmostVotes' => 'tour with the most votes',
     'tourCreateMonth' => 'tours created this month',
     'largestTotal' => 'tour has the largest total time',

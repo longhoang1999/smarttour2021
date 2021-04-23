@@ -9,6 +9,9 @@
 			color: #fff !important;
     		background: #1abc9c !important;
 		}
+        #loadMoreTour{
+            color: #005dcc;
+        }
 	</style>
 @stop
 @section('content')
@@ -82,7 +85,7 @@
                         for ($i=0; $i < count($pieces)-1; $i++) {
                             $array = Arr::add($array, $i ,$pieces[$i]);
                         }
-                        $detailLocation = "";
+                        $detailLocation = array();
                         foreach ($array as  $ar) {
                             $checkDes = Destination::where("de_remove",$ar)->first();
                             if($checkDes->de_default == "0")
@@ -90,17 +93,17 @@
                                 if(Session::has('website_language') && Session::get('website_language') == "vi")
                                 {
                                     $desName = Language::select('de_name')->where("language","vn")->where("des_id",$ar)->first();
-                                    $detailLocation=$detailLocation.'--'.$desName->de_name;
+                                    array_push($detailLocation, $desName->de_name);
                                 }
                                 else
                                 {
                                     $desName = Language::select('de_name')->where("language","en")->where("des_id",$ar)->first();
-                                    $detailLocation=$detailLocation.'--'.$desName->de_name;
+                                    array_push($detailLocation, $desName->de_name);
                                 }
                             }
                             else if($checkDes->de_default == "1")
                             {
-                                $detailLocation= $detailLocation.'--'.$checkDes->de_name;
+                                array_push($detailLocation, $checkDes->de_name);
                             }
                         }
                    ?>
@@ -116,8 +119,13 @@
                             <div class="col-md-4 col-sm-6 col-12">
                                 <p class="font-weight-bold font-italic">Location</p>
                             </div>
-                            <div class="col-md-8 col-sm-6 col-12">
-                                <p>{{$detailLocation}}</p>
+                            <div class="col-md-8 col-sm-6 col-12 mb-2">
+                                @foreach($detailLocation as $detail)
+                                <p class="mb-0">
+                                    <i class="fas fa-street-view point text-danger"></i>
+                                    <span>{{$detail}}</span>
+                                </p>
+                                @endforeach
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
                                 <p class="font-weight-bold font-italic">Time start</p>

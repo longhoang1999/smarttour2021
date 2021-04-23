@@ -2,7 +2,7 @@
 .Language{position: relative;font-size: 1em;color: white;margin: 0 1rem}
 .lan_title{cursor: pointer; border-radius: .8em;
      border: 1px solid #ced4da;
-     padding: .3rem .6rem;
+     padding: .5rem .6rem;
      color: #727a82;
      background: white;
      font-weight: bold;
@@ -11,12 +11,12 @@
 .lan_more{position: absolute;
     background: white;
     border-radius: 15px;
-    top: 2.2em;
+    top: 2.7em;
     width: 100%;
     color: #2c3e50;
     overflow: hidden;
     display: none;
-    border: 1px solid #ced4da;
+    /*border: 1px solid #ced4da;*/
     box-shadow: 0 0 15px #706a6a;
 }
 .lan_more p{margin: 0;
@@ -25,7 +25,7 @@
     cursor: pointer;
 }
 .lan_more p:hover{
-    background: #2c3e50;
+    background: #727a82;
     color: white;
 }
 .tour{cursor: pointer;}
@@ -91,8 +91,7 @@ header .slider div{width: 100%;min-height:40rem; }
     color: #2c3e50 !important; text-decoration: none;
 }
 .tourPlace .downPlace {
-   max-width: 40rem;
-   max-height: 20rem;
+
 }
 .downPlace p{
     font-family: auto;
@@ -141,8 +140,9 @@ header .slider div{width: 100%;min-height:40rem; }
 .openScroll {
     overflow-y: auto;
     max-height: 20rem;
-    padding: 0 2rem;
+    padding: 1em 2rem;
     margin-bottom: 2rem;
+    padding-top: 0;
 }
 .hightly_div_child {
     overflow: hidden;
@@ -230,19 +230,19 @@ p.tourName {
 p{font-family: auto !important;}
 h2{line-height: 3.5rem !important;}
 .page-section {
-    padding: 5rem 0;
+    padding: 8rem 0;
 }
 .child_header{
-    background: #f6f6f6;padding: .4rem 0;display: flex;
-    border-radius: 0 0 8px 8px;
+    padding: .4rem 0;display: flex;
     justify-content: center;
+    background: white;
 }
 #searchPlace{
     width: 100%;
-    height: 2.2rem;
+    height: 2.56rem;
 }
 #div_search{
-    width: 30%;
+    width: 25%;
     position: relative;
 }
 .result_search{
@@ -257,7 +257,7 @@ h2{line-height: 3.5rem !important;}
 .box-header {
     background: white;
     margin: 0 .5rem;
-    padding: .3rem .6rem;
+    padding: .5rem .6rem;
     border-radius: .8em;
     min-width: 6rem;
     text-align: center;
@@ -269,7 +269,7 @@ h2{line-height: 3.5rem !important;}
     cursor: pointer;
 }
 .box-header:hover{
-    background: #1a252f;
+    background: #497782;
     color: white;
 }
 ul{
@@ -295,14 +295,15 @@ ul{
 }
 .up_btn {
     background: white;
-    padding: .2rem 1rem;
+    padding: 0 1rem;
     border: 1px solid #ced4da;
     border-radius: .3em;
     cursor: pointer;
     color: #1abc9c;
+    padding-top: .4em;
 }
 .up_btn:hover{
-    background: #1a252f;
+    background: #497782;
     color: white;
 }
 .show_btn{
@@ -322,5 +323,96 @@ ul{
     font-weight: bold;
 }
 .show_btn:hover {
-    background: #2c3e50;
+    background: #1abc9c;
 }
+.big-size > span{
+    position: absolute;
+    top: 0;
+    font-size: 15px;
+    margin-left: .5rem;
+}
+.big-size{
+    font-size: 20px;
+    margin-bottom: 0;
+    padding: .5em 0;
+    padding-left: 1em;
+    font-weight: 600;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    overflow: hidden;
+    line-height: 2em;
+    position: relative;
+    padding-top: 1em;
+    padding-bottom: 0;
+}
+.big-size:hover{
+    background: whitesmoke;
+    color: #303030;
+    font-weight: bold;
+}
+.detail-tour {
+    text-align: left;
+    padding-left: 1.5em;
+    background: whitesmoke;
+    padding-top: .6em;
+    padding-bottom: .6em;
+    border-top: 1px solid #ed3d3d;
+}
+.dateCreated_group{
+    background: #cecece;
+    padding: .4em 0;
+    margin-bottom: 0;
+}
+.dateCreated_group p{margin: 0}
+#mainNav{
+    /*background: #497782;*/
+    background: white;
+}
+.footer{
+    background: #3f6670 !important;
+}
+.copyright{
+    background: #2c3e50 !important;
+}
+body:after {
+    content: "";
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: rgba(255,255,255,0.4);
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+.footer,.copyright{
+    position: relative;
+    z-index: 2;
+}
+.main-search{
+    margin-top: 3em;
+}
+section, .main-search{
+    position: relative;
+    z-index: 2;
+}
+body{padding-top: 3rem;}
+section{
+    min-height: 40rem;
+}
+#mainNav{
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+.change-background{
+    /*background: rgb(12,80,108) !important;
+    background: linear-gradient(90deg, rgba(12,80,108,0.7343312324929971) 0%, rgba(10,70,111,0.7651435574229692) 100%) !important;*/
+    background: white;
+}
+/*section{display: none;}
+.main-search{
+    display: none;
+}*/
+
+#personalInfo{font-family: inherit !important;}
+#p_logout{font-family: inherit !important;}

@@ -1,0 +1,299 @@
+#header_starttour,#header_starttour:hover{
+	color: #fff !important;
+	background: #1abc9c !important;
+}
+#map {height: 25em !important;}
+#centent-previous{display: flex;}
+.div-search {
+    border-radius: 2em;
+    position: relative;
+    width: 100%;
+    height: 23em;
+    background-color: transparent;
+}
+#text_title {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: .5em;
+}
+#text_title h4{
+    color: #497689;
+    font-weight: bold;
+    font-size: 47px;
+    margin-bottom: 0;
+}
+#div_search{
+    position: absolute;
+    top: 7.4em;
+    width: 100%;
+    text-align: center;
+}
+#searchPlace {
+    width: 70%;
+    height: 50px;
+    line-height: 50px;
+    border: none;
+    box-shadow: 0px 6px 8px grey;
+    margin: auto;
+    padding-left: 1.2rem;
+}
+#text_title p {
+    color: #497689;
+    font-size: 20px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.result_search{
+    background: white;
+    border-radius: 0;
+    box-shadow: none;
+    top: 3em;
+    width: 70%;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0px 6px 8px gray;
+    border-radius: 0 0 9px 9px;
+    z-index: 99;
+    border-top: 1px solid #dedfdb;
+    padding-bottom: 1.2em;
+}
+.result_search ul li {
+    padding: .3rem;
+    cursor: pointer;
+    text-align: left;
+    padding: 16px 24px;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: inherit;
+    color: #497689;
+}
+#introduce-page{
+    margin-top: 8em;
+    overflow: hidden;
+    transition: all 2s;
+}
+.result_search ul li img {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    margin-right: 1em;
+}
+.start_tour{display: flex;
+    height: 20rem;
+    border-radius: 0 10px 10px 10px;
+    overflow:hidden;
+    box-shadow: 9px 13px 15px 0px #676363;
+}
+.start_tour_left{width: 40%;
+    height: 100%;
+    background: #ff5d5d;
+}
+.start_tour_right{width: 60%;
+    height: 100%;
+    position: relative;
+
+}
+.start_tour_right img{
+    object-fit: cover;
+    width: 100%; height: 100%;
+}
+#StarttourNow {
+    position: absolute;
+    background: #68a7c0;
+    z-index: 10;
+    right: 1em;
+    top: 9.5em;
+    border-radius: 2rem;
+    padding: .6rem 3rem;
+    color: white;
+    font-weight: bold;
+    font-size: 25px;
+    cursor: pointer;
+}
+#StarttourNow:hover{
+    background: #598ca1;
+    margin-top: 2px;
+    margin-left: 2px;
+}
+.title_start_tour {
+	font-family: auto;
+    font-weight: bold;
+    font-size: 30px;
+    color: #497689;
+    background: white;
+    z-index: 10;
+    padding: 0.2em .4em;
+    border-radius: 3px 3px 0 0;
+    margin-bottom: 0;
+}
+.start_tour_left p {
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+    margin-top: 6rem;
+    margin-left: 3rem;
+}
+.parent-icon {
+    position: relative;
+    border: 1px solid white;
+    border-radius: 2rem;
+    height: 50px;
+    width: 50px;
+    color: white;
+    cursor: pointer;
+    margin-right: 2rem;
+}
+.parent-icon:hover > svg{
+    font-size: 26px;
+}
+.parent-icon:hover > span{
+    font-size: 15px;
+}
+.icon{display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 3em;
+}
+.parent-icon span {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.parent-icon svg {
+    font-size: 24px;
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.bg-green{
+    background: #49c249;
+}
+.arrow{
+    width: 5em;
+    background: white;
+    height: .3em;
+    -webkit-transform: rotate3d(-2,1, 0,314deg);
+}
+.arrow_2{
+	width: 5em;
+    background: white;
+    height: .25em;
+    -webkit-transform: rotate3d(1,1, 1,14deg);
+}
+.align-items{
+    align-items: center;
+}
+.previous-tour,.search-tour,.slide-show,.slide-show{
+    margin-top: 5em;
+}
+#starttour,.previous-tour,.search-tour,.slide-show{
+	transform: translateX(-100%);
+	transition: all 1s;
+}
+.bg-blue{
+	background: #20d4c4;
+}
+.hightly_div_child:before {
+    position: absolute;
+    content: "";
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0);
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+    z-index: 15;
+}
+.hightly_div_child {
+    width: 20em;
+    height: 19em;
+    margin: auto;
+    position: relative;
+    cursor: pointer;
+    border-radius: 3px;
+    margin: 0 2em;
+}
+.slide-show-tour{
+    width: 100%;
+    box-shadow: 0px 7px 15px 0px #676363;
+    padding: 1rem 0;
+    position: relative;
+}
+.hightly_div_child .tourContent {
+    color: white;
+    position: absolute;
+    bottom: 0;
+    background: rgba(0,0,0,.6);
+    width: 100%;
+    text-align: center;
+    line-height: 3em;
+    font-weight: 700;
+    margin: 0;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+.nameTour {
+    margin: 0;
+    height: 1em;
+    line-height: 1em;
+    margin-top: .5em;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+}
+.hightly_div_child img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 2s;
+}
+button.slick-prev,button.slick-next {
+    position: absolute;
+    z-index: 2;
+    top: 40%;
+    transform: translateY(-50%);
+    background: transparent;
+    outline: none;
+    border: none;
+    height: 6em;
+    line-height: 6em;
+    width: 1.2em;
+    border-radius: 0 2px 2px 0;
+    font-size: 25px;
+    color: #3a3030;
+}
+button.slick-prev{
+    left: 0;
+}
+button.slick-next {
+    right: 0;
+}
+ul.slick-dots {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.2em;
+}
+ul.slick-dots li button {
+    color: white;
+    font-weight: bold;
+    background: transparent;
+    margin-right: 5px;
+    outline: none;
+    border: none;
+    box-shadow: 0 0 9px #262222;
+    border-radius: 2em;
+    min-width: 2em;
+    min-height: 2em;
+    max-width: 4em;
+    max-height: 4em;
+}
+.slick-active > button{
+    background: #9eb9a1 !important;
+}

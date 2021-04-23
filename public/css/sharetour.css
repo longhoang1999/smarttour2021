@@ -110,6 +110,7 @@
     border-top: 0;
     font-size: 14px;
     color: #054000;
+    background: white;
 }
 #content_search span,#content_totalName span{cursor: pointer;}
 #content_search span:hover,#content_totalName span:hover{text-decoration: underline;
@@ -125,6 +126,7 @@
     font-size: 14px;
     color: #054000;
     text-align: center;
+    background: white;
 }
 #content_select input{
     width: 70%;

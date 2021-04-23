@@ -46,7 +46,8 @@ class MapDirectController {
 		$destination  = array();
 		foreach ($de as $value) {
 			$latlng = array('lat' => $value->de_lat, 'lng' => $value->de_lng);
-			$des  = (object) array('place_id'=> $value ->de_id,'de_name' => $value->de_name,'location' =>$latlng,'de_duration'=>$value->de_duration,'de_link'=>$value->de_link,'de_description'=>$value->de_description);
+			$tmp  = (object) array('de_name' => $value->de_name,'location' =>$latlng,'de_duration'=>$value->de_duration,'de_link'=>$value->de_link,'de_description'=>$value->de_description);
+			$des =   [$value->de_id,$tmp];
 			array_push($destination,$des);
 		}
 		// thẻ select 2

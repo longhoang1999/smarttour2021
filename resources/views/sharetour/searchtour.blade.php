@@ -17,190 +17,195 @@
     }
     #div_1,#div_2,#div_3,#div_4{
       cursor: pointer;
+      border-bottom-color: white;
+      border-top-color: white;
+      border-right-color: white;
     }
     p{margin: 0}
   </style>
 @stop
 @section('content')
-  <h2 id="page_title" lass="page-section-heading text-center text-uppercase text-secondary mb-0">{{ trans('newlang.searchtour') }}</h2>
-  <div class="divider-custom">
-      <div class="divider-custom-line"></div>
-      <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-      <div class="divider-custom-line"></div>
-  </div>
-  <div id="main-page">
-      <div class="left" id="sitebar">
-          <ul>
-              <li id="site_history"><a href="#" id="user_tour_history">{{ trans('newlang.tourhistory') }}</a></li>
-              <li id="site_searchtour"><a href="{{route('searchTour')}}">{{ trans('newlang.searchtour') }}</a></li>
-          </ul>
-          <span id="site_searchTitle">--{{ trans('newlang.Search') }}</span>
-          <div id="content_search">
-              @if(Auth::check())
-                <span id="site_youShared">{{ trans('newlang.tourShare') }}</span>
-              @endif
-              <span id="site_highlyRated">{{ trans('newlang.highRate') }}</span>
-              <span id="site_thisMonth">{{ trans('newlang.tourThisMonth') }}</span>
-              <span id="site_lastMonth">{{ trans('newlang.tourLastMonth') }}</span>
-          </div>
-          <span id="site_selectMon">--{{ trans('newlang.selectMonth') }}</span>
-          <div id="content_select">
-              <input type="month" id="fdate" name="fdate" class="form-control">
-          </div>
-          <span id="site_total_time">--{{ trans('newlang.totalTime') }}</span>
-          <div id="content_totalName">
-              <span id="site_max">{{ trans('newlang.Ascending') }}</span>
-              <span id="site_min">{{ trans('newlang.Descending') }}</span>
-          </div>
-      </div>
+  <div class="main-search">
+      <h2 id="page_title" lass="page-section-heading text-center text-uppercase text-secondary mb-0">{{ trans('newlang.searchtour') }}</h2>
+    <div class="divider-custom">
+        <div class="divider-custom-line"></div>
+        <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+        <div class="divider-custom-line"></div>
+    </div>
+    <div id="main-page">
+        <div class="left" id="sitebar">
+            <ul>
+                <li id="site_history"><a href="#" id="user_tour_history">{{ trans('newlang.tourhistory') }}</a></li>
+                <li id="site_searchtour"><a href="{{route('searchTour')}}">{{ trans('newlang.searchtour') }}</a></li>
+            </ul>
+            <span id="site_searchTitle">--{{ trans('newlang.Search') }}</span>
+            <div id="content_search">
+                @if(Auth::check())
+                  <span id="site_youShared">{{ trans('newlang.tourShare') }}</span>
+                @endif
+                <span id="site_highlyRated">{{ trans('newlang.highRate') }}</span>
+                <span id="site_thisMonth">{{ trans('newlang.tourThisMonth') }}</span>
+                <span id="site_lastMonth">{{ trans('newlang.tourLastMonth') }}</span>
+            </div>
+            <span id="site_selectMon">--{{ trans('newlang.selectMonth') }}</span>
+            <div id="content_select">
+                <input type="month" id="fdate" name="fdate" class="form-control">
+            </div>
+            <span id="site_total_time">--{{ trans('newlang.totalTime') }}</span>
+            <div id="content_totalName">
+                <span id="site_max">{{ trans('newlang.Ascending') }}</span>
+                <span id="site_min">{{ trans('newlang.Descending') }}</span>
+            </div>
+        </div>
 
-      <div class="right" id="main">
-          <div class="container-fluid">
-              <div class="row">
-                    <!-- khối 1 -->
-                    <div class="col-xl-3 col-md-6 mb-4 div_parent">
-                      <div class="card border-left-primary shadow h-100 py-2" id="div_1">
-                        <div class="card-body">
-                          <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ trans('newlang.tourover') }}<i class="fas fa-star text-warning"></i></div>
-                              <div class="h5 mb-0 font-weight-bold text-gray-800">{{$votes_over}} tours</div>
-                            </div>
-                            <div class="col-auto">
-                              <i class="fas fa-star fa-2x text-warning"></i>
+        <div class="right" id="main">
+            <div class="container-fluid">
+                <div class="row">
+                      <!-- khối 1 -->
+                      <div class="col-xl-3 col-md-6 mb-4 div_parent">
+                        <div class="card border-left-primary shadow h-100" id="div_1">
+                          <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                              <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ trans('newlang.tourover') }}<i class="fas fa-star text-warning"></i></div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{$votes_over}} tours</div>
+                              </div>
+                              <div class="col-auto">
+                                <i class="fas fa-star fa-2x text-warning"></i>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <!-- khối 1 -->
-                    <!-- khối 2 -->
-                    <div class="col-xl-3 col-md-6 mb-4 div_parent">
-                      <div class="card border-left-success shadow h-100 py-2" id="div_2">
-                        <div class="card-body">
-                          <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ trans('newlang.tourmostVotes') }} (>=2)</div>
-                              <div class="h5 mb-0 font-weight-bold text-gray-800">{{$votes_number}} tours</div>
-                            </div>
-                            <div class="col-auto">
-                              <i class="fas fa-chart-line fa-2x text-success"></i>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- khối 2 -->
-                    <!-- khối 3 -->
-                    <div class="col-xl-3 col-md-6 mb-4 div_parent">
-                      <div class="card border-left-info shadow h-100 py-2" id="div_3">
-                        <div class="card-body">
-                          <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ trans('newlang.tourCreateMonth') }}</div>
-                              <div class="h5 mb-0 font-weight-bold text-gray-800">{{$thismonth}} tours</div>
-                            </div>
-                            <div class="col-auto">
-                              <i class="fas fa-map-marker-alt fa-2x text-info"></i>
+                      <!-- khối 1 -->
+                      <!-- khối 2 -->
+                      <div class="col-xl-3 col-md-6 mb-4 div_parent">
+                        <div class="card border-left-success shadow h-100" id="div_2">
+                          <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                              <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ trans('newlang.tourmostVotes') }} (>=2)</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{$votes_number}} tours</div>
+                              </div>
+                              <div class="col-auto">
+                                <i class="fas fa-chart-line fa-2x text-success"></i>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <!-- khối 3 -->
-                    <!-- khối 4 -->
-                    <div class="col-xl-3 col-md-6 mb-4 div_parent">
-                      <div class="card border-left-warning shadow h-100 py-2" id="div_4">
-                        <div class="card-body">
-                          <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ trans('newlang.largestTotal') }} (> 1day)</div>
-                              <div class="h5 mb-0 font-weight-bold text-gray-800">{{$votes_total_time}} tours</div>
-                            </div>
-                            <div class="col-auto">
-                              <i class="fas fa-calendar-alt fa-2x text-primary"></i>
+                      <!-- khối 2 -->
+                      <!-- khối 3 -->
+                      <div class="col-xl-3 col-md-6 mb-4 div_parent">
+                        <div class="card border-left-info shadow h-100" id="div_3">
+                          <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                              <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ trans('newlang.tourCreateMonth') }}</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{$thismonth}} tours</div>
+                              </div>
+                              <div class="col-auto">
+                                <i class="fas fa-map-marker-alt fa-2x text-info"></i>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
+                      <!-- khối 3 -->
+                      <!-- khối 4 -->
+                      <div class="col-xl-3 col-md-6 mb-4 div_parent">
+                        <div class="card border-left-warning shadow h-100" id="div_4">
+                          <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                              <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ trans('newlang.largestTotal') }} (> 1day)</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{$votes_total_time}} tours</div>
+                              </div>
+                              <div class="col-auto">
+                                <i class="fas fa-calendar-alt fa-2x text-primary"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- khối 4 -->
+                </div>
+            </div>
+            <div id="search_advan">
+                <span class="search_advan_title font-italic">{{ trans('newlang.advanSearch') }}</span><span class="openModalSearch">{{ trans('newlang.clickhere') }}</span>
+            </div>
+            <div class="AllClass_Table">
+                <div class="AllClass_Table_title">
+                  <p class="text-uppercase">{{ trans('newlang.tourRequest') }}</p>
+                </div>
+                <div class="AllClass_Table_content">
+                    <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
+                          <thead>
+                          <tr>
+                              <th>{{ trans("newlang.Order") }}</th>
+                              <th>ID</th>
+                              <th>{{ trans('newlang.Tourname') }}</th>
+                              <th>{{ trans('newlang.startLocation') }}</th>
+                              <th>{{ trans('newlang.detailPlaces') }}</th>
+                              <th>{{ trans('newlang.averageRating') }}</th>
+                              <th>{{ trans('newlang.Votes') }}</th>
+                              <th>{{ trans('newlang.totalTime') }}</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                      </table>
+                </div>
+            </div>
+            
+            <h5 class="font-italic font-weight-bold" id="detail_title">{{ trans('newlang.tourDetail') }}</h5>
+            <div class="tour_infor">
+                <div class="tour_infor_left slider autoplay">
+                </div>
+                <div class="tour_infor_right">
+                    <h3 class="font-weight-bold font-italic" id="name_tour"></h3>
+                    <hr>
+                    <div id="div_btn">
+                        <button class="btn btn-warning" data-toggle="modal"
+                        @if(Auth::check())
+                            data-target="#exampleModal"
+                        @else
+                            data-target="#modalLogin"
+                        @endif
+                        >{{ trans('newlang.Rating') }}</button>
+                        <a href="#" id="link_view_tour" class="btn btn-info">{{ trans('newlang.viewTour') }}</a>
                     </div>
-                    <!-- khối 4 -->
-              </div>
-          </div>
-          <div id="search_advan">
-              <span class="search_advan_title font-italic">{{ trans('newlang.advanSearch') }}</span><span class="openModalSearch">{{ trans('newlang.clickhere') }}</span>
-          </div>
-          <div class="AllClass_Table">
-              <div class="AllClass_Table_title">
-                <p class="text-uppercase">{{ trans('newlang.tourRequest') }}</p>
-              </div>
-              <div class="AllClass_Table_content">
-                  <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
-                        <thead>
-                        <tr>
-                            <th>{{ trans("newlang.Order") }}</th>
-                            <th>ID</th>
-                            <th>{{ trans('newlang.Tourname') }}</th>
-                            <th>{{ trans('newlang.startLocation') }}</th>
-                            <th>{{ trans('newlang.detailPlaces') }}</th>
-                            <th>{{ trans('newlang.averageRating') }}</th>
-                            <th>{{ trans('newlang.Votes') }}</th>
-                            <th>{{ trans('newlang.totalTime') }}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-              </div>
-          </div>
-          
-          <h5 class="font-italic font-weight-bold" id="detail_title">{{ trans('newlang.tourDetail') }}</h5>
-          <div class="tour_infor">
-              <div class="tour_infor_left slider autoplay">
-              </div>
-              <div class="tour_infor_right">
-                  <h3 class="font-weight-bold font-italic" id="name_tour"></h3>
-                  <hr>
-                  <div id="div_btn">
-                      <button class="btn btn-warning" data-toggle="modal"
-                      @if(Auth::check())
-                          data-target="#exampleModal"
-                      @else
-                          data-target="#modalLogin"
-                      @endif
-                      >{{ trans('newlang.Rating') }}</button>
-                      <a href="#" id="link_view_tour" class="btn btn-info">{{ trans('newlang.viewTour') }}</a>
-                  </div>
-                  <p id="p_votes"><span class="font-weight-bold font-italic">{{ trans('newlang.Yourvotes') }}: </span>
-                  <span id="text_votes"></span></p>
+                    <p id="p_votes"><span class="font-weight-bold font-italic">{{ trans('newlang.Yourvotes') }}: </span>
+                    <span id="text_votes"></span></p>
 
-                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.Introduce') }}: </span>
-                  <span id="text_intro"></span></p>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.Introduce') }}: </span>
+                    <span id="text_intro"></span></p>
 
-                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.averageRating') }}: </span>
-                  <span id="text_avgRating"></span></p>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.averageRating') }}: </span>
+                    <span id="text_avgRating"></span></p>
 
-                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.numberofRatings') }}: </span>
-                  <span id="text_number_rates"></span></p>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.numberofRatings') }}: </span>
+                    <span id="text_number_rates"></span></p>
 
-                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.startLocation') }}: </span>
-                  <span id="startLocation"></span></p>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.startLocation') }}: </span>
+                    <span id="startLocation"></span></p>
 
-                  <p class="font-weight-bold font-italic mb-0">{{ trans('newlang.Location') }}:</p>
-                  <p id="detail_location"></p>
+                    <p class="font-weight-bold font-italic mb-0">{{ trans('newlang.Location') }}:</p>
+                    <p id="detail_location"></p>
 
-                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.startTime') }}: </span>
-                  <span id="start_time"></span></p>
-                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.endtimeTime') }}: </span>
-                  <span id="end_time"></span></p>
-                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.totalTourTime') }}: </span>
-                  <span id="total_time"></span></p>
-                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.dateCreated') }}: </span>
-                  <span id="date_created"></span></p>
-              </div>
-          </div>
-          
-      </div>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.startTime') }}: </span>
+                    <span id="start_time"></span></p>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.endtimeTime') }}: </span>
+                    <span id="end_time"></span></p>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.totalTourTime') }}: </span>
+                    <span id="total_time"></span></p>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.dateCreated') }}: </span>
+                    <span id="date_created"></span></p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
   </div>
   <!-- modal rating -->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -224,11 +229,6 @@
                   <i class="fas fa-star star_3 fa-2x" data-value="3" style="cursor: pointer;"></i>
                   <i class="fas fa-star star_4 fa-2x"  data-value="4" style="cursor: pointer;"></i>
                   <i class="fas fa-star star_5 fa-2x" data-value="5" style="cursor: pointer;"></i>
-                  <i class="fas fa-star star_6 fa-2x" data-value="6" style="cursor: pointer;"></i> 
-                  <i class="fas fa-star star_7 fa-2x" data-value="7" style="cursor: pointer;"></i>
-                  <i class="fas fa-star star_8 fa-2x" data-value="8" style="cursor: pointer;"></i>
-                  <i class="fas fa-star star_9 fa-2x" data-value="9" style="cursor: pointer;"></i>
-                  <i class="fas fa-star star_10 fa-2x" data-value="10" style="cursor: pointer;"></i>
                 </div>
                 <input type="hidden" id="star_Share" name="numberStar">
               </div>
@@ -379,9 +379,9 @@
           @endif
         });
         // votess star
-        @for($i = 1; $i<= 10; $i++)
+        @for($i = 1; $i<= 5; $i++)
           $("#div_Starrank_tour .star_{{$i}}").click(function(){
-              @for($j = 1 ; $j <= 10; $j++)
+              @for($j = 1 ; $j <= 5; $j++)
                   $("#div_Starrank_tour .star_{{$j}}").css("color","#212529");
               @endfor
               @for($j = 1 ; $j <= $i; $j++)
@@ -586,6 +586,7 @@
             $("#ModalSearch").modal("show");
           })
           // sài on (click) thay cho click (function)
+          var idShare;
           var idShareTour;
           $('#Table_AllClass tbody').on('click', 'tr', function () {
             idShareTour = $(this).find(".id_class").text();
@@ -597,6 +598,7 @@
                   method:"POST",
                   data:{_token:_token,idShareTour:idShareTour},
                   success:function(data){ 
+                    idShare = data[14];
                     // //show div detail
                     $("#detail_title").show();
                     $(".tour_infor").css("display","flex");
@@ -649,6 +651,61 @@
                     $("#total_time").append(durationString);
                  }
             });
+          });
+          $('#exampleModal').on('show.bs.modal', function (event) {
+              // load start
+              let _token = $('meta[name="csrf-token"]').attr('content');
+              let $url_path = '{!! url('/') !!}';
+              let routeCheckTour = $url_path+"/voteUser";
+              $.ajax({
+                    url:routeCheckTour,
+                    method:"POST",
+                    data:{_token:_token,shareId:idShare},
+                    success:function(result){ 
+                      console.log(result);
+                      //reset
+                      $("#star_Share").val('0');
+                      $(".star_1").css("color","#212529");
+                      $(".star_2").css("color","#212529");
+                      $(".star_3").css("color","#212529");
+                      $(".star_4").css("color","#212529");
+                      $(".star_5").css("color","#212529");
+                      if(result[0] == "yes")
+                      {
+                        $("#star_Share").val(result[1]);
+                        if(result[1] == "1")
+                        {
+                          $(".star_1").css("color","#ff9700");
+                        }
+                        else if(result[1] == "2")
+                        {
+                          $(".star_1").css("color","#ff9700");
+                          $(".star_2").css("color","#ff9700");
+                        }
+                        else if(result[1] == "3")
+                        {
+                          $(".star_1").css("color","#ff9700");
+                          $(".star_2").css("color","#ff9700");
+                          $(".star_3").css("color","#ff9700");
+                        }
+                        else if(result[1] == "4")
+                        {
+                          $(".star_1").css("color","#ff9700");
+                          $(".star_2").css("color","#ff9700");
+                          $(".star_3").css("color","#ff9700");
+                          $(".star_4").css("color","#ff9700");
+                        }
+                        else if(result[1] == "5")
+                        {
+                          $(".star_1").css("color","#ff9700");
+                          $(".star_2").css("color","#ff9700");
+                          $(".star_3").css("color","#ff9700");
+                          $(".star_4").css("color","#ff9700");
+                          $(".star_5").css("color","#ff9700");
+                        }
+                      }
+                   }
+              });
           });
           $("#btn_Rating").click(function(){
               let _token = $('meta[name="csrf-token"]').attr('content');

@@ -83,17 +83,21 @@ Route::group(
 		//user
 		Route::get("dashboard","UserController@dashboard")->name("user.dashboard");
 		Route::post("feedback","UserController@feedback")->name("user.feedback");
-		Route::get("saveTour","UserController@saveTour")->name("user.saveTour");
+		Route::post("saveTour","UserController@saveTour")->name("user.saveTour");
+		Route::post("saveImgShareTour/{idShareTour}","UserController@saveImgShareTour")->name("user.saveImgShareTour");
 		Route::post("checkTour","UserController@checkTour")->name("user.checkTour");
 		Route::post("checkUser","UserController@checkUser")->name("user.checkUser");
 		Route::post("editInfo","UserController@editInfo")->name("user.editInfo");
 		Route::get("editTourUser/{id}","AdminController@editTour")->name('user.editTour');
 		Route::post("shareTour","UserController@shareTour")->name("user.shareTour");
 		Route::post("rating","ShareTourController@rating")->name("user.rating");
-		Route::get("editRoute/{id}","AdminController@editRoute")->name("user.editRoute");
+		Route::post("getinfor-touredit","ShareTourController@getinforTouredit")->name("user.getinfor-touredit");
+		Route::post("editRoute/{id}","AdminController@editRoute")->name("user.editRoute");
 		Route::get("tourhistory","ShareTourController@tourhistory")->name("user.tourhistory");
 		Route::get("showtourhistory","ShareTourController@showtourhistory")->name('share.showtourhistory');
 		Route::post("takeDetailTour","ShareTourController@takeDetailTour")->name('share.takeDetailTour');
+		Route::post("voteUser","ShareTourController@voteUser")->name('share.voteUser');
+		
 	}
 );
 Route::group(

@@ -216,9 +216,12 @@ class ShareTourController extends Controller
                 $latlng_new = Arr::add($latlng_new, $j ,$latlng);
                 $dename_new = Arr::add($dename_new, $j ,$desCheck->de_name);
                 $placeId_new = Arr::add($placeId_new, $j ,$desCheck->de_remove);
-                $duration_new = Arr::add($duration_new, $j ,$desCheck->de_duration);
                 $j++;
             }
+        }
+        $pieces_3 = explode("|", $route->to_duration);
+        for ($i=0; $i < count($pieces_3)-1; $i++) {
+            $duration_new = Arr::add($duration_new, $i ,$pieces_3[$i]);
         }
         if($route->to_startLocat != "")        
         {
@@ -236,7 +239,8 @@ class ShareTourController extends Controller
             $duration_start = "";
         }
         //$user = Auth::user();
-        return view('recommend_tour',['shareId'=>$shareId,
+        return view('recommend_tour',[
+            'shareId'=>$shareId,
             'startLocat'=>$route->to_startLocat,
             'to_des'=>$route->to_des,
             'to_starttime'=>$route->to_starttime,
@@ -264,7 +268,7 @@ class ShareTourController extends Controller
             if(intval(Carbon::parse($route->to_endtime)->day) - intval(Carbon::parse($route->to_starttime)->day) == 0)
                 $votes_total_time->forget($key);
         }
-        $votes_over = ShareTour::where("number_star",">=","8")->get()->count();
+        $votes_over = ShareTour::where("number_star",">=","4")->get()->count();
         $votes_number = ShareTour::where("numberReviews",">=","2")->get()->count();
         $allShareTour = ShareTour::get();
         $i=0;
@@ -294,7 +298,7 @@ class ShareTourController extends Controller
     // div_1
     public function searchTourTable()
     {
-        $votes_over = ShareTour::where("number_star",">=","8")->get();
+        $votes_over = ShareTour::where("number_star",">=","4")->get();
         return DataTables::of($votes_over)
             ->addColumn(
                 'stt',
@@ -1352,7 +1356,8 @@ class ShareTourController extends Controller
             date('d/m/Y h:i a', strtotime($route->to_endtime)),
             date('d/m/Y', strtotime($route->to_startDay)),
             $link_view_tour,
-            Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime))
+            Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime)),
+            $sharetour->sh_id
         ];
     }
     public function takeDetail($array)
@@ -1697,5 +1702,28 @@ class ShareTourController extends Controller
             $link_view_tour,
             Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime))
         ];
+    }
+    public function getinforTouredit(Request $req)
+    {
+        $findTour = Route::where("to_id",$req->routeId)->first();
+        $findShare = ShareTour::where("sh_to_id",$req->routeId)->first();
+        if(empty($findShare))
+            return [$findTour->to_name,$findTour->to_star,$share = "no"];
+        else
+        {
+            if($findShare->image == "")
+                $image = "";
+            else
+                $image = asset($findShare->image);
+            return [$findTour->to_name,$findTour->to_star,$share = "yes",$findShare->content,$image];
+        }
+    }
+    public function voteUser(Request $req)
+    {
+        $findUserVotes = Uservotes::where("sh_id",$req->shareId)->where("us_id",Auth::user()->us_id)->first();
+        if(empty($findUserVotes))
+            return [$status = "no"];
+        else
+            return [$status = "yes",$findUserVotes->vote_number];
     }
 }

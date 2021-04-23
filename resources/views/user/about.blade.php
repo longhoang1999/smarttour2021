@@ -12,6 +12,12 @@
         #div_more #header_about{
             color: white !important;
         }
+        .lead-content {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: black;
+            font-style: italic;
+        }
 	</style>
 @stop
 @section('content')
@@ -27,10 +33,10 @@
             </div>
             <!-- About Section Content-->
             <div class="row">
-                <div class="col-lg-4 ml-auto"><p class="lead">{{ trans('messages.Aboutleft') }}</p></div>
-                <div class="col-lg-4 mr-auto"><p class="lead">{{ trans('messages.Aboutright') }}</p>
-                <p class="lead" style="font-style: italic;"><i class="fas fa-phone-square-alt"></i> Tel: 0327927587</p>
-                <p class="lead" style="font-style: italic;"><i class="fas fa-envelope"></i> Email: longhoanghai8499@gmail.com</p>
+                <div class="col-lg-4 ml-auto"><p class="lead-content">{{ trans('messages.Aboutleft') }}</p></div>
+                <div class="col-lg-4 mr-auto"><p class="lead-content">{{ trans('messages.Aboutright') }}</p>
+                <p class="lead-content" style="font-style: italic;"><i class="fas fa-phone-square-alt"></i> Tel: 0327927587</p>
+                <p class="lead-content" style="font-style: italic;"><i class="fas fa-envelope"></i> Email: longhoanghai8499@gmail.com</p>
                 </div>
             </div>
         </div>

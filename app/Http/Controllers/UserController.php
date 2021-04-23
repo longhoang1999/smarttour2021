@@ -35,16 +35,17 @@ class UserController extends Controller
     }
     public function login()
     {
+        $shareTour = ShareTour::orderBy('numberReviews', 'DESC')->limit(10)->get();
         if(Auth::check())
         {
             $user = Auth::user();
-            $route = Route::where('to_id_user',$user->us_id)->get();
+            $route = Route::where('to_id_user',$user->us_id)->orderBy('to_startDay', 'desc')->get();
             session()->put('route',$route);
-            return view('user.dashboard',['fullName'=>$user->us_fullName]);
+            return view('user.dashboard',['fullName'=>$user->us_fullName,'shareTour'=>$shareTour]);
         }
         else
         {
-            return view('user.dashboard');
+            return view('user.dashboard',['shareTour'=>$shareTour]);
         }
     }
     public function tour()
@@ -376,8 +377,45 @@ class UserController extends Controller
         }
         $route->to_des = $desId;
         $route->to_duration = $duration;
+        $route->to_star = $req->star;
         $route->save();
-        return [$route->to_id,$url = route('user.editTour',$route->to_id)];
+        //share tour
+        if($req->options == "yes")
+        {
+            $share = new ShareTour();
+            $share->sh_to_id = $route->to_id;
+            $share->number_star = $req->star;
+            $share->content = $req->recommend;
+            $share->numberReviews = "1";
+            $share->save();
+
+            $uservotes = new Uservotes();
+            $uservotes->sh_id = $share->sh_id;
+            $uservotes->us_id = Auth::user()->us_id;
+            $uservotes->vote_number = $req->star;
+            $uservotes->save();
+        }
+        if($req->options == "yes")
+            $shareId = $share->sh_id;
+        else
+            $shareId = "";
+        return [$req->options,$shareId,$route->to_id,$url = route('user.editTour',$route->to_id)];
+    }
+    public function saveImgShareTour(Request $req,$idShareTour)
+    {
+        $findShare = ShareTour::where("sh_id",$idShareTour)->first();
+        if($findShare->image != "")
+        {
+            File::delete(public_path($findShare->image));
+        }
+        if($req->file('image_tour'))
+        {
+            $image = $req->file('image_tour');
+            $picName = time().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('img_ShareTour'), $picName);
+            $findShare->image='img_ShareTour/'.$picName;
+            $findShare->save();
+        }
     }
     public function shareTour(Request $req)
     {

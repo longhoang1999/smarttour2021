@@ -203,11 +203,6 @@
                     <i class="fas fa-star star_3 fa-2x" data-value="3" style="cursor: pointer;"></i>
                     <i class="fas fa-star star_4 fa-2x"  data-value="4" style="cursor: pointer;"></i>
                     <i class="fas fa-star star_5 fa-2x" data-value="5" style="cursor: pointer;"></i>
-                    <i class="fas fa-star star_6 fa-2x" data-value="6" style="cursor: pointer;"></i> 
-                    <i class="fas fa-star star_7 fa-2x" data-value="7" style="cursor: pointer;"></i>
-                    <i class="fas fa-star star_8 fa-2x" data-value="8" style="cursor: pointer;"></i>
-                    <i class="fas fa-star star_9 fa-2x" data-value="9" style="cursor: pointer;"></i>
-                    <i class="fas fa-star star_10 fa-2x" data-value="10" style="cursor: pointer;"></i>
                   </div>
                   <input type="hidden" id="star_Share" name="numberStar">
                 </div>
@@ -224,9 +219,9 @@
     <script type="text/javascript">
         $(document).ready(function(){
             // votess star
-            @for($i = 1; $i<= 10; $i++)
+            @for($i = 1; $i<= 5; $i++)
               $("#div_Starrank_tour .star_{{$i}}").click(function(){
-                  @for($j = 1 ; $j <= 10; $j++)
+                  @for($j = 1 ; $j <= 5; $j++)
                       $("#div_Starrank_tour .star_{{$j}}").css("color","#212529");
                   @endfor
                   @for($j = 1 ; $j <= $i; $j++)
@@ -313,6 +308,61 @@
     </script>
     <script type="text/javascript">
         $(document).ready(function(){
+            $('#exampleModal').on('show.bs.modal', function (event) {
+              // load start
+              let _token = $('meta[name="csrf-token"]').attr('content');
+              let $url_path = '{!! url('/') !!}';
+              let routeCheckTour = $url_path+"/voteUser";
+              $.ajax({
+                    url:routeCheckTour,
+                    method:"POST",
+                    data:{_token:_token,shareId:{{$share->sh_id}}},
+                    success:function(result){ 
+                      console.log(result);
+                      //reset
+                      $("#star_Share").val('0');
+                      $(".star_1").css("color","#212529");
+                      $(".star_2").css("color","#212529");
+                      $(".star_3").css("color","#212529");
+                      $(".star_4").css("color","#212529");
+                      $(".star_5").css("color","#212529");
+                      if(result[0] == "yes")
+                      {
+                        $("#star_Share").val(result[1]);
+                        if(result[1] == "1")
+                        {
+                          $(".star_1").css("color","#ff9700");
+                        }
+                        else if(result[1] == "2")
+                        {
+                          $(".star_1").css("color","#ff9700");
+                          $(".star_2").css("color","#ff9700");
+                        }
+                        else if(result[1] == "3")
+                        {
+                          $(".star_1").css("color","#ff9700");
+                          $(".star_2").css("color","#ff9700");
+                          $(".star_3").css("color","#ff9700");
+                        }
+                        else if(result[1] == "4")
+                        {
+                          $(".star_1").css("color","#ff9700");
+                          $(".star_2").css("color","#ff9700");
+                          $(".star_3").css("color","#ff9700");
+                          $(".star_4").css("color","#ff9700");
+                        }
+                        else if(result[1] == "5")
+                        {
+                          $(".star_1").css("color","#ff9700");
+                          $(".star_2").css("color","#ff9700");
+                          $(".star_3").css("color","#ff9700");
+                          $(".star_4").css("color","#ff9700");
+                          $(".star_5").css("color","#ff9700");
+                        }
+                      }
+                   }
+              });
+          });
             $("#input_File").change(function(){
                 $(".btn_upload").css("background","#ff8304");
                 $("#file_name").css("display","block");

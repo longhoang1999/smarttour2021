@@ -5,6 +5,15 @@
 @stop
 @section('header_styles')
     <link rel="stylesheet" href="{{asset('css/listplace.css')}}">
+    <style>
+        #placeMap,#placeVr{
+            color: #005dcc !important;
+            font-weight: bold
+        }
+        .div_detail {
+            min-height: 50rem;
+        }
+    </style>
 @stop
 @section('content')
 	<section class="page-section" id="contact">
@@ -83,7 +92,7 @@
             });
 
             function callajax(idPlace){
-                $(".div_detail").slideUp("fast");
+                $(".div_detail").slideUp("slow");
                 let $url_path = '{!! url('/') !!}';
                 let _token = $('meta[name="csrf-token"]').attr('content');
                 let routeLoadPlaceInfo = $url_path+"/loadPlaceInfo";
@@ -92,7 +101,7 @@
                       method:"POST",
                       data:{_token:_token,idPlace:idPlace},
                       success:function(data){ 
-                        $(".div_detail").slideDown("fast");
+                        $(".div_detail").slideDown("slow");
                         if(data['de_image'] == "")
                         {
                             $("#place_a").attr("href",$url_path+ "/assets/img/portfolio/cabin.png");

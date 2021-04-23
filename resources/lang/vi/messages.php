@@ -26,7 +26,7 @@ return [
     'Starttournow' => 'Bắt đầu tour ngay bây giờ',
     'Previoustours' => 'Các tour trước đó',
     'historyTitle' => 'Nơi lưu các chuyến tham quan trước đây của bạn',
-    'routeDetails' => '(Nhấp vào chuyến đi để xem chi tiết tuyến đường)',
+    'routeDetails' => 'Nhấp vào chuyến đi để xem chi tiết tuyến đường',
     'notTrips' => 'Bạn không có bất kỳ chuyến đi nào',
     'CloseWindow' => 'Đóng cửa sổ',
     'NoInformation' => 'Không có thông tin',

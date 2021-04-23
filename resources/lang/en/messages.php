@@ -26,7 +26,7 @@ return [
     'Starttournow' => 'Start tour now',
     'Previoustours' => 'Previous tours',
     'historyTitle' => 'Where to save your previous tours',
-    'routeDetails' => '(Click the trip to see the route details)',
+    'routeDetails' => 'Click the trip to see the route details',
     'notTrips' => 'You do not have any trips',
     'CloseWindow' => 'Close Window',
     'NoInformation' => 'No information',

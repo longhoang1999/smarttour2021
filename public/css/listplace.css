@@ -7,7 +7,7 @@
     height: 3rem;
     line-height: 3rem;
     border-bottom: 1px solid #dbdbdb;
-    font-family: cursive;
+    font-family: emoji;
     font-weight: bold;
     color: #1abc9c;
     overflow: hidden;
@@ -24,7 +24,7 @@
     text-align: center;
     padding: 1rem 0;
     font-size: 20px;
-    font-family: cursive;
+    font-family: emoji;
     background: lightblue;
     color: #117964;
     font-weight: bold;
@@ -40,4 +40,5 @@
 }
 .div_detail .item{
     padding: 0 1rem;
+    color: black;
 }

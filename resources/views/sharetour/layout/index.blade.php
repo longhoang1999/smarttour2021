@@ -32,13 +32,8 @@
             var durationString;
         </script>
         <style>
-            body{padding-top: 3rem;}
-            section{
-                min-height: 40rem;
-            }
-            #mainNav{
-                padding-top: 0.5rem !important;
-                padding-bottom: 0.5rem !important;
+            body:after {
+               content: none;
             }
         </style>
         <!--page level css-->
@@ -69,6 +64,23 @@
         <script type="text/javascript" src="{{ asset('datatables/js/jquery.dataTables.js') }}" ></script>
         <script type="text/javascript" src="{{ asset('datatables/js/dataTables.bootstrap4.js') }}" ></script>
         <script type="text/javascript">
+            $(window).scroll(function(){
+                var aTop = $('#mainNav').height();
+                if($(this).scrollTop() >= aTop){
+                    $('.up_btn').trigger('click');
+                    $('#mainNav').css("border-bottom","1px solid #efe1e1");
+                    $("#mainNav").removeClass("change-background");
+                }
+                else
+                {
+                    $('#mainNav').css("border-bottom","1px solid white");
+                    $('.show_btn').trigger('click');
+                    $("#mainNav").addClass("change-background");
+                }
+            });
+            // $(document).ready(function(){
+            //     $(".main-search").show(500);
+            // });
             $("#searchTour").click(function(){
                 location.replace("{{route('searchTour')}}");
             });
