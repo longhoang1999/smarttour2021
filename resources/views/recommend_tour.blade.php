@@ -90,18 +90,23 @@
 					</div>
 					<div id='time-cost-container'>
 						<div class="left">
-							<label><b>Ghé thăm trong:</b></label><br>
-							<div class="ui input">
+							<span style="margin-top: 0.1em; width: 20%"><b>Ghé thăm trong:</b></span>
+							<div class="ui input" style="width: 80%">
 					      <input type="text" id="duration-picker" value="3600">
 					    </div>
 						</div>
-						<div class="right" style="padding-left: 1em;">
-							<label><b>Chi phí:</b></label><br>	
+						<div class="right">
+							<span><b>Chi phí:</b></span>	
+
 							<div class="ui right labeled input">
 							  <input type="number" value="100000" min="50000" id="amount">
-							  <div class="ui basic label">VND</div>
+							  <select class="currency-select ui compact selection dropdown">
+							    <option value="all">VND</option>
+							    <option selected="" value="articles">USD</option>
+							  </select>
+							  <span class="amount-text"></span>
 							</div>
-							<b><span class="amount-text"></span></b>
+							
 						</div>
 					</div>
 						
@@ -309,6 +314,32 @@
 		use Illuminate\Support\Facades\Auth;
 	?>
 		<script type="text/javascript">
+			$("#list-container").on('click','.item-content',function(){
+				let id_place = $(this).attr('value');
+				let _token = $('meta[name="csrf-token"]').attr('content');
+				let $url_path = '{!! url('/') !!}';
+				let routeTakeInforPlace = $url_path+"/loadPlaceInfo";
+				$.ajax({
+                      url:routeTakeInforPlace,
+                      method:"POST",
+                      data:{_token:_token,idPlace:id_place},
+                      success:function(data){ 
+                        if(data != "empty")
+                        {
+                        	if(data['de_image'] == "")
+	                        {
+	                            $(".parents-img img").attr("src",$url_path+ "/imgs/image.jpg");
+	                        }
+	                        else
+	                        {
+	                        	$(".parents-img img").attr("src",data['de_image']);
+	                        }
+                        }
+                        else
+                        	$(".parents-img img").attr("src",$url_path+ "/imgs/image.jpg");
+                     }
+                });
+			});
 			// part 1
 			@if(Auth::check())
 				$("#saveTour").click(function(){
@@ -724,8 +755,8 @@ function initMap(){
 				$('#get-route').hide();
 				idToData(null,"LatLngArr");
 				$('#time-cost-picker').hide();
-				e.currentTarget.className.replace("loading", "");
-				e.currentTarget.className += ' loading';
+				// e.currentTarget.className.replace("loading", "");
+				// e.currentTarget.className += ' loading';
 				if((Object.entries(startLocat).length && locationID.length == 1) || (!Object.entries(startLocat).length && locationID.length ==2))
 					drawRoutes();
 				else
@@ -741,25 +772,29 @@ function initMap(){
 		$('#startDate').change(updateRoute);
 		$('#time-end').change(updateRoute);
 
-		$('#amount').keydown(e=>{
+		$('#amount').keyup(e=>{
 				let val = ''+$('#amount').val();
-				if(e.key !== 'Backspace')
-				 val+=e.key
-				else 
-					val = val.substring(0,val.length - 1);
+				// if(e.key !== 'Backspace')
+				//  val+=e.key
+				// else 
+				// 	val = val.substring(0,val.length - 1);
 
 			  if(['1','2','3','4','5', '6', '7', '8', '9', '0','Backspace'].indexOf(e.key) === -1)
 			    e.preventDefault();		
 			  else {
-			  	if(val == ''){
-					$('.amount-text').text(''); 
-			  		return;
-			  	} 
-			  	let id = $('#time-cost-picker').attr('value')
-			  	idToData(id,'setCost',parseInt(val));
-		  		val = parseInt(val).toLocaleString(undefined,{ style: 'currency', currency: 'VND'});
-		  		$('.amount-text').text(val);
+			  // 	if(val == ''){
+					// $('.amount-text').text(''); 
+			  // 		return;
+			  // 	} 
+			  // 	let id = $('#time-cost-picker').attr('value')
+			  // 	idToData(id,'setCost',parseInt(val));
+		  	// 	val = parseInt(val).toLocaleString(undefined,{ style: 'currency', currency: 'VND'});
+		  	// 	$('.amount-text').text(val);
+			  	var notification_money=val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+				 	$('.amount-text').text(notification_money + $('.currency-select').find(":selected").text() );
 			  }
+			 // var notification_money=val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+			 // $('.amount-text').text(notification_money);
 
 			});
 	}
@@ -768,12 +803,12 @@ function initMap(){
 		if(disResponse != undefined){
 			$("#get-route").show();
 			$("#get-route").text('Update');
-			$("#get-route").removeClass("loading");
+			// $("#get-route").removeClass("loading");
 		}
 	}
 
 	function drawRoutes(){
-		document.getElementById('get-route').className.replace('loading',' ');
+		// document.getElementById('get-route').className.replace('loading',' ');
 		let waypts =[];
 		for(var i=1; i<locats.length; i++)
 	      waypts.push({

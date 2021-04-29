@@ -30,7 +30,7 @@
                     <div class="container-fluid">
                         <div class="row mb-1 pt-0 pb-0">
                             <div class="col-md-12 col-sm-12 col-12" id="tourExists">
-                                <p class="m-0">Bạn đã có tour đi qua các điểm này trước đó. Bạn có thể sử các tour đó ở dưới đây:</p>
+                                <p class="m-0">Bạn đã có tour đi qua các điểm này trước đó. Bạn có thể sửa các tour đó ở dưới đây:</p>
                                 <div class="list_tourExists">
                                     <ul>
                                     </ul>

@@ -19,6 +19,10 @@
         display: block;
     }
     p{margin: 0}
+    th,td{text-align: center;}
+    td.detaillocat_class{
+      text-align: justify;
+    }
   </style>
 @stop
 @section('content')
@@ -50,6 +54,7 @@
                             <th>Tour name</th>
                             <th>Start Location</th>
                             <th>Detail Places</th>
+                            <th>Star</th>
                             <th>Total time(hours)</th>
                         </tr>
                         </thead>
@@ -208,7 +213,8 @@
           "order": [[ 1, 'asc' ]],
           "columnDefs": [
               { className: "id_class", "targets": [ 1 ] },
-              { className: "startlocat_class", "targets": [ 3 ] }
+              { className: "startlocat_class", "targets": [ 3 ] },
+              { className: "detaillocat_class", "targets": [ 4 ] }
             ],
             processing: true,
             serverSide: true,
@@ -220,6 +226,7 @@
                 { data: 'to_name', name: 'to_name' },
                 { data: 'startLocat', name: 'startLocat' },
                 { data: 'detailPlace', name: 'detailPlace' },
+                { data: 'Star', name: 'Star' },
                 { data: 'totalTime', name: 'totalTime' },
                 ]
             });

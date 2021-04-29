@@ -308,7 +308,7 @@ class ShareTourController extends Controller
     // div_1
     public function searchTourTable()
     {
-        $votes_over = ShareTour::where("number_star",">=","4")->get();
+        $votes_over = ShareTour::where("number_star",">=","4")->orderBy('number_star', 'DESC')->get();
         return DataTables::of($votes_over)
             ->addColumn(
                 'stt',
@@ -409,7 +409,7 @@ class ShareTourController extends Controller
     //div_2
     public function searchMostVotes()
     {
-        $votes_over = ShareTour::where("numberReviews",">=","2")->get();
+        $votes_over = ShareTour::where("numberReviews",">=","2")->orderBy('number_star', 'DESC')->get();
         return DataTables::of($votes_over)
             ->addColumn(
                 'stt',
@@ -510,7 +510,7 @@ class ShareTourController extends Controller
     // div_3
     public function searchThisMonth()
     {
-        $votes_over = ShareTour::get();
+        $votes_over = ShareTour::orderBy('number_star', 'DESC')->get();
         foreach ($votes_over as $key => $value) {
             $checkRoute = Route::where("to_id",$value->sh_to_id)->first();
             $month = date("m", strtotime($checkRoute->to_startDay)); 
@@ -620,7 +620,7 @@ class ShareTourController extends Controller
     //div_4
     public function searchForHighTotal()
     {
-        $votes_over = ShareTour::get();
+        $votes_over = ShareTour::orderBy('number_star', 'DESC')->get();
         foreach ($votes_over as $key =>$sharetour) {
             $route = Route::where("to_id",$sharetour->sh_to_id)->first();
             if(intval(Carbon::parse($route->to_endtime)->day) - intval(Carbon::parse($route->to_starttime)->day) == 0)
@@ -726,7 +726,7 @@ class ShareTourController extends Controller
     //max total
     public function searchMaxTotal()
     {
-        $votes_over = ShareTour::get();
+        $votes_over = ShareTour::orderBy('number_star', 'DESC')->get();
         foreach ($votes_over as $key =>$sharetour) {
             $route = Route::where("to_id",$sharetour->sh_to_id)->first();
             $sharetour['minutes'] = Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime));
@@ -832,7 +832,7 @@ class ShareTourController extends Controller
     //min total
     public function searchMinTotal()
     {
-        $votes_over = ShareTour::get();
+        $votes_over = ShareTour::orderBy('number_star', 'DESC')->get();
         foreach ($votes_over as $key =>$sharetour) {
             $route = Route::where("to_id",$sharetour->sh_to_id)->first();
             $sharetour['minutes'] = Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime));
@@ -938,7 +938,7 @@ class ShareTourController extends Controller
     //last month
     public function searchLastMonth()
     {
-        $votes_over = ShareTour::get();
+        $votes_over = ShareTour::orderBy('number_star', 'DESC')->get();
         foreach ($votes_over as $key => $value) {
             $checkRoute = Route::where("to_id",$value->sh_to_id)->first();
             $month = date("m", strtotime($checkRoute->to_startDay)); 
@@ -1048,7 +1048,7 @@ class ShareTourController extends Controller
     // tour you shared
     public function searchTourYouShared()
     {
-        $votes_over = ShareTour::get();
+        $votes_over = ShareTour::orderBy('number_star', 'DESC')->get();
         foreach ($votes_over as $key => $value) {
             $checkRoute = Route::where("to_id",$value->sh_to_id)->first();
             if($checkRoute->to_id_user != Auth::user()->us_id)
@@ -1160,7 +1160,7 @@ class ShareTourController extends Controller
         $monthRequest = $monthYear[1];
         $yearRequest = $monthYear[0];
 
-        $votes_over = ShareTour::get();
+        $votes_over = ShareTour::orderBy('number_star', 'DESC')->get();
         foreach ($votes_over as $key => $value) {
             $checkRoute = Route::where("to_id",$value->sh_to_id)->first();
             $month = date("m", strtotime($checkRoute->to_startDay)); 
@@ -1595,6 +1595,20 @@ class ShareTourController extends Controller
                 }
             )
             ->addColumn(
+                'Star',
+                function ($route) {
+                    $findShare = ShareTour::where("sh_to_id",$route->to_id)->first();
+                    if(empty($findShare))
+                    {
+                        return $route->to_star.' <i class="fas fa-star text-warning"></i>';
+                    }
+                    else
+                    {
+                        return $findShare->number_star.' <i class="fas fa-star text-warning"></i>';
+                    }
+                }
+            )
+            ->addColumn(
                 'totalTime',
                 function ($route) {
                     $start_time = Carbon::parse($route->to_starttime);
@@ -1640,7 +1654,7 @@ class ShareTourController extends Controller
                     return $Detail;
                 }
             )
-            ->rawColumns(['stt','startLocat','detailPlace','totalTime'])
+            ->rawColumns(['stt','startLocat','detailPlace','totalTime','Star'])
             ->make(true);
     }
     public function takeDetailTour(Request $req)

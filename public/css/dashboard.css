@@ -143,8 +143,10 @@ header .slider div{width: 100%;min-height:40rem; }
     padding: 1em 2rem;
     margin-bottom: 2rem;
     padding-top: 0;
+    padding-right: 0;
 }
 .hightly_div_child {
+    display: block;
     overflow: hidden;
     border-radius: 15px;
 }
@@ -345,6 +347,7 @@ ul{
     position: relative;
     padding-top: 1em;
     padding-bottom: 0;
+    padding-right: 3em;
 }
 .big-size:hover{
     background: whitesmoke;
@@ -416,3 +419,8 @@ section{
 
 #personalInfo{font-family: inherit !important;}
 #p_logout{font-family: inherit !important;}
+#detailTour{
+    position: absolute;
+    right: .5em;
+    top: 1em;
+}

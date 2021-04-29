@@ -139,7 +139,7 @@
                     <div class="slide-show-tour">
                         @foreach($shareTour as $value)
                         <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
-                        <div class="hightly_div_child">
+                        <a href="{{route('viewtour',$value->sh_id)}}" class="hightly_div_child">
                             <p class="tourContent">
                                 <span class="nameTour">{{$route->to_name}}</span>
                                 {{$value->number_star}}<i class="fas fa-star text-warning"></i> - {{$value->numberReviews}} votes
@@ -149,7 +149,7 @@
                             @else
                                 <img src="{{asset('imgPlace/empty.png')}}" alt="" title="location with no photo" class="img_open_model{{$value->sh_id}}"/>
                             @endif
-                        </div>
+                        </a>
                         @endforeach
                     </div>
                 </div>
@@ -175,7 +175,7 @@
                                     <span>{{ trans('messages.historyTitle') }}</span>
                                     <br>
                                     <small>{{ trans('messages.routeDetails') }}</small>
-                                    <small>-- Double click to edit the route </small>
+                                    <!-- <small>-- Double click to edit the route </small> -->
                                 </div>
                                 <div id="centent-previous">
                                     <div style="width: 60%">
@@ -230,15 +230,16 @@
                                                      ?>  
                                                     <div>
                                                         <?php $findShare = ShareTour::where("sh_to_id",$value->to_id)->first(); ?>
-                                                        <p class="text-left big-size tour" data-id="{{$value->to_id}}">
+                                                        <p class="text-left big-size tour" data-id="{{$value->to_id}}" title="{{$value->to_name}}">
                                                             <span>
                                                             @if(empty($findShare))
                                                                 {{$value->to_star}} <i class="fas fa-star text-warning"></i> <span class="font-italic">-- No share</span>
                                                             @else
                                                                 {{$findShare->number_star}} <i class="fas fa-star text-warning"></i> <span class="font-italic">-- Shared</span>
                                                             @endif
-                                                             </span>
+                                                            </span>
                                                             {{$value->to_name}}
+                                                            <a href="{{route('user.editTour',$value->to_id)}}" class="btn btn-link btn-sm" id="detailTour">Detail</a>
                                                         </p>
                                                         <div class="detail-tour">
                                                             @foreach($des_1 as $des)
@@ -289,14 +290,7 @@
                 prevArrow: '<button type="button" class="slick-prev"><i class="fas fa-caret-left"></i></button>',
                 nextArrow: '<button type="button" class="slick-next"><i class="fas fa-caret-right"></i></button>',
             });
-            @foreach($shareTour as $value)
-                $(".img_open_model{{$value->sh_id}}").dblclick(function(){
-                    location.replace("{{route('viewtour',$value->sh_id)}}");
-                });
-                $(".img_open_model{{$value->sh_id}}").parent().dblclick(function(){
-                    location.replace("{{route('viewtour',$value->sh_id)}}");
-                });
-            @endforeach
+
             $(".searchTour").click(function(){
                 location.replace("{{route('searchTour')}}");
             });
