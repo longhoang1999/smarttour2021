@@ -21,7 +21,7 @@
 			height: 100%;
 		}
 		.footer{
-			margin-top: 3rem;
+			margin-top: 4rem;
 		}
 		body:after {
 		   content: none;
@@ -46,7 +46,7 @@
 								</svg>
 							</span>
 							<div id="myDropdown" class="dropdown-content">
-								<a href="#" id="btn-rating">Rating</a>
+								<a href="#" id="btn-rating" data-toggle="modal" data-target="#modalRating">Rating</a>
 								<a href="#home">Home</a>
 								<a href="#about">About</a>
 								<a href="#contact">Contact</a>
@@ -97,10 +97,11 @@
 						</div>
 						<div class="right" style="padding-left: 1em;">
 							<label><b>Chi phí:</b></label><br>	
-							<div class="ui labeled input">
-							  <label for="amount" class="ui label">$</label>
-							  <input type="number" value="100000"  id="amount">
+							<div class="ui right labeled input">
+							  <input type="number" value="100000" min="50000" id="amount">
+							  <div class="ui basic label">VND</div>
 							</div>
+							<b><span class="amount-text"></span></b>
 						</div>
 					</div>
 						
@@ -379,7 +380,6 @@
 					$("input[name=checkmodal]").val("modal")
 				    var form = $(this);
 				    var url = form.attr('action');
-				    console.log(form.serialize());
 				    $.ajax({
 			           type: "POST",
 			           url: url,
@@ -570,6 +570,7 @@
 	<!-- /end long viết -->
 	<script type="text/javascript">
 		$(document).ready(function(){
+
 			$("#show-timeline .close_timeline").click(function(){
 				$(".translate-none").hide();
 				$('#control-column').width('30%');
@@ -739,6 +740,28 @@ function initMap(){
 		// $('.dur-dis').click(updateRoute);
 		$('#startDate').change(updateRoute);
 		$('#time-end').change(updateRoute);
+
+		$('#amount').keydown(e=>{
+				let val = ''+$('#amount').val();
+				if(e.key !== 'Backspace')
+				 val+=e.key
+				else 
+					val = val.substring(0,val.length - 1);
+
+			  if(['1','2','3','4','5', '6', '7', '8', '9', '0','Backspace'].indexOf(e.key) === -1)
+			    e.preventDefault();		
+			  else {
+			  	if(val == ''){
+					$('.amount-text').text(''); 
+			  		return;
+			  	} 
+			  	let id = $('#time-cost-picker').attr('value')
+			  	idToData(id,'setCost',parseInt(val));
+		  		val = parseInt(val).toLocaleString(undefined,{ style: 'currency', currency: 'VND'});
+		  		$('.amount-text').text(val);
+			  }
+
+			});
 	}
 
 	function updateRoute(){
@@ -757,8 +780,8 @@ function initMap(){
 	        location: locats[i],
 	        stopover: true
 	      });
-			
 		reorderlist();
+		console.log(locationID);
 		directionsService.route({
 				origin: locats[0],
 				destination: locats[locats.length-1],
@@ -768,7 +791,6 @@ function initMap(){
 	}
 
 	function customDirectionsRenderer(response, status) {
-
 		var bounds = new google.maps.LatLngBounds();
 		var legs = response.routes[0].legs;
 		for(var i=0;i<polylines.length;i++){
@@ -851,13 +873,14 @@ function initMap(){
   		else 
   			locationIndex = i + 1;
   		let curtime = converttime(converttime(tl[i]) + Object(locationdata.get(tmpLocationID[i])).de_duration);
-
-  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s timeline__list--type${locationIndex}"><div class="timeline__picture" style="background-image: url('{{asset("imgs/7.jpg")}}')"><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${Object(locationdata.get(tmpLocationID[i])).de_name }</a></div><div class="star-votes"><span id="star"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star-half-alt text-warning"></i></span><span id="votes">2.290 votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${Object(locationdata.get(tmpLocationID[i])).de_name }" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon"><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
-  			`<div class="animated fadeInLeft delay-2s" style="position: relative; line-height: 40px;">${curtime} - ${tl[i+1]}</div>`);
+  		let tral_duration =curtime +' - '+ tl[i+1];
+  		if(i == tl.length-1) tral_duration = 'End the tour at '+curtime;
+  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s timeline__list--type${locationIndex}"><div class="timeline__picture" style="background-image: url('{{asset("imgs/7.jpg")}}')"><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${Object(locationdata.get(tmpLocationID[i])).de_name }</a></div><div class="star-votes"><span id="star"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star-half-alt text-warning"></i></span><span id="votes">2.290 votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${Object(locationdata.get(tmpLocationID[i])).de_name }" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon"><div class="parent-icon"><i class="fas fa-hotel"></i><span>Hotel</span></div><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
+  			`<div class="timeline__traveltime animated fadeInLeft delay-2s" ><span>${tral_duration}</span></div>`);
     }
-    
+    // <div><i class="fas fa-route"></i></div>
     $('.chip').css('display','inline-block');
-    // findres();
+    $('.timeline__list').last().addClass('timeline__list-lastelement');
   }
 
   function findres(){
@@ -947,10 +970,14 @@ function initMap(){
 			return;
 		}
 		$("#time-cost-picker").show();
+		$("#time-cost-picker").attr('value',id);
 		$("#get-route-pannel").show();
 		$('#duration-picker').val(parseInt(Object(locationdata.get(id)).de_duration));
 		$('#duration-picker').trigger('change');
 		$('#location-dur-cost').text(Object(locationdata.get(id)).de_name);
+		$('#amount').val(Object(locationdata.get(id)).de_cost);
+		let money =idToData(id,'cost').toLocaleString(undefined,{ style: 'currency', currency: 'VND'});
+		$('.amount-text').text(money);
 	}
 
 	function processAddToList(){
@@ -1117,6 +1144,7 @@ function initMap(){
 			locats = [];
 			locationID.forEach(ele=>{
 				locats.push(Object(locationdata.get(ele)).location);
+				console.log(locationdata.get(ele))
 			})
 			if(Object.entries(startLocat).length)  locats.unshift(idToData(startLocat.id,'LatLng'));
 			if($('#is-back').is(':checked')) locats.push(locats[0]);
@@ -1146,6 +1174,15 @@ function initMap(){
 						locationdata.get(id).de_duration = parseInt(value); 
 					}
 					break;
+				case 'setCost':
+					if (locationdata.has(id)){
+						locationdata.get(id).de_cost = parseInt(value); 
+					}
+					break;
+				case 'cost':
+					return Object(locationdata.get(id)).de_cost;
+					break;
+
 				default: break;
 			}
 	}
@@ -1216,6 +1253,7 @@ function initMap(){
 								de_name: response[0].formatted_address,
 								location: response[0].geometry.location.toJSON(),
 								de_duration: 3600,
+								de_cost: 100000,
 								de_default: 1
 							}
 
@@ -1393,22 +1431,27 @@ function initMap(){
 		listItems.forEach(ele=>{
 			let id = ele.attributes.value.value;
 			let color = ele.style.backgroundColor;
-			let icon = {
-				path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
-				fillColor: color,
-				fillOpacity: 1,
-				strokeColor: 'white',
-				strokeWeight: 3,
-				scale: 1.4,
-			},
-			label = {
-				text: Object(locationdata.get(id)).de_name,
-				color: color,
-				fontWeight: 'bold',
-				fontSize: '20px' 
-			};
-			Object(markerArray.get(id)).setIcon(icon);
-			Object(markerArray.get(id)).setLabel(label);
+			if(markerArray.has(id)){
+				let icon = {
+					path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
+					fillColor: color,
+					fillOpacity: 1,
+					strokeColor: 'white',
+					strokeWeight: 3,
+					scale: 1.4,
+				},
+				label = {
+					text: Object(locationdata.get(id)).de_name,
+					color: color,
+					fontWeight: 'bold',
+					fontSize: '20px' 
+				};
+				Object(markerArray.get(id)).setIcon(icon);
+				Object(markerArray.get(id)).setLabel(label);
+			} else {
+				addMarkers(id,color);
+			}
+						
 		})
 		
 	}
@@ -1755,6 +1798,7 @@ function initMap(){
 							else 
 								to_comback = "0";
 							let to_optimized = '1';
+
 							let tmparr = [];
 							let val = {};
 							if(Object.entries(startLocat).length){
@@ -1764,6 +1808,7 @@ function initMap(){
 								val.de_name = Object(locationdata.get(startLocat.id)).de_name;
 								val.de_duration = Object(locationdata.get(startLocat.id)).de_duration;
 								val.de_default = Object(locationdata.get(startLocat.id)).de_default;
+								val.de_cost = Object(locationdata.get(startLocat.id)).de_cost;
 							}
 
 							locationID.forEach(ele=>{
@@ -1774,7 +1819,8 @@ function initMap(){
 									location: coor.lat+"|"+coor.lng,
 									de_name: Object(locationdata.get(ele)).de_name,
 									de_duration: Object(locationdata.get(ele)).de_duration,
-									de_default: Object(locationdata.get(ele)).de_default
+									de_default: Object(locationdata.get(ele)).de_default,
+									de_cost: Object(locationdata.get(ele)).de_cost
 								})
 							})
 							// information of share
@@ -1814,6 +1860,44 @@ function initMap(){
 							});
 						}
 					}));
+					$('#enterNameTour').on('show.bs.modal', function (event) {
+			            let _token = $('meta[name="csrf-token"]').attr('content');
+			            let $url_path = '{!! url('/') !!}';
+			            let routeDuplicate = $url_path+"/duplicate";
+			            let tmparr = [];
+			            locationID.forEach(ele=>{
+							let coor = Object(locationdata.get(ele)).location;
+							let tmp = ele+'';
+							tmparr.push({
+								de_id: tmp,
+								location: coor.lat+"|"+coor.lng,
+								de_name: Object(locationdata.get(ele)).de_name,
+								de_duration: Object(locationdata.get(ele)).de_duration,
+								de_default: Object(locationdata.get(ele)).de_default,
+								de_cost: Object(locationdata.get(ele)).de_cost
+							})
+						})
+			            $.ajax({
+			                  url:routeDuplicate,
+			                  method:"POST",
+			                  data:{_token:_token,tmparr:tmparr},
+			                  success:function(data){ 
+			                  	if(data.length != 0)
+			                  	{
+			                  		$("#tourExists").show();
+			                  		$(".list_tourExists ul").empty();
+			                  		data.forEach(function(item, index){
+			                  			let routeEditTourExists = $url_path+'/editTourUser/'+item.idTour;
+			                  			$(".list_tourExists ul").append('<li><a href="'+routeEditTourExists+'">'+item.nameTour+'</a></li>');
+			                  		});
+			                  	}
+			                    else
+			                    {
+			                    	$("#tourExists").hide();
+			                    }
+			                }
+			            });
+			        });
 				@else
 					//edit tour
 					$('#upload_form').on('submit',(function(e) {
@@ -1826,7 +1910,7 @@ function initMap(){
 						else
 						{
 							let $url_path = '{!! url('/') !!}';
-							let routeId = {{$id}};
+              				let routeId = {{$id}};
 							let routeDetail=$url_path+"/editRoute/"+routeId;
 							// information of tour
 							let a = $('#startDate').val().replace(/am|pm/gi,':00');
@@ -1834,20 +1918,12 @@ function initMap(){
 							let timeStart = b;
 							let timeEnd = converttime(timeline[timeline.length-1]) - converttime(timeline[0]);
 							let to_comback;
-							if ($('#is-back').is(':checked'))
-							{
-									to_comback = "1";
-							}
-							else to_comback = "0";
+							if ($('#is-back').is(':checked')) 
+								to_comback = "1";
+							else 
+								to_comback = "0";
 							let to_optimized = '1';
-							// if ($('#is-opt').is(':checked') == false)
-							// {
-							// 	to_optimized="0";
-							// }
-							// else{
-							// 	// to_optimized = $('input[name="durdis"]').val();
-								// to_optimized = '1';
-							// }
+
 							let tmparr = [];
 							let val = {};
 							if(Object.entries(startLocat).length){
@@ -1857,6 +1933,7 @@ function initMap(){
 								val.de_name = Object(locationdata.get(startLocat.id)).de_name;
 								val.de_duration = Object(locationdata.get(startLocat.id)).de_duration;
 								val.de_default = Object(locationdata.get(startLocat.id)).de_default;
+								val.de_cost = Object(locationdata.get(startLocat.id)).de_cost;
 							}
 
 							locationID.forEach(ele=>{
@@ -1867,13 +1944,15 @@ function initMap(){
 									location: coor.lat+"|"+coor.lng,
 									de_name: Object(locationdata.get(ele)).de_name,
 									de_duration: Object(locationdata.get(ele)).de_duration,
-									de_default: Object(locationdata.get(ele)).de_default
+									de_default: Object(locationdata.get(ele)).de_default,
+									de_cost: Object(locationdata.get(ele)).de_cost
 								})
 							})
 							// information of share
 							let star = $('input[name="star"]').val();
 							let options = $('input[name="options"]:checked').val();
 							let recommend = $('textarea[name="recommend"]').val();
+							
 							$.ajaxSetup({
 					            headers: {
 					                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1884,6 +1963,7 @@ function initMap(){
 								method:"post",
 								data:{tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,val:val,nameTour:nameTour,star:star,options:options,recommend:recommend},
 								success:function(data){ 
+									//console.log(data);
 									if(data[0] == "no")
 										location.replace(data[3])
 									else if(data[0] == "yes")
@@ -1983,92 +2063,104 @@ function initMap(){
 							for ($i=0; $i < count($pieces_2)-1; $i++) {
 									$array = Arr::add($array, $i ,$pieces_2[$i]);
 							}
-					 ?>
+					?>
+					$('#get-route-pannel').show();
+					$('.chip').css('display','inline-block');
 					@foreach($array as $value)
-						locatsList.push('{{$value}}');
+						locationID.push('{{$value}}');
 					@endforeach
-						$("#time input").val('{{date("d-m-Y h:i", strtotime($to_starttime))}}');
-					@if($to_endtime != "")
-						$("#time-end input").val('{{date("d-m-Y h:i", strtotime($to_endtime))}}');
-					@endif
+					$("#time input").val();
+					document.querySelector('#startDate')._flatpickr.set("minDate","");
+					document.querySelector('#startDate')._flatpickr.setDate([new Date('{{date("m/d/Y h:i", strtotime($to_starttime))}}')]);
+
 					@if($to_comback == '1')
 						$('#is-back').prop('checked',true);
 					@endif
-					@if($to_optimized == '1')
-						//$('.dur-dis[value="1"]').prop('checked', true);
-					@elseif($to_optimized == '2')
-						//$('.dur-dis[value="2"]').prop('checked', true);
-					@else
-						$('#is-opt').prop('checked',false);
-					@endif
+					// @if($to_optimized == '1')
+					// 	//$('.dur-dis[value="1"]').prop('checked', true);
+					// @elseif($to_optimized == '2')
+					// 	//$('.dur-dis[value="2"]').prop('checked', true);
+					// @else
+					// 	$('#is-opt').prop('checked',false);
+					// @endif
+					isopt = 0;
 					<?php $dem = 0 ?>
 					@if(count($latlng_new) > 0)
 							@foreach($latlng_new as $value)
-									locationsdata.push({
+									locationdata.set("{{$placeId_new[$dem]}}",{
+											de_cost: {{$cost_new[$dem]}},
+											de_description: "{{$description_new[$dem]}}",
+											de_duration: {{$duration_new[$dem]}},
+											de_link: "",
 											de_name: "{{$dename_new[$dem]}}",
 											location: <?php echo json_encode($latlng_new[$dem]); ?>,
-											place_id: "{{$placeId_new[$dem]}}",
-											de_duration: {{$duration_new[$dem]}},
-											de_default: 1
+											de_default: 1,
 									})
-									newPlaceIdArr.push("{{$placeId_new[$dem]}}")
+									// newPlaceIdArr.push("{{$placeId_new[$dem]}}")
 									<?php $dem++; ?>
 							@endforeach
 					@endif
 					// $array  $duration_new
-					// gán lại duration cho locationsdata
-					@for($i=0 ; $i < count($array) ; $i++)
-						for(let a=0; a<locationsdata.length; a++)
-						{
-							if ("{{$array[$i]}}" == locationsdata[a].place_id){
-								locationsdata[a].de_duration = parseInt("{{$duration_new[$i]}}"); 
-								break;
-							}
-						}
-					@endfor
-
-					console.log(locationsdata);
+					// gán lại duration vs cost cho locationdata
+					setTimeout(function(){ 
+						@for($i = 0 ; $i < count($array) ; $i++)
+							Object(locationdata.get("{{$array[$i]}}")).de_duration = parseInt("{{$duration_new[$i]}}");
+							Object(locationdata.get("{{$array[$i]}}")).de_cost = parseInt("{{$cost_new[$i]}}");
+						@endfor
+					}, 500);
+			
 					@if( $latlng_start != "")
-						locationsdata.push({
+						locationdata.set("{{$placeId_start}}",{
+								de_cost: {{$cost_start}},
+								de_description: {{$description_start}},
+								de_duration: {{$duration_start}},
+								de_link: "",
 								de_name: "{{$dename_start}}",
 								location: <?php echo json_encode($latlng_start); ?>,
-								place_id: "{{$placeId_start}}",
-								de_duration: {{$duration_start}},
-								de_default: 1
+								de_default: 1,
 						})
-						newPlaceIdArr.push("{{$placeId_start}}")
+						locationID.unshift();
+						// newPlaceIdArr.push("{{$placeId_start}}")
 					@endif
 					// startlocat
 					@if( $latlng_start != "")
-						startlocat = "{{$placeId_start}}";
-						staMarker = new google.maps.Marker({
+						startLocat.id = "{{$placeId_start}}";
+						startLocat.marker = new google.maps.Marker({
 									label: idToData(startlocat,'text'),
+									map:map,
+									position: idToData(startlocat,'LatLng')
 						});
-						staMarker.setMap(map);
-						staMarker.setPosition(idToData(startlocat,'LatLng'));
-						$('#your-start').show();
-						document.getElementById('your-start').innerHTML= idToData(startlocat,'text')+'<span id="your-start-close">×</span>';
-						$('#your-start-close').click(()=>{
-								//staMarker.setMap(null);
-								staMarker = undefined;
-								$('.map-marker-label').remove();
-								$('#your-start').hide();
-								startlocat = undefined;
-								updateRoute();
-						})
-						customLabel(staMarker);
+						customLabel(staMarker,startLocat.id);
+						$('#start-locat').html(`<span>Click trên bản đồ hoặc chọn trong ô tìm kiếm</span><div id="close-start" style="display: inline-flex; position: absolute; right: 0.5em;"><i class="fas fa-times " ></i></div>`);
+						$('#start-locat').attr('data-start',2);
+						$('#start-locat').attr('data-clsclk',0);
+						closeStart();
+						// $('#your-start').show();
+						// document.getElementById('your-start').innerHTML= idToData(startlocat,'text')+'<span id="your-start-close">×</span>';
+						// $('#your-start-close').click(()=>{
+						// 		//staMarker.setMap(null);
+						// 		staMarker = undefined;
+						// 		$('.map-marker-label').remove();
+						// 		$('#your-start').hide();
+						// 		startlocat = undefined;
+						// 		updateRoute();
+						// })
+						
 					@endif
 					// drawRoutes
 					@if($to_des != "")
-						idToData(null,'LatLngArr');
-						drawRoutes();
-						$("#tab-timeline").attr('style','display: block');
-						$("#get-route").hide();
+						
+						setTimeout(function(){ 
+						    idToData(null,'LatLngArr');
+							drawRoutes();
+							$(".chip").attr('style','display: inline-block');
+							$("#get-route").hide();
+						}, 1000);
 						// setTimeout(function(){ 
 						//   $("#get-route").click();
 						// }, 200);
-						let height = ($('.list-item').length+1) * 45 +5;
-						$('#container-height').css('height',height+'px');
+						// let height = ($('.list-item').length+1) * 45 +5;
+						// $('#container-height').css('height',height+'px');
 					@endif
 				@endif
 	})();

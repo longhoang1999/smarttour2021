@@ -1,3 +1,20 @@
+<style>
+    #tourExists{
+        background: #ea7373;
+        color: white;
+        padding: .5rem 2rem;
+        border-radius: .5rem;
+        margin-bottom: 1.2em;
+        display: none;
+    }
+    #tourExists ul{margin: 0;list-style: circle}
+    div#tourExists a {
+        color: #ffffff;
+        font-weight: 500;
+        text-decoration: underline;
+        font-style: italic;
+    }
+</style>    
 <!-- map -->
 <div class="modal fade" id="enterNameTour" tabindex="-1" role="dialog" aria-labelledby="enterNameTourLabel" aria-hidden="true">
     <div class="modal-dialog modal-dm">
@@ -12,6 +29,14 @@
                 <div class="modal-body pb-3">
                     <div class="container-fluid">
                         <div class="row mb-1 pt-0 pb-0">
+                            <div class="col-md-12 col-sm-12 col-12" id="tourExists">
+                                <p class="m-0">Bạn đã có tour đi qua các điểm này trước đó. Bạn có thể sử các tour đó ở dưới đây:</p>
+                                <div class="list_tourExists">
+                                    <ul>
+                                    </ul>
+                                </div>
+                                <p class="font-italic">Hoặc bạn muốn tạo một tour mới:</p>
+                            </div>
                             <div class="col-md-12 col-sm-12 col-12">
                                 <p class="font-weight-bold font-italic mb-0">{{ trans('messages.NameTour') }}</p>
                             </div>

@@ -23,30 +23,32 @@ class MapDirectController {
         {
             $de = Language::where("language","vn")->get();
             foreach ($de as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_cost')->where("de_remove",$value->des_id)->first();
                 $value["de_id"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_link"] = $des->de_link;
                 $value["de_duration"] = $des->de_duration;
+                $value["de_cost"] = $des->de_cost;
             }
         }
         else
         {
             $de = Language::where("language","en")->get();
             foreach ($de as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_cost')->where("de_remove",$value->des_id)->first();
                 $value["de_id"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_link"] = $des->de_link;
                 $value["de_duration"] = $des->de_duration;
+                $value["de_cost"] = $des->de_cost;
             }
         }
 		$destination  = array();
 		foreach ($de as $value) {
 			$latlng = array('lat' => $value->de_lat, 'lng' => $value->de_lng);
-			$tmp  = (object) array('de_name' => $value->de_name,'location' =>$latlng,'de_duration'=>$value->de_duration,'de_link'=>$value->de_link,'de_description'=>$value->de_description);
+			$tmp  = (object) array('de_name' => $value->de_name,'location' =>$latlng,'de_duration'=>$value->de_duration,'de_link'=>$value->de_link,'de_description'=>$value->de_description,'de_cost'=>$value->de_cost);
 			$des =   [$value->de_id,$tmp];
 			array_push($destination,$des);
 		}

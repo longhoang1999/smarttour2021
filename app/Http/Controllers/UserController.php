@@ -307,8 +307,28 @@ class UserController extends Controller
         $feedback->save();
         return back()->with("notification","You have submitted your response successfully");
     }
+    public function duplicate(Request $req)
+    {
+        $allTour = Route::where("to_id_user",Auth::user()->us_id)->get();
+        $desId = "";
+        $i=0;
+        foreach ($req->tmparr as  $value) {
+            $desId = $desId.$value['de_id']."|";
+            $i++;
+        }
+        $duplicateTour = array();
+        foreach ($allTour as $tour) {
+            if($tour->to_des == $desId)
+            {
+                $infoTour = (object) array('idTour' => $tour->to_id,'nameTour' => $tour->to_name);
+                array_push($duplicateTour, $infoTour);
+            }
+        }
+        return $duplicateTour;
+    }
     public function saveTour(Request $req)
     {
+
         if(!empty($req->val))
         {
             $des = new Destination();
@@ -319,6 +339,7 @@ class UserController extends Controller
             $des->de_lng = $latlng[1];
             $des->de_name = $req->val['de_name'];
             $des->de_duration = $req->val['de_duration'];
+            $des->de_cost = $req->val['de_cost'];
             $des->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
             $des->de_default = "1";
             // plus
@@ -345,6 +366,7 @@ class UserController extends Controller
         $i=0;
         $desId = "";
         $duration = "";
+        $cost = "";
         foreach ($req->tmparr as  $value) {
             if(empty($value['de_default']))
             {
@@ -361,6 +383,7 @@ class UserController extends Controller
                 $desNewPlace->de_lng = $latlng[1];
                 $desNewPlace->de_name = $value['de_name'];
                 $desNewPlace->de_duration = $value['de_duration'];
+                $desNewPlace->de_cost = $value['de_cost'];
                 $desNewPlace->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
                 $desNewPlace->de_default = "1";
                 // plus
@@ -374,9 +397,11 @@ class UserController extends Controller
                 $i++;
             }
             $duration = $duration.$value['de_duration']."|";
+            $cost = $cost.$value['de_cost']."|";
         }
         $route->to_des = $desId;
         $route->to_duration = $duration;
+        $route->to_cost = $cost;
         $route->to_star = $req->star;
         $route->save();
         //share tour

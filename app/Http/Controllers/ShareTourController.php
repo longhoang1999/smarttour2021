@@ -207,6 +207,7 @@ class ShareTourController extends Controller
         $dename_new = array();
         $placeId_new = array();
         $duration_new = array();
+        $cost_new = array();
         $j = 0;
         foreach ($array as $value) {
             $desCheck = Destination::where("de_remove",$value)->first();
@@ -223,6 +224,11 @@ class ShareTourController extends Controller
         for ($i=0; $i < count($pieces_3)-1; $i++) {
             $duration_new = Arr::add($duration_new, $i ,$pieces_3[$i]);
         }
+        //cost
+        $pieces_4 = explode("|", $route->to_cost);
+        for ($i=0; $i < count($pieces_4)-1; $i++) {
+            $cost_new = Arr::add($cost_new, $i ,$pieces_4[$i]);
+        }
         if($route->to_startLocat != "")        
         {
             $des = Destination::where("de_remove",$route->to_startLocat)->first();
@@ -230,6 +236,7 @@ class ShareTourController extends Controller
             $dename_start = $des->de_name;
             $placeId_start =  $des->de_remove;
             $duration_start = $des->de_duration;
+            $cost_start = $des->de_cost;
         }
         else
         {
@@ -237,6 +244,7 @@ class ShareTourController extends Controller
             $dename_start = "";
             $placeId_start =  "";
             $duration_start = "";
+            $cost_start = "";
         }
         //$user = Auth::user();
         return view('recommend_tour',[
@@ -252,9 +260,11 @@ class ShareTourController extends Controller
             'dename_new' => $dename_new,
             'placeId_new' => $placeId_new,
             'duration_new' => $duration_new,
+            'cost_new' => $cost_new,
             'latlng_start' => $latlng_start,
             'dename_start' => $dename_start,
             'placeId_start' => $placeId_start,
+            'cost_start' => $cost_start,
             'duration_start' => $duration_start,
             'justview' => 'justview'
         ]);

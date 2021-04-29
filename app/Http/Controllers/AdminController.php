@@ -1808,6 +1808,8 @@ class AdminController extends Controller
                 $dename_new = array();
                 $placeId_new = array();
                 $duration_new = array();
+                $description_new = array();
+                $cost_new = array();
                 $j = 0;
                 foreach ($array as $value) {
                     $desCheck = Destination::where("de_remove",$value)->first();
@@ -1817,6 +1819,14 @@ class AdminController extends Controller
                         $latlng_new = Arr::add($latlng_new, $j ,$latlng);
                         $dename_new = Arr::add($dename_new, $j ,$desCheck->de_name);
                         $placeId_new = Arr::add($placeId_new, $j ,$desCheck->de_remove);
+                        if($desCheck->de_description != "")
+                        {
+                            $description_new = Arr::add($description_new, $j ,$desCheck->de_description);
+                        }
+                        else
+                        {
+                            $description_new = Arr::add($description_new, $j ,"");
+                        }
                         $j++;
                     }
                 }
@@ -1826,6 +1836,11 @@ class AdminController extends Controller
                 for ($i=0; $i < count($pieces_3)-1; $i++) {
                     $duration_new = Arr::add($duration_new, $i ,$pieces_3[$i]);
                 }
+                //cost
+                $pieces_4 = explode("|", $route->to_cost);
+                for ($i=0; $i < count($pieces_4)-1; $i++) {
+                    $cost_new = Arr::add($cost_new, $i ,$pieces_4[$i]);
+                }
                 if($route->to_startLocat != "")        
                 {
                     $des = Destination::where("de_remove",$route->to_startLocat)->first();
@@ -1833,6 +1848,8 @@ class AdminController extends Controller
                     $dename_start = $des->de_name;
                     $placeId_start =  $des->de_remove;
                     $duration_start = $des->de_duration;
+                    $description_start = $des->de_description;
+                    $cost_start = $des->de_cost;
                 }
                 else
                 {
@@ -1840,6 +1857,8 @@ class AdminController extends Controller
                     $dename_start = "";
                     $placeId_start =  "";
                     $duration_start = "";
+                    $cost_start = "";
+                    $description_start = "";
                 }
                 return view('recommend_tour',[
                     'startLocat'=>$route->to_startLocat,
@@ -1852,11 +1871,15 @@ class AdminController extends Controller
                     'latlng_new' => $latlng_new,
                     'dename_new' => $dename_new,
                     'placeId_new' => $placeId_new,
+                    'description_new' => $description_new,
                     'duration_new' => $duration_new,
+                    'cost_new' => $cost_new,
                     'latlng_start' => $latlng_start,
                     'dename_start' => $dename_start,
                     'placeId_start' => $placeId_start,
                     'duration_start' => $duration_start,
+                    'cost_start' => $cost_start,
+                    'description_start' => $description_start
                 ]);
             }
             else
@@ -1928,6 +1951,7 @@ class AdminController extends Controller
             $des->de_lng = $latlng[1];
             $des->de_name = $req->val['de_name'];
             $des->de_duration = $req->val['de_duration'];
+            $des->de_cost = $req->val['de_cost'];
             $des->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
             $des->de_default = "1";
             $findType = TypePlace::select("id")->where("status","1")->first();
@@ -1957,6 +1981,7 @@ class AdminController extends Controller
         $i=0;
         $desId = "";
         $duration = "";
+        $cost = "";
         foreach ($req->tmparr as  $value) {
             if(empty($value['de_default']))
             {
@@ -1973,6 +1998,7 @@ class AdminController extends Controller
                 $desNewPlace->de_lng = $latlng[1];
                 $desNewPlace->de_name = $value['de_name'];
                 $desNewPlace->de_duration = $value['de_duration'];
+                $desNewPlace->de_cost = $value['de_cost'];
                 $desNewPlace->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
                 $desNewPlace->de_default = "1";
                 // plus
@@ -1986,9 +2012,11 @@ class AdminController extends Controller
                 $i++;
             }
             $duration = $duration.$value['de_duration']."|";
+            $cost = $cost.$value['de_cost']."|";
         }
         $new_route->to_des = $desId;
         $new_route->to_duration = $duration;
+        $new_route->to_cost = $cost;
         $new_route->to_star = $req->star;
         $new_route->save();
         //share tour

@@ -306,15 +306,7 @@ div#search-title label {
   top: 51%;
 }
 
-.header,.footer {
-    background: white;
-    width: 100%;
-    text-align: center;
-    min-height: 3em;
-    line-height: 3em;
-    font-weight: bold;
-    border: 1px solid black;
-}
+
 #link-img{
   display: block;
 }
@@ -496,11 +488,25 @@ div#search-title label {
   display: none;
 }
 
+.left{
+  width: 49%;
+  margin-right: 1%;
+}
+#amount::-webkit-outer-spin-button,
+#amount::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#amount{
+    -moz-appearance:textfield;
+}
+
 .jdp-input {
     border-radius: .28571429rem;
-    padding: 0 3px;
     border: 1px solid rgba(34, 36, 38, .15);
     cursor: text;
+    padding: 0 3px;
 }
 
 .jdp-input.disabled {
@@ -512,8 +518,12 @@ div#search-title label {
     display: inline-block;
     line-height: 1;
     text-align: center;
-    padding: 5px 10px;
+    padding:10px;
     font-size: 18px;
+    width: 32%;
+}
+.jdp-block span{
+  margin-bottom: 0.1em;
 }
 
 .jdp-label {
@@ -609,6 +619,19 @@ div#search-title label {
   border: 2px solid #9251ac;
 }
 
+.timeline__traveltime{
+  position: relative;
+  line-height: 40px;
+  color: rgba(0, 0, 0, 0.37);
+  font-style: italic;
+  font-family: Lato,sans-serif;
+  font-weight: 500;
+}
+
+.timeline__traveltime div{
+  
+}
+
 .timeline__list--type0:before {
   background: #811411;
   border-color: #811411;
@@ -670,12 +693,16 @@ div#search-title label {
   border-color: #5bc0de;
 }
 
-
 .timeline__list--type5 .timeline__list__content__title a {
   color: #5bc0de;
 }
-.timeline__list:last-child:after {
+.timeline__list--type5:after {
+  background: #5bc0de;
+}
+
+.timeline__list-lastelement:after {
   content: none;
+  background: none !important;
 }
 
 @media (max-width: 786px) {
@@ -703,7 +730,7 @@ div#search-title label {
     width: 50px;
     color: black;
     cursor: pointer;
-    margin-right: 2rem;
+    margin-right: 1rem;
 }
 
 .parent-icon svg {
@@ -719,4 +746,12 @@ div#search-title label {
     bottom: -25px;
     left: 50%;
     transform: translateX(-50%);
+}
+.amount-text{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+  display: block;
+  max-width: 95px;
 }

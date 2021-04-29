@@ -97,7 +97,8 @@ Route::group(
 		Route::get("showtourhistory","ShareTourController@showtourhistory")->name('share.showtourhistory');
 		Route::post("takeDetailTour","ShareTourController@takeDetailTour")->name('share.takeDetailTour');
 		Route::post("voteUser","ShareTourController@voteUser")->name('share.voteUser');
-		
+		// check tour duplicate
+		Route::post("duplicate","UserController@duplicate")->name("user.duplicate");
 	}
 );
 Route::group(
