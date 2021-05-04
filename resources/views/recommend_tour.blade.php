@@ -757,8 +757,9 @@ function initMap(){
 				$('#time-cost-picker').hide();
 				// e.currentTarget.className.replace("loading", "");
 				// e.currentTarget.className += ' loading';
-				if((Object.entries(startLocat).length && locationID.length == 1) || (!Object.entries(startLocat).length && locationID.length ==2))
+				if((Object.entries(startLocat).length && locationID.length == 1) || (!Object.entries(startLocat).length && locationID.length ==2)){
 					drawRoutes();
+				}
 				else
 					processanddrawrouteclient();
 			}
@@ -816,7 +817,6 @@ function initMap(){
 	        stopover: true
 	      });
 		reorderlist();
-		console.log(locationID);
 		directionsService.route({
 				origin: locats[0],
 				destination: locats[locats.length-1],
@@ -894,7 +894,6 @@ function initMap(){
   }
 
   function settimeline(tl){
-  	console.log(tl);
   	$(".timeline").children().remove();
   	let tmpLocationID = locationID;
   	if(Object.entries(startLocat).length)
@@ -987,13 +986,12 @@ function initMap(){
 					$('#start-locat').attr('data-clsclk',1);
 					$('#start-locat span').text('Click chuột vào đây để chọn điểm bắt đầu');
 					$('#start-locat').attr('data-start',0);
-					let id = document.getElementById('close-start').getAttribute('value');
-					if(id != '') {
-						locationID.splice(locationID.indexOf($(e.currentTarget).val()),1);
+					let id = startLocat.id;
+					if(id != undefined) {
 						startLocat.marker.setMap(null);
 						$(`.map-marker-label[value="${id}"]`).remove();
+						startLocat = {};
 					}
-					console.log(e.currentTarget)
 					$(e.currentTarget).remove();
 				})
 	}
@@ -1027,7 +1025,7 @@ function initMap(){
 		$('#search-input').val('').trigger('change');
 		$('#search-input').select2();
 		if($('#start-locat').attr('data-start') === '1'){
-			$('#start-locat').html(`<span>${text}</span><div id="close-start" value="${id}" style="display: inline-flex; position: absolute; right: 0.5em;" ><i class="fas fa-times " ></i></div>`);
+			$('#start-locat').html(`<span>${text}</span><div id="close-start" style="display: inline-flex; position: absolute; right: 0.5em;" ><i class="fas fa-times " ></i></div>`);
 			closeStart();
 			$('#start-locat').attr('data-start',2);
 
@@ -1179,7 +1177,6 @@ function initMap(){
 			locats = [];
 			locationID.forEach(ele=>{
 				locats.push(Object(locationdata.get(ele)).location);
-				console.log(locationdata.get(ele))
 			})
 			if(Object.entries(startLocat).length)  locats.unshift(idToData(startLocat.id,'LatLng'));
 			if($('#is-back').is(':checked')) locats.push(locats[0]);
@@ -1480,7 +1477,7 @@ function initMap(){
 					color: color,
 					fontWeight: 'bold',
 					fontSize: '20px' 
-				};
+				}; 
 				Object(markerArray.get(id)).setIcon(icon);
 				Object(markerArray.get(id)).setLabel(label);
 			} else {
@@ -1493,18 +1490,26 @@ function initMap(){
 
 	function processanddrawrouteclient(){ 
 			let Arr = [];
+			allRoutePosible = [];
 			//Check if recent results can reuse (Don't have to call api agian)
 			if(!recentLocatID.length){
 				recentLocatID = locationID;
 				if(Object.entries(startLocat).length) 
 					recentStart = startLocat.id 
+				else 
+					recentStart = undefined;
 	 		} else {
 	 			// check nếu mảng mới kể cả điểm bắt đầu có ở mảng cũ chưa
-				if(locationID.every(e=>recentLocatID.includes(e))||(locationID.every(e=>recentLocatID.includes(e))&&(recentStart == startLocat.id || locationID.indexOf(recentStart)>=0))){
-
+	 			let tmpLocationID = locationID.splice();
+	 			if(Object.entries(startLocat).length) tmpLocationID.unshift(startLocat.id);
+	 			let tmprecentLocatID = recentLocatID.splice();
+	 			if(recentStart != undefined) tmprecentLocatID.unshift(recentStart); 
+				// if(locationID.every(e=>recentLocatID.includes(e))||(locationID.every(e=>recentLocatID.includes(e))&&(recentStart == startLocat.id || locationID.indexOf(recentStart)>=0))){
+				if(tmpLocationID.every(e=>tmprecentLocatID.includes(e))){ 
 					locationID.forEach(ele => Arr.push(
-						(locationID.every(e=>recentLocatID.includes(e))&&(recentStart == startLocat.id || locationID.indexOf(recentStart)>=0))?(recentLocatID.indexOf(ele)+1):recentLocatID.indexOf(ele)
+						(locationID.every(e=>recentLocatID.includes(e))&&(recentStart == startLocat.id || locationID.indexOf(recentStart)>=0))?(recentLocatID.indexOf(ele)+1):(recentLocatID.indexOf(ele))
 					));
+
 					//Nếu điêm bắt đầu có tồn tại gán điểm bắt đầu = 0 nếu bằng điểm bắt đầu mới else gán bằng chi số trong mảng
 					if(locationID.every(e=>recentLocatID.includes(e))&&(recentStart == startLocat.id || locationID.indexOf(recentStart)>=0)){
 						if(recentStart == startLocat.id) 
@@ -1569,6 +1574,12 @@ function initMap(){
 			value: 0
 		}
 		let total = 0;
+		let tmp = [];
+		let tmpArr = [];
+		if(recentLocatID.length) 
+			tmpArr = recentLocatID;
+		else 
+			tmpArr = locationID;
 		// Optimize by duration with the start location
 		if(!isAuDel && isopt == 1 && Object.entries(startLocat).length){
 		// Loop all route posible to calculate the best way
@@ -1632,10 +1643,10 @@ function initMap(){
 			for(var i = 0 ;i<allRoutePosible.length; i++){
 				var A = allRoutePosible[i];
 				for(var j = 0 ;j<A.length-1; j++){
-					total+= Object(locationdata.get(locationID[A[j]])).de_duration;
+					total+= Object(locationdata.get(tmpArr[A[j]])).de_duration;
 					total+= disresponse.rows[A[j]].elements[A[j+1]].duration.value;
 				}
-				total+= Object(locationdata.get(locationID[A[A.length-1]])).de_duration;
+				total+= Object(locationdata.get(tmpArr[A[A.length-1]])).de_duration;
 
 				if($('#is-back').is(':checked')) 
 						total += disresponse.rows[A[A.length-1]].elements[0].duration.value;
@@ -1673,12 +1684,7 @@ function initMap(){
 				total = 0;
 			}
 		}
-		let tmp = [];
-		let tmpArr = [];
-		if(recentLocatID.length) 
-			tmpArr = recentLocatID;
-		else 
-			tmpArr = locationID;
+		
 		if(isAuDel && Object.entries(startLocat).length){
 			let allRouteOptimize =[];
 			for(var i = 0 ;i<allRoutePosible.length; i++){
@@ -1777,7 +1783,7 @@ function initMap(){
 		for(var i=0;i<routeOptimized.route.length;i++)
 			tmp[i] = (Object.entries(startLocat).length)?tmpArr[routeOptimized.route[i]-1]:tmpArr[routeOptimized.route[i]];
 		locationID = tmp;
-		
+
 		timeCheck(routeOptimized.value);	
 		
 	}

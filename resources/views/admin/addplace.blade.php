@@ -7,13 +7,12 @@
 	<link rel="stylesheet" href="{{asset('css/adminDashboard.css')}}">
   <link rel="stylesheet" href="{{asset('css/addPlace.css')}}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" />
-  <style type="text/css">
-    textarea{min-height: 15rem;}
-    .contents{color: white}
-    .img-fluid{
-      width: 100%;
-      max-height: 20rem !important;
-    }
+  <style>
+    @if(Session::has('website_language') && Session::get('website_language') == "vi")
+      .div_addfor_en{display: none;}
+    @else
+      .div_addfor_vn{display: none;}
+    @endif
   </style>
 @stop
 @section('content')
@@ -175,45 +174,47 @@
                 <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('admin.languageShown') }}</span> 
                 <select id="selectLang_add" class="form-control" style="width: 40%">
                   <option hidden="">--Your choice--</option>
-                  <option selected="" value="en">{{ trans('admin.EN') }}</option>
-                  <option value="vn">{{ trans('admin.VN') }}</option>
+                  @if(Session::has('website_language') && Session::get('website_language') == "vi")
+                    <option value="en">{{ trans('admin.EN') }}</option>
+                    <option selected="" value="vn">{{ trans('admin.VN') }}</option>
+                  @else
+                    <option selected="" value="en">{{ trans('admin.EN') }}</option>
+                    <option value="vn">{{ trans('admin.VN') }}</option>
+                  @endif
                 </select>
               </div>
-              <style>
-                .div_addfor_vn{display: none;}
-              </style>
               <!-- Place Name -->
               <div class="div_addfor_en">
                 <div class="form-group">
                   <label for="inputName">{{ trans('admin.NamePlace') }} - for English</label>
-                  <input type="text" class="form-control" id="inputName" placeholder="{{ trans('admin.NamePlace') }}" required="" name="de_name_en">
-                </div>
-                <!-- Des -->
-                <div class="form-group">
-                  <label for="inputDescription">{{ trans('admin.Description') }} - for English</label>
-                  <textarea class="form-control" id="inputDescription" required="" placeholder="{{ trans('admin.Description') }}" name="de_description_en"></textarea>
+                  <input type="text" class="form-control" id="inputName" placeholder="{{ trans('admin.NamePlace') }}" name="de_name_en">
                 </div>
                 <!-- Short -->
                 <div class="form-group">
                   <label for="inputShortdes">{{ trans('admin.Shortdes') }} - for English</label>
-                  <textarea class="form-control" id="inputShortdes" required="" placeholder="{{ trans('admin.Shortdes') }}" name="de_shortdes_en"></textarea>
+                  <textarea class="form-control" id="inputShortdes" placeholder="{{ trans('admin.Shortdes') }}" name="de_shortdes_en"></textarea>
+                </div>
+                <!-- Des -->
+                <div class="form-group">
+                  <label for="inputDescription">{{ trans('admin.Description') }} - for English</label>
+                  <textarea class="form-control" id="inputDescription" placeholder="{{ trans('admin.Description') }}" name="de_description_en"></textarea>
                 </div>
               </div>
               <!-- vn -->
               <div class="div_addfor_vn">
                 <div class="form-group">
                   <label for="inputName">{{ trans('admin.NamePlace') }} - for Tiếng Việt</label>
-                  <input type="text" class="form-control" id="inputName_vn" placeholder="{{ trans('admin.NamePlace') }}" required="" name="de_name_vn">
-                </div>
-                <!-- Des -->
-                <div class="form-group">
-                  <label for="inputDescription">{{ trans('admin.Description') }} - for Tiếng Việt</label>
-                  <textarea class="form-control" id="inputDescription_vn" required="" placeholder="{{ trans('admin.Description') }}" name="de_description_vn"></textarea>
+                  <input type="text" class="form-control" id="inputName_vn" placeholder="{{ trans('admin.NamePlace') }}" name="de_name_vn">
                 </div>
                 <!-- Short -->
                 <div class="form-group">
                   <label for="inputShortdes">{{ trans('admin.Shortdes') }} - for Tiếng Việt</label>
-                  <textarea class="form-control" id="inputShortdes_vn" required="" placeholder="{{ trans('admin.Shortdes') }}" name="de_shortdes_vn"></textarea>
+                  <textarea class="form-control" id="inputShortdes_vn" placeholder="{{ trans('admin.Shortdes') }}" name="de_shortdes_vn"></textarea>
+                </div>
+                <!-- Des -->
+                <div class="form-group">
+                  <label for="inputDescription">{{ trans('admin.Description') }} - for Tiếng Việt</label>
+                  <textarea class="form-control" id="inputDescription_vn" placeholder="{{ trans('admin.Description') }}" name="de_description_vn"></textarea>
                 </div>
               </div>
 
@@ -556,7 +557,17 @@
                     url: url,
                      // data: form.serialize(),
                     data: formData,
-                    success: getDuration,
+                    success: function(data){
+                      if(data == "false")
+                      {
+                        alert("you miss the name of the place");
+                      }
+                      else
+                      {
+                        console.log(data);
+                        // getDuration(data);
+                      }
+                    },
                     cache: false,
                     contentType: false,
                     processData: false 

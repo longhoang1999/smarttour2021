@@ -119,8 +119,13 @@
 				        		</div>
 				        		<div class="col-md-6 col-sm-6 col-6 mb-3">
 				        			<select name="lang" id="select-language"class="form-control" >
-				        				<option value="vi">{{ trans('admin.VN') }}</option>
+			        				@if(Session::has('website_language') && Session::get('website_language') == "vi")
+				        				<option selected="true" value="vi">{{ trans('admin.VN') }}</option>
 				        				<option value="en">{{ trans('admin.EN') }}</option>
+				        			@else
+				        				<option value="vi">{{ trans('admin.VN') }}</option>
+				        				<option selected="true" value="en">{{ trans('admin.EN') }}</option>
+				        			@endif
 				        			</select>
 				        		</div>
 				        	</div>
@@ -242,6 +247,7 @@
 	@yield('footer-js')
 	<script type="text/javascript">
 		$(document).ready(function(){
+			$("#select-language option[selected='true']").css("background","#e9ecef");
 			$("#a_settingModal").click(function(){
 				$("#modalSetting").modal("show");
 			});

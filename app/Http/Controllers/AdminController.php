@@ -442,60 +442,74 @@ class AdminController extends Controller
     }
     public function postaddPlace(Request $req)
     {
-    	$randomletter = substr(str_shuffle("abcdefghijklmnopqrstuvwxyz0123456789QAZXSWEDCRFVTGBYHNUJMIKLPO"), 0, 27);
-    	$destination = new Destination();
-        $destination->de_name = $req->de_name_vn;
-        $destination->de_description = $req->de_description_vn;
-        $destination->de_shortdes = $req->de_shortdes_vn;
-    	$destination->de_id = $randomletter;
-    	$destination->de_remove = $randomletter;
-    	$destination->de_name = $req->de_name_vn;
-    	$destination->de_lat = $req->de_lat;
-    	$destination->de_lng = $req->de_lng;
-        $destination->de_type = $req->typePlace;
-        //total Place
-        $typeplace = TypePlace::where("id",$req->typePlace)->first();
-        $typeplace->totalPlace = intval($typeplace->totalPlace) + 1;
-        $typeplace->save();
-        $destination->de_default = "0";
-        $destination->de_map = $req->de_map;
-    	$destination->de_link = $req->de_link;
-    	$destination->de_duration = floatval($req->de_duration)*60*60;
-        //img
-        if($req->file('de_image'))
+    	if(is_null($req->de_name_en) && is_null($req->de_name_vn))
         {
-            $image = $req->file('de_image');
-            //File::delete(public_path($user->us_image));
-            $picName = time().'.'.$image->getClientOriginalExtension();
-            $image->move(public_path('imgPlace/'), $picName);
-            $destination->de_image='imgPlace/'.$picName;
+            return $status = "false";
         }
-    	$destination->save();
+        else
+        {
+            $namePlaceVN = $req->de_name_vn;
+            $namePlaceEN = $req->de_name_en;
+            if($req->de_name_vn == "")
+                $namePlaceVN = $req->de_name_en;
+            if($req->de_name_en == "")
+                $namePlaceEN = $req->de_name_vn;
+            
+            $randomletter = substr(str_shuffle("abcdefghijklmnopqrstuvwxyz0123456789QAZXSWEDCRFVTGBYHNUJMIKLPO"), 0, 27);
+        	$destination = new Destination();
+            $destination->de_name = $namePlaceVN;
+            $destination->de_description = $req->de_description_vn;
+            $destination->de_shortdes = $req->de_shortdes_vn;
+        	$destination->de_id = $randomletter;
+        	$destination->de_remove = $randomletter;
+        	$destination->de_name = $namePlaceVN;
+        	$destination->de_lat = $req->de_lat;
+        	$destination->de_lng = $req->de_lng;
+            $destination->de_type = $req->typePlace;
+            //total Place
+            $typeplace = TypePlace::where("id",$req->typePlace)->first();
+            $typeplace->totalPlace = intval($typeplace->totalPlace) + 1;
+            $typeplace->save();
+            $destination->de_default = "0";
+            $destination->de_map = $req->de_map;
+        	$destination->de_link = $req->de_link;
+        	$destination->de_duration = floatval($req->de_duration)*60*60;
+            //img
+            if($req->file('de_image'))
+            {
+                $image = $req->file('de_image');
+                //File::delete(public_path($user->us_image));
+                $picName = time().'.'.$image->getClientOriginalExtension();
+                $image->move(public_path('imgPlace/'), $picName);
+                $destination->de_image='imgPlace/'.$picName;
+            }
+        	$destination->save();
 
-        $lang_vn = new Language();
-        $lang_vn->des_id = $randomletter;
-        $lang_vn->language = "vn";
-        $lang_vn->de_name = $req->de_name_vn;
-        $lang_vn->de_description = $req->de_description_vn;
-        $lang_vn->de_shortdes = $req->de_shortdes_vn;
-        $lang_vn->save();
-        
-        $lang_en = new Language();
-        $lang_en->des_id = $randomletter;
-        $lang_en->language = "en";
-        $lang_en->de_name = $req->de_name_en;
-        $lang_en->de_description = $req->de_description_en;
-        $lang_en->de_shortdes = $req->de_shortdes_en;
-        $lang_en->save();
-        $array = array();
-        $array = Arr::add($array, 0 ,$randomletter);
-        $allDes = Destination::where('de_id','<>',$randomletter)->get();
-        $i=1;
-        foreach ($allDes as $value) {
-            $array = Arr::add($array, $i ,$value->de_remove);
-            $i++;
+            $lang_vn = new Language();
+            $lang_vn->des_id = $randomletter;
+            $lang_vn->language = "vn";
+            $lang_vn->de_name = $namePlaceVN;
+            $lang_vn->de_description = $req->de_description_vn;
+            $lang_vn->de_shortdes = $req->de_shortdes_vn;
+            $lang_vn->save();
+            
+            $lang_en = new Language();
+            $lang_en->des_id = $randomletter;
+            $lang_en->language = "en";
+            $lang_en->de_name = $namePlaceEN;
+            $lang_en->de_description = $req->de_description_en;
+            $lang_en->de_shortdes = $req->de_shortdes_en;
+            $lang_en->save();
+            $array = array();
+            $array = Arr::add($array, 0 ,$randomletter);
+            $allDes = Destination::where('de_id','<>',$randomletter)->get();
+            $i=1;
+            foreach ($allDes as $value) {
+                $array = Arr::add($array, $i ,$value->de_remove);
+                $i++;
+            }
+        	return $array;
         }
-    	return $array;
     }
     public function getLatLng(Request $req)
     {
