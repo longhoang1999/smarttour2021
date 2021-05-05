@@ -141,4 +141,5 @@ return [
     'Createdby' => 'Created by',
     'inforDescribe' => 'information describing the location',
     'otherInfo' => 'information about coordinates and other information',
+    'cost' => 'Cost',
 ];

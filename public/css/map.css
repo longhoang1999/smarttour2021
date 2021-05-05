@@ -490,7 +490,6 @@ div#search-title label {
 }
 
 .left{
-  display: flex;
   margin-bottom: 1em;
 }
 
@@ -504,18 +503,29 @@ div#search-title label {
 }
 
 .right{
-  display: flex;
+  position: relative;
+}
+.currency{
+  position: absolute;
+  width: 21%;
+  top: -8px;
+  left: 20%;
+  border: 0;
 }
 
 .right > div{
   width: 65% ;
-  position: relative;
+  margin-top: 1em
+}
+.amount-text{
+  color: red;
 }
 
-.right > div > span{
-  position: absolute;
-  left: 0;
-  top: 3em;
+.text_money{
+  font-size: 14px;
+  margin-left: 1em;
+  font-style: italic;
+  margin-top: .4em;
 }
 
 .right > span{
@@ -630,14 +640,14 @@ div#search-title label {
   color: #525f7f;
   font-family: "Open Sans", sans-serif;
 }
-.timeline__list:after {
+.timeline__list-after {
   content: "";
-  width: 2px;
+  width: 4px;
   height: 100%;
   background: #9251ac;
   position: absolute;
   top: 52%;
-  left: -3.5rem;
+  left: -3.6rem;
   z-index: -1;
 }
 .timeline__list:before {
@@ -670,8 +680,20 @@ div#search-title label {
   background: #811411;
   border-color: #811411;
 }
-.timeline__list--type0:after {
+.timeline__list--type0-after {
   background: #811411;
+}
+
+.timeline__list--type0-after {
+  background: #811411;
+}
+
+.timeline__list--type0-after:hover {
+  box-shadow: 0px 2px 10px 1.5px #811411;
+}
+
+.timeline__list--active0-after {
+  box-shadow: 0px 2px 10px 1.5px #811411;
 }
 
 .timeline__list--type0 .timeline__list__content__title a {
@@ -682,8 +704,16 @@ div#search-title label {
   background: #418bca;
   border-color: #418bca;
 }
-.timeline__list--type1:after {
+.timeline__list--type1-after {
   background: #418bca;
+}
+
+.timeline__list--type1-after:hover {
+  box-shadow: 0px 2px 10px 1.5px #418bca;
+}
+
+.timeline__list--active1-after {
+  box-shadow: 0px 2px 10px 1.5px #418bca;
 }
 
 .timeline__list--type1 .timeline__list__content__title a {
@@ -693,9 +723,17 @@ div#search-title label {
   background: #00bc8c;
   border-color: #00bc8c;
 }
-.timeline__list--type2:after {
+.timeline__list--type2-after {
   background: #00bc8c;
 }
+
+.timeline__list--active2-after {
+  box-shadow: 0px 2px 10px 1.5px #00bc8c;
+}
+.timeline__list--type2-after:hover {
+  box-shadow: 0px 2px 10px 1.5px #00bc8c;
+}
+
 .timeline__list--type2 .timeline__list__content__title a {
   color: #00bc8c;
 }
@@ -704,8 +742,16 @@ div#search-title label {
   background: #f89a14;
   border-color: #f89a14;
 }
-.timeline__list--type3:after {
+.timeline__list--type3-after {
   background: #f89a14;
+}
+
+.timeline__list--type-after:hover {
+  box-shadow: 0px 2px 10px 1.5px #f89a14;
+}
+
+.timeline__list--active3-after {
+  box-shadow: 0px 2px 10px 1.5px #f89a14;
 }
 
 .timeline__list--type3 .timeline__list__content__title a {
@@ -715,8 +761,16 @@ div#search-title label {
   background: #ef6f6c;
   border-color: #ef6f6c;
 }
-.timeline__list--type4:after {
+.timeline__list--type4-after {
   background: #ef6f6c;
+}
+
+.timeline__list--type4-after:hover {
+  box-shadow: 0px 2px 10px 1.5px #ef6f6c;
+}
+
+.timeline__list--active4-after {
+  box-shadow: 0px 2px 10px 1.5px #ef6f6c;
 }
 
 .timeline__list--type4 .timeline__list__content__title a {
@@ -730,11 +784,19 @@ div#search-title label {
 .timeline__list--type5 .timeline__list__content__title a {
   color: #5bc0de;
 }
-.timeline__list--type5:after {
+.timeline__list--type5-after {
   background: #5bc0de;
 }
 
-.timeline__list-lastelement:after {
+.timeline__list--type5-after:hover {
+  box-shadow: 0px 2px 10px 1.5px #5bc0de;
+}
+
+.timeline__list--active5-after {
+  box-shadow: 0px 2px 10px 1.5px #5bc0de;
+}
+
+.timeline__list-lastelement > .timeline__list-after {
   content: none;
   background: none !important;
 }
@@ -786,6 +848,6 @@ div#search-title label {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: bold;
-  display: block;
   max-width: 95px;
 }
+

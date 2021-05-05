@@ -133,6 +133,13 @@
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-justify pb-3" id="duration"></p>
             </div>
+            <!-- cost -->
+            <div class="col-md-3 col-sm-6 col-6">
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.cost') }}</p>
+            </div>
+            <div class="col-md-9 col-sm-6 col-6">
+              <p class="text-justify pb-3" id="cost"></p>
+            </div>
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.linkmap') }}</p>
             </div>
@@ -277,6 +284,7 @@
                   $("#description").html(data[3]);
                   $("#shortdes").html(data[4]);
                   $("#duration").html(data[5]);
+                  $("#cost").html(data[10].toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
                   if(data[6] != null)
                   {
                     $("#link_vr").html("Link here");

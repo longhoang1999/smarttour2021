@@ -14,99 +14,208 @@
         text-decoration: underline;
         font-style: italic;
     }
+    .content_modal{
+        display: flex;
+    }
+    .content_modal_left{
+        width: 50%;
+        margin: 1rem 1rem;
+    }
+    #upload_form{
+        width: 50%;
+    }
+    .content_modal_left{
+        height: 35em;
+        overflow-y: auto;
+    }
+    #upload_form{
+        height: 35em;
+        overflow-y: auto;
+        margin-right: 1em;
+    }
+    .left_content{
+        width: 30%;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .detail_tour{
+        display: flex;
+        height: 10em;
+        margin-bottom: 1em;
+    }
+    .left_content img{
+        width: 100%;
+        height: 100%;
+    }
+    .right_content{
+        padding: .5em;
+        padding-left: 1.5em;
+        width: 70%;
+    }
 </style>    
 <!-- map -->
 <div class="modal fade" id="enterNameTour" tabindex="-1" role="dialog" aria-labelledby="enterNameTourLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dm">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="enterNameTourLabel">{{ trans('messages.Enternametour') }}</h5>
+                <h5 class="modal-title" id="enterNameTourLabel">Save tour</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" id="upload_form" enctype="multipart/form-data" action="">
-                <div class="modal-body pb-3">
-                    <div class="container-fluid">
-                        <div class="row mb-1 pt-0 pb-0">
-                            <div class="col-md-12 col-sm-12 col-12" id="tourExists">
-                                <p class="m-0">Bạn đã có tour đi qua các điểm này trước đó. Bạn có thể sửa các tour đó ở dưới đây:</p>
-                                <div class="list_tourExists">
-                                    <ul>
-                                    </ul>
-                                </div>
-                                <p class="font-italic">Hoặc bạn muốn tạo một tour mới:</p>
-                            </div>
-                            <div class="col-md-12 col-sm-12 col-12">
-                                <p class="font-weight-bold font-italic mb-0">{{ trans('messages.NameTour') }}</p>
-                            </div>
-                            <div class="col-md-12 col-sm-12 col-12 mb-2">
-                                <input type="text" class="form-control" placeholder="{{ trans('messages.NameTour') }}" name="nameTour">
-                            </div>
-                            <div class="col-md-12 col-sm-12 col-12">
-                                <p class="font-weight-bold font-italic mb-1">Rating for your tour</p>
-                            </div>
-                            <div class="col-md-12 col-sm-12 col-12 mb-2" id="div_Starrank_tour">
-                                <i class="fas fa-star star_1 fa-2x star1"  data-value="1" style="cursor: pointer;"></i>
-                                <i class="fas fa-star star_2 fa-2x star2" data-value="2" style="cursor: pointer;"></i>
-                                <i class="fas fa-star star_3 fa-2x star3" data-value="3" style="cursor: pointer;"></i>
-                                <i class="fas fa-star star_4 fa-2x star4"  data-value="4" style="cursor: pointer;"></i>
-                                <i class="fas fa-star star_5 fa-2x star5" data-value="5" style="cursor: pointer;"></i>
-                            </div>
-                            <input type="hidden" id="star_Share" name="star" value="0">
-                            <div class="col-md-12 col-sm-12 col-12">
-                                <p class="font-weight-bold font-italic mb-1">Would you like to share the tour?</p>
-                            </div>
-                            <div class="col-md-12 col-sm-12 col-12 mb-2">
-                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                  <label class="btn btn-primary" id="noPublic">
-                                    <input type="radio" value="no" name="options" id="option2" autocomplete="off" checked> No
-                                  </label>
-                                  <label class="btn btn-primary active" id="yesPublic">
-                                    <input type="radio" value="yes" name="options" id="option1" autocomplete="off"> Yes
-                                  </label>
-                                </div>
-                            </div>
+            <div class="content_modal">
+                <div class="content_modal_left">
+                    <p>Detail tour</p>
+                    <div class="detail_tour">
+                        <div class="left_content">
+                            <a data-fancybox="gallery" 
+                            href="{{asset('imgPlace/1615649892.jpg')}}">
+                                <img class="img-fluid rounded mb-5" style="width:100%;" src="{{asset('imgPlace/1615649892.jpg')}}" alt="">
+                            </a>
                         </div>
-                        <hr>
-                        <div class="row inforForShare pt-0 pb-0">
-                            <div class="col-md-12 col-sm-12 col-12">
-                                <p class="font-weight-bold font-italic mb-1">Recommend your tour</p>
-                            </div>
-                            <div class="col-md-12 col-sm-12 col-12">
-                                <textarea class="form-control" placeholder="Recommend" name="recommend"></textarea>
-                            </div>
-                            <!-- old image -->
-                            <div class="col-md-12 col-sm-12 col-12" id="oldImageTitle">
-                                <p class="font-weight-bold font-italic mb-1">Old image</p>
-                            </div>
-                            <div class="col-md-12 col-sm-12 col-12" id="oldImageContent">
-                            </div>
-                            <!-- /oldimage -->
-                            <div class="col-md-12 col-sm-12 col-12">
-                                <p class="font-weight-bold font-italic mb-1">Photo to represent your tour</p>
-                            </div>
-                            <div class="col-md-12 col-sm-12 col-12 mb-3">
-                                <div class="Update_img_tour">Upload Image</div>
-                                <p class="name_file_tour font-weight-bold font-italic"></p>
-                                <input accept="image/*" type="file" name="image_tour" class="form-control" id="img_input_Rank">
-                            </div>
+                        <div class="right_content">
+                            <p class="mb-1">Place name: <span class="font-italic text-danger">Chùa một cột</span></p>
+                            <p class="mb-1">Duration: <span class="font-italic text-danger">0d 4h 30m</span></p>
+                            <p class="mb-1">Cost: <span class="font-italic text-danger">20 USD</span></p>
+                        </div>
+                    </div>
+                    <div class="detail_tour">
+                        <div class="left_content">
+                            <a data-fancybox="gallery" 
+                            href="{{asset('imgPlace/1615649892.jpg')}}">
+                                <img class="img-fluid rounded mb-5" style="width:100%;" src="{{asset('imgPlace/1615649892.jpg')}}" alt="">
+                            </a>
+                        </div>
+                        <div class="right_content">
+                            <p class="mb-1">Place name: <span class="font-italic text-danger">Chùa một cột</span></p>
+                            <p class="mb-1">Duration: <span class="font-italic text-danger">0d 4h 30m</span></p>
+                            <p class="mb-1">Cost: <span class="font-italic text-danger">20 USD</span></p>
+                        </div>
+                    </div>
+                    <div class="detail_tour">
+                        <div class="left_content">
+                            <a data-fancybox="gallery" 
+                            href="{{asset('imgPlace/1615649892.jpg')}}">
+                                <img class="img-fluid rounded mb-5" style="width:100%;" src="{{asset('imgPlace/1615649892.jpg')}}" alt="">
+                            </a>
+                        </div>
+                        <div class="right_content">
+                            <p class="mb-1">Place name: <span class="font-italic text-danger">Chùa một cột</span></p>
+                            <p class="mb-1">Duration: <span class="font-italic text-danger">0d 4h 30m</span></p>
+                            <p class="mb-1">Cost: <span class="font-italic text-danger">20 USD</span></p>
+                        </div>
+                    </div>
+                    <div class="detail_tour">
+                        <div class="left_content">
+                            <a data-fancybox="gallery" 
+                            href="{{asset('imgPlace/1615649892.jpg')}}">
+                                <img class="img-fluid rounded mb-5" style="width:100%;" src="{{asset('imgPlace/1615649892.jpg')}}" alt="">
+                            </a>
+                        </div>
+                        <div class="right_content">
+                            <p class="mb-1">Place name: <span class="font-italic text-danger">Chùa một cột</span></p>
+                            <p class="mb-1">Duration: <span class="font-italic text-danger">0d 4h 30m</span></p>
+                            <p class="mb-1">Cost: <span class="font-italic text-danger">20 USD</span></p>
+                        </div>
+                    </div>
+                    <div class="detail_tour">
+                        <div class="left_content">
+                            <a data-fancybox="gallery" 
+                            href="{{asset('imgPlace/1615649892.jpg')}}">
+                                <img class="img-fluid rounded mb-5" style="width:100%;" src="{{asset('imgPlace/1615649892.jpg')}}" alt="">
+                            </a>
+                        </div>
+                        <div class="right_content">
+                            <p class="mb-1">Place name: <span class="font-italic text-danger">Chùa một cột</span></p>
+                            <p class="mb-1">Duration: <span class="font-italic text-danger">0d 4h 30m</span></p>
+                            <p class="mb-1">Cost: <span class="font-italic text-danger">20 USD</span></p>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer p-2 pl-5 pr-5">
-                    <button type="submit" class="btn btn-primary" id="btnSaveNameTour">
-                        @if(!isset($to_des))
-                            {{ trans('messages.SaveTour') }}
-                        @else
-                            {{ trans('messages.EditTour') }}
-                        @endif
-                    </button>
-                    <!-- @if(!isset($to_des))
-                        <button type="button" class="btn btn-success" id="btnSaveShareTour">Save and share the tour</button>
-                    @endif -->
-                </div>
-            </form>
+                <form method="post" id="upload_form" enctype="multipart/form-data" action="">
+                    <div class="modal-body pb-3">
+                        <div class="container-fluid">
+                            <div class="row mb-1 pt-0 pb-0">
+                                <div class="col-md-12 col-sm-12 col-12" id="tourExists">
+                                    <p class="m-0">Bạn đã có tour đi qua các điểm này trước đó. Bạn có thể sửa các tour đó ở dưới đây:</p>
+                                    <div class="list_tourExists">
+                                        <ul>
+                                        </ul>
+                                    </div>
+                                    <p class="font-italic">Hoặc bạn muốn tạo một tour mới:</p>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-12">
+                                    <p class="font-weight-bold font-italic mb-0">{{ trans('messages.NameTour') }}</p>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-12 mb-2">
+                                    <input type="text" class="form-control" placeholder="{{ trans('messages.NameTour') }}" name="nameTour">
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-12">
+                                    <p class="font-weight-bold font-italic mb-1">Rating for your tour</p>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-12 mb-2" id="div_Starrank_tour">
+                                    <i class="fas fa-star star_1 fa-2x star1"  data-value="1" style="cursor: pointer;"></i>
+                                    <i class="fas fa-star star_2 fa-2x star2" data-value="2" style="cursor: pointer;"></i>
+                                    <i class="fas fa-star star_3 fa-2x star3" data-value="3" style="cursor: pointer;"></i>
+                                    <i class="fas fa-star star_4 fa-2x star4"  data-value="4" style="cursor: pointer;"></i>
+                                    <i class="fas fa-star star_5 fa-2x star5" data-value="5" style="cursor: pointer;"></i>
+                                </div>
+                                <input type="hidden" id="star_Share" name="star" value="0">
+                                <div class="col-md-12 col-sm-12 col-12">
+                                    <p class="font-weight-bold font-italic mb-1">Would you like to share the tour?</p>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-12 mb-2">
+                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                      <label class="btn btn-primary" id="noPublic">
+                                        <input type="radio" value="no" name="options" id="option2" autocomplete="off" checked> No
+                                      </label>
+                                      <label class="btn btn-primary active" id="yesPublic">
+                                        <input type="radio" value="yes" name="options" id="option1" autocomplete="off"> Yes
+                                      </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row inforForShare pt-0 pb-0">
+                                <div class="col-md-12 col-sm-12 col-12">
+                                    <p class="font-weight-bold font-italic mb-1">Recommend your tour</p>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-12">
+                                    <textarea class="form-control" placeholder="Recommend" name="recommend"></textarea>
+                                </div>
+                                <!-- old image -->
+                                <div class="col-md-12 col-sm-12 col-12" id="oldImageTitle">
+                                    <p class="font-weight-bold font-italic mb-1">Old image</p>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-12" id="oldImageContent">
+                                </div>
+                                <!-- /oldimage -->
+                                <div class="col-md-12 col-sm-12 col-12">
+                                    <p class="font-weight-bold font-italic mb-1">Photo to represent your tour</p>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-12 mb-3">
+                                    <div class="Update_img_tour">Upload Image</div>
+                                    <p class="name_file_tour font-weight-bold font-italic"></p>
+                                    <input accept="image/*" type="file" name="image_tour" class="form-control" id="img_input_Rank">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer p-2 pl-5 pr-5">
+                        <button type="submit" class="btn btn-primary" id="btnSaveNameTour">
+                            @if(!isset($to_des))
+                                {{ trans('messages.SaveTour') }}
+                            @else
+                                {{ trans('messages.EditTour') }}
+                            @endif
+                        </button>
+                        <!-- @if(!isset($to_des))
+                            <button type="button" class="btn btn-success" id="btnSaveShareTour">Save and share the tour</button>
+                        @endif -->
+                    </div>
+                </form>
+            </div>
+            
         </div>
     </div>
 </div>

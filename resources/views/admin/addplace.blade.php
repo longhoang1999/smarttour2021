@@ -75,58 +75,75 @@
       <div class="modal-body">
         <div class="container-fluid">
           <div class="row">
+            <!-- name place -->
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.NamePlace') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-justify pb-3" id="placeName"></p>
             </div>
+            <!-- type place -->
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.typeOfPlace') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6 text-justify" id="placeType">
             </div>
+            <!-- image -->
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Image') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6" id="placeImage">
             </div>
+            <!-- lng -->
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Longitude') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-justify pb-3" id="longitude"></p>
             </div>
+            <!-- lat -->
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Latitude') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-justify pb-3" id="latitude"></p>
             </div>
+            <!-- des -->
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Description') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-justify pb-3" id="description"></p>
             </div>
+            <!-- short -->
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Shortdes') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-justify pb-3" id="shortdes"></p>
             </div>
+            <!-- duration -->
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.Duration') }} ({{ trans('admin.hours') }})</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6">
               <p class="text-justify pb-3" id="duration"></p>
             </div>
+            <!-- cost -->
+            <div class="col-md-3 col-sm-6 col-6">
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.cost') }}</p>
+            </div>
+            <div class="col-md-9 col-sm-6 col-6">
+              <p class="text-justify pb-3" id="cost"></p>
+            </div>
+            <!-- link map -->
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.linkmap') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6 text-justify">
               <a href="#" class="pb-3" id="link" target="_blank">{{ trans('admin.Linkhere') }}</a>
             </div>
+            <!-- link vr -->
             <div class="col-md-3 col-sm-6 col-6">
               <p class="font-weight-bold text-left pb-3">{{ trans('admin.linkVR') }}</p>
             </div>
@@ -245,6 +262,27 @@
                 <label for="inputDuration">{{ trans('admin.avgTime') }} ({{ trans('admin.hours') }})</label>
                 <input type="number" class="form-control" id="inputDuration" placeholder="{{ trans('admin.avgTime') }}" required="" name="de_duration" step="0.1">
               </div>
+              <!-- cost -->
+              <div class="form-group">
+                <label for="inputCost">
+                  Cost
+                  <span class="show_yourCost"> -Bạn đã nhập: <span class="show_money"></span></span>
+                </label>
+                <div class="enterCost_block">
+                  <select name="currency" class="form-control" id="selectCurrency">
+                    @if(Session::has('website_language') && Session::get('website_language') == "vi")
+                      <option selected="true" value="VNĐ">VNĐ</option>
+                      <option value="USD">USD</option>
+                    @else
+                      <option value="VNĐ">VNĐ</option>
+                      <option selected="true" value="USD">USD</option>
+                    @endif
+                  </select>
+                  <input type="number" class="form-control" id="inputCost" placeholder="Enter Cost" required="" name="de_cost" step="10">
+                </div>
+              </div>
+              <!-- cost -->
+
               <div class="form-group">
                 <label for="googleLink">{{ trans('admin.linkmap') }}</label>
                 <input type="text" class="form-control" id="googleLink" readonly="" required="" name="de_map">
@@ -261,11 +299,34 @@
 @stop
 @section('footer-js')
 	<!-- datatable -->
-  	<script type="text/javascript" src="{{ asset('datatables/js/jquery.dataTables.js') }}" ></script>
+  	<script type="text/javascript" src="{{ asset('datatables/js/jquery.dataTables.js') }}" ></script>  
   	<script type="text/javascript" src="{{ asset('datatables/js/dataTables.bootstrap4.js') }}" ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
+        // format money
+        $("#inputCost").keyup(function(){
+          if($(this).val() == "")
+          {
+            $(".show_yourCost").hide();
+          }
+          else
+          {
+            $(".show_money").text($(this).val().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") +" "+$("#selectCurrency").val());
+            $(".show_yourCost").show();
+          }
+        });
+        $("#selectCurrency").change(function(){
+          var string_money = $(".show_money").text();
+          if(string_money.indexOf("VNĐ") != "-1")
+          {
+            $(".show_money").text(string_money.slice(0,string_money.indexOf("VNĐ")) + $(this).val());
+          }
+          else if(string_money.indexOf("USD") != "-1")
+          {
+            $(".show_money").text(string_money.slice(0,string_money.indexOf("USD")) + $(this).val());
+          }
+        });
         $("#selectLang_add").change(function(){
           if($("#selectLang_add").val() == "vn")
           {
@@ -390,6 +451,7 @@
                   $("#description").html(data[3]);
                   $("#shortdes").html(data[4]);
                   $("#duration").html(data[5]);
+                  $("#cost").html(data[10].toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
                   if(data[6] != null)
                   {
                     $("#link_vr").html("Link here");
@@ -460,6 +522,7 @@
           var map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 12.5,
                 center: { lat: 21.0226586, lng: 105.8179091 },
+                gestureHandling: 'greedy',
               }),
           directionsService = new google.maps.DirectionsService();
           map.addListener('click',function(evt){
@@ -564,8 +627,7 @@
                       }
                       else
                       {
-                        console.log(data);
-                        // getDuration(data);
+                        getDuration(data);
                       }
                     },
                     cache: false,

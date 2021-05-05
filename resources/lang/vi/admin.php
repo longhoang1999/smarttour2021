@@ -141,4 +141,5 @@ return [
     'Createdby' => 'Tạo bởi',
     'inforDescribe' => 'thông tin mô tả vị trí',
     'otherInfo' => 'thông tin về tọa độ và thông tin khác',
+    'cost' => 'Giá cả',
 ];

@@ -7,7 +7,7 @@
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBgbjwIY5Q1eZ-Ejqur0a8avEQWowfA39s&callback=initMap&libraries=places"   defer></script>
 	<link rel="stylesheet" type="text/css" href="{{asset('semantic/semantic.min.css')}}">
 	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.5.7/themes/airbnb.css'>
-  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css'>
+  	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css'>
 	<link 	rel="stylesheet" type="text/css" href="{{asset('css/map.css')}}">
 	<link 	rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" defer> 
 	<link 	rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -49,7 +49,8 @@
 								<a href="#" id="btn-rating" data-toggle="modal" data-target="#modalRating">Rating</a>
 								<a href="#home">Home</a>
 								<a href="#about">About</a>
-								<a href="#contact">Contact</a>
+								<a href="#reset" id="reset_opt">Reset</a>
+								<a href="#reset" id="clear_mark" style="display: none;">Clear markers</a>
 							</div>
 						</div>
 					</div>
@@ -96,17 +97,15 @@
 					    </div>
 						</div>
 						<div class="right">
-							<span><b>Chi phí:</b></span>	
-
-							<div class="ui right labeled input">
-							  <input type="number" value="100000" min="50000" id="amount">
-							  <select class="currency-select ui compact selection dropdown">
-							    <option value="all">VND</option>
-							    <option selected="" value="articles">USD</option>
+							<span class="font-weight-bold">Chi phí:</span>	
+							<div class="form-group input_money">
+							  <input type="number" id="amount" class="form-control">
+							  <select class="form-control currency">
+							  		<option selected="true" value="VNĐ">VNĐ</option>
+								 	<option value="USD">USD</option>
 							  </select>
-							  <span class="amount-text"></span>
+							  <span class="text_money">you entered: <span class="amount-text"></span></span>
 							</div>
-							
 						</div>
 					</div>
 						
@@ -205,7 +204,7 @@
 						<div class="short-des mt-2">
 							<p class="text-justify">
 								<span class="font-weight-bold">Mô tả ngắn gọn: </span>
-								<span>Đây là địa điểm du lịch nổi tiếng với ngàn năm lịch sử</span>
+								<span id="short_des">Đây là địa điểm du lịch nổi tiếng với ngàn năm lịch sử</span>
 							</p>
 						</div>
 						<div class="more-infor-place">
@@ -314,32 +313,32 @@
 		use Illuminate\Support\Facades\Auth;
 	?>
 		<script type="text/javascript">
-			$("#list-container").on('click','.item-content',function(){
-				let id_place = $(this).attr('value');
-				let _token = $('meta[name="csrf-token"]').attr('content');
-				let $url_path = '{!! url('/') !!}';
-				let routeTakeInforPlace = $url_path+"/loadPlaceInfo";
-				$.ajax({
-                      url:routeTakeInforPlace,
-                      method:"POST",
-                      data:{_token:_token,idPlace:id_place},
-                      success:function(data){ 
-                        if(data != "empty")
-                        {
-                        	if(data['de_image'] == "")
-	                        {
-	                            $(".parents-img img").attr("src",$url_path+ "/imgs/image.jpg");
-	                        }
-	                        else
-	                        {
-	                        	$(".parents-img img").attr("src",data['de_image']);
-	                        }
-                        }
-                        else
-                        	$(".parents-img img").attr("src",$url_path+ "/imgs/image.jpg");
-                     }
-                });
-			});
+			// $("#list-container").on('click','.item-content',function(){
+			// 	let id_place = $(this).attr('value');
+			// 	let _token = $('meta[name="csrf-token"]').attr('content');
+			// 	let $url_path = '{!! url('/') !!}';
+			// 	let routeTakeInforPlace = $url_path+"/loadPlaceInfo";
+			// 	$.ajax({
+   //                    url:routeTakeInforPlace,
+   //                    method:"POST",
+   //                    data:{_token:_token,idPlace:id_place},
+   //                    success:function(data){ 
+   //                      if(data != "empty")
+   //                      {
+   //                      	if(data['de_image'] == "")
+	  //                       {
+	  //                           $(".parents-img img").attr("src",$url_path+ "/imgs/image.jpg");
+	  //                       }
+	  //                       else
+	  //                       {
+	  //                       	$(".parents-img img").attr("src",data['de_image']);
+	  //                       }
+   //                      }
+   //                      else
+   //                      	$(".parents-img img").attr("src",$url_path+ "/imgs/image.jpg");
+   //                   }
+   //              });
+			// });
 			// part 1
 			@if(Auth::check())
 				$("#saveTour").click(function(){
@@ -651,14 +650,16 @@ var newMarkOnClk = {},
 		startLocat = {},
 		newLocatMark =[],
 		polylines = [],
+		glowPolylines =[],
 		isopt = 1,
 		locats = [],
 		isAuDel = 0,
-		disResponse,
+		disresponse,
 		allRoutePosible = [],
 		recentLocatID = [],
 		recentStart,
-		newStartIndex;
+		newStartIndex,
+		nearMarks = [];
 
 function initMap(){
 //==================Main progress========================
@@ -772,39 +773,133 @@ function initMap(){
 		// $('.dur-dis').click(updateRoute);
 		$('#startDate').change(updateRoute);
 		$('#time-end').change(updateRoute);
+		// format money
+		$("#amount").keyup(function(){
+          if($(this).val() == "")
+          {
+          	$(".text_money").hide();
+            $(".amount-text").hide();
+          }
+          else
+          {
+            $(".amount-text").text($(this).val().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") +" "+$(".currency").val());
+            $(".text_money").show();
+          }
+        });
+        $(".currency").change(function(){
+          var string_money = $(".amount-text").text();
+          if(string_money.indexOf("VNĐ") != "-1")
+          {
+            $(".amount-text").text(string_money.slice(0,string_money.indexOf("VNĐ")) + $(this).val());
+          }
+          else if(string_money.indexOf("USD") != "-1")
+          {
+            $(".amount-text").text(string_money.slice(0,string_money.indexOf("USD")) + $(this).val());
+          }
+        });
+		// $('#amount').keyup(e=>{
+		// 		let val = ''+$('#amount').val();
+		// 		// if(e.key !== 'Backspace')
+		// 		//  val+=e.key
+		// 		// else 
+		// 		// 	val = val.substring(0,val.length - 1);
 
-		$('#amount').keyup(e=>{
-				let val = ''+$('#amount').val();
-				// if(e.key !== 'Backspace')
-				//  val+=e.key
-				// else 
-				// 	val = val.substring(0,val.length - 1);
+		// 	  if(['1','2','3','4','5', '6', '7', '8', '9', '0','Backspace'].indexOf(e.key) === -1)
+		// 	    e.preventDefault();		
+		// 	  else {
+		// 	  // 	if(val == ''){
+		// 			// $('.amount-text').text(''); 
+		// 	  // 		return;
+		// 	  // 	} 
+		// 	  // 	let id = $('#time-cost-picker').attr('value')
+		// 	  // 	idToData(id,'setCost',parseInt(val));
+		//   	// 	val = parseInt(val).toLocaleString(undefined,{ style: 'currency', currency: 'VND'});
+		//   	// 	$('.amount-text').text(val);
+		// 	  	var notification_money=val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+		// 		 	$('.amount-text').text(notification_money + $('.currency-select').find(":selected").text() );
+		// 	  }
+		// 	 // var notification_money=val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+		// 	 // $('.amount-text').text(notification_money);
 
-			  if(['1','2','3','4','5', '6', '7', '8', '9', '0','Backspace'].indexOf(e.key) === -1)
-			    e.preventDefault();		
-			  else {
-			  // 	if(val == ''){
-					// $('.amount-text').text(''); 
-			  // 		return;
-			  // 	} 
-			  // 	let id = $('#time-cost-picker').attr('value')
-			  // 	idToData(id,'setCost',parseInt(val));
-		  	// 	val = parseInt(val).toLocaleString(undefined,{ style: 'currency', currency: 'VND'});
-		  	// 	$('.amount-text').text(val);
-			  	var notification_money=val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-				 	$('.amount-text').text(notification_money + $('.currency-select').find(":selected").text() );
-			  }
-			 // var notification_money=val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-			 // $('.amount-text').text(notification_money);
+		// 	});
+		$('#clear_mark').click(()=>{
+			 if(nearMarks.length)
+			 	nearMarks.forEach(ele=>ele.setMap(null));
 
-			});
+			 $('.map-marker-label[value="nearByPlace"]').remove();
+
+		})
+		resetAllHTML();
+	}
+	
+
+	function resetAllHTML(){
+		$("#reset_opt").click(()=>{
+			$("#start-locat").html("<span>Click chuột vào đây để chọn điểm bắt đầu</span>");
+			$("#start-locat").attr('data-start',0);
+			$("#start-locat").attr('data-clsclk',0);
+			$('#list-container').empty();
+			$('#time-cost-picker').hide();
+			$('#get-route-pannel').hide();
+			$('#add-waypoints').hide();
+			$('.chip').hide();
+			$('#location-detail').hide();
+			$('#clear_mark').hide();
+			$('#clear_mark').trigger('click');
+			$("#search-input option").prop('disabled',false);
+
+			if(polylines.length){
+				for(let i =0; i<polylines.length;i++){
+					glowPolylines[i].setMap(null)
+					polylines[i].setMap(null)
+				}
+			}
+
+			if(markerArray.size){
+				markerArray.forEach((value,key)=>{
+					value.setMap(null);
+					markerArray.delete(key);
+				});
+			}
+
+			if(Object.entries(startLocat).length){
+				startLocat.marker.setMap(null);
+			}
+
+			$('.map-marker-label').remove();
+			
+			map.setCenter({ lat: 21.0226586, lng: 105.8179091 });
+      		map.setZoom(12.5);
+
+	 		newMarkOnClk = {};
+	 		startLocat = {}
+			locationID = []
+			newLocatMark =[]
+			polylines = []
+			glowPolylines = []
+			locats = []
+			allRoutePosible = []
+			recentLocatID = []
+			nearMarks = []
+			isopt = 1
+			isAuDel = 0
+			disresponse = undefined
+			recentStart = undefined
+			newStartIndex = undefined
+		});
 	}
 
 	function updateRoute(){
-		if(disResponse != undefined){
+		if(disresponse != undefined){
 			$("#get-route").show();
 			$("#get-route").text('Update');
 			// $("#get-route").removeClass("loading");
+		}
+		if(polylines.length){
+			for(let i =0; i<polylines.length;i++){
+				glowPolylines[i].setMap(null)
+				polylines[i].setMap(null)
+			}
 		}
 	}
 
@@ -828,28 +923,38 @@ function initMap(){
 	function customDirectionsRenderer(response, status) {
 		var bounds = new google.maps.LatLngBounds();
 		var legs = response.routes[0].legs;
-		for(var i=0;i<polylines.length;i++){
+		for(let i=0;i<polylines.length;i++){
 			polylines[i].setMap(null);
 		}
 		polylines = [];
 		for (i = 0; i < legs.length; i++) {
 			(i>=5&&i%5 == 0)?index = 4:((Object.entries(startLocat).length)?index = (i%5)-1:index = (i%5));
 			if(Object.entries(startLocat).length && i==0) index = 5;
-			 var polyline = new google.maps.Polyline({
+			 let polyline = new google.maps.Polyline({
 				map:map, 
 				path:[], 
 				strokeColor: colorlist[index],
 				strokeOpacity: 0.7,
 				strokeWeight: 5});
-			var steps = legs[i].steps;
+			 let glowPolyline = new google.maps.Polyline({
+				map:map, 
+				path:[], 
+				strokeColor: colorlist[index],
+				strokeOpacity: 0.3,
+				strokeWeight: 15,
+				visible: false
+			 });
+			let steps = legs[i].steps;
 			for (j = 0; j < steps.length; j++) {
-				var nextSegment = steps[j].path;
+				let nextSegment = steps[j].path;
 				for (k = 0; k < nextSegment.length; k++) {
 					polyline.getPath().push(nextSegment[k]);
+					glowPolyline.getPath().push(nextSegment[k]);
 					bounds.extend(nextSegment[k]);
 				}
 			}
 			polylines.push(polyline);
+			glowPolylines.push(glowPolyline);
 		}
 		map.fitBounds(bounds);
 		getandsettimeline(response.routes[0].legs);
@@ -857,45 +962,75 @@ function initMap(){
 
 
 	function getandsettimeline(response){
-    timeline = [];
-    let tmpTimeLine =[];
-    let tmp = $('#startDate').val().substr(10).replace(/\s|am|pm/gi,'');
-    if(tmp.split(":")[0].length == 1) tmp = "0"+tmp;
-    timeline.push(tmp);
-    tmpTimeLine.push(tmp);
-    tmp = converttime(tmp);
-    if(Object.entries(startLocat).length){
-    	tmp += idToData(startLocat.id,'duration');
-       timeline.push(converttime(tmp));
-    }
-     for(var i = 0; i < response.length-1 ; i++){
-      if(!Object.entries(startLocat).length){
-        tmp += idToData(locationID[i],'duration');
-        timeline.push(converttime(tmp));
-      } else if(i >=1){
-      	if(idToData(locationID[i-1],'duration')>0){
-      		tmp += idToData(locationID[i-1],'duration');
-        	timeline.push(converttime(tmp));
-      	}
-        
-      }
-      
-      tmp += response[i].duration.value;
-      timeline.push(converttime(tmp));
-      tmpTimeLine.push(converttime(tmp));
-    }
+	    timeline = [];
+	    let tmpTimeLine =[];
+	    let tmp = $('#startDate').val().substr(10).replace(/\s|am|pm/gi,'');
+	    if(tmp.split(":")[0].length == 1) tmp = "0"+tmp;
+	    timeline.push(tmp);
+	    tmpTimeLine.push(tmp);
+	    tmp = converttime(tmp);
+	    if(Object.entries(startLocat).length){
+	    	tmp += idToData(startLocat.id,'duration');
+	       timeline.push(converttime(tmp));
+	    }
+	     for(var i = 0; i < response.length-1 ; i++){
+	      if(!Object.entries(startLocat).length){
+	        tmp += idToData(locationID[i],'duration');
+	        timeline.push(converttime(tmp));
+	      } else if(i >=1){
+	      	if(idToData(locationID[i-1],'duration')>0){
+	      		tmp += idToData(locationID[i-1],'duration');
+	        	timeline.push(converttime(tmp));
+	      	}
+	      }
+	      
+	      tmp += response[i].duration.value;
+	      timeline.push(converttime(tmp));
+	      tmpTimeLine.push(converttime(tmp));
+	    }
 
-    if(!$('#is-back').is(':checked')){
-      tmp += idToData(locationID[locationID.length-1],'duration');
-      timeline.push(converttime(tmp));
-    }
+	    if(!$('#is-back').is(':checked')){
+	      tmp += idToData(locationID[locationID.length-1],'duration');
+	      timeline.push(converttime(tmp));
+	    }
+
+    let totaldistance = 0;
+		for(let i = 0;i<response.length;i++){
+			totaldistance+=response[i].distance.value;
+		}
+		totaldistance = totaldistance/1000 +'km';
+		
+		
+		for(let i= 0;i<response.length;i++){
+			let infoWindow = new google.maps.InfoWindow();
+			let content = 
+			'<p>- Total time: '+converttime('duration')+'</p>'+
+			'<p>- Total distance: '+totaldistance+'</p>';
+			let timelineLeg = (Object.entries(startLocat).length)?i:i+1;
+			// timeline__list--type
+			polylines[i].addListener('mouseover', (e)=>{
+				infoWindow.setPosition(e.latLng);
+				infoWindow.setContent(content);
+				infoWindow.open(map);
+				glowPolylines[i].setVisible(true);
+			$(`.timeline__list--type${timelineLeg}`).addClass(`timeline__list--active${timelineLeg}`);
+				console.log($(`.timeline__list--type${timelineLeg}`));
+			});
+
+		// Close the InfoWindow on mouseout:
+			polylines[i].addListener('mouseout', () => {
+				 infoWindow.close();
+				 glowPolylines[i].setVisible(false);
+				 $(`.timeline__list--type${timelineLeg}`).removeClass(`timeline__list--active${(Object.entries(startLocat).length?i:i+1)}`);
+			});
+		}
 
     settimeline(tmpTimeLine);
   }
 
   function settimeline(tl){
   	$(".timeline").children().remove();
-  	let tmpLocationID = locationID;
+  	let tmpLocationID = locationID.slice();
   	if(Object.entries(startLocat).length)
   		tmpLocationID.unshift(startLocat.id);
   	let locationIndex = 0;
@@ -909,62 +1044,78 @@ function initMap(){
   		let curtime = converttime(converttime(tl[i]) + Object(locationdata.get(tmpLocationID[i])).de_duration);
   		let tral_duration =curtime +' - '+ tl[i+1];
   		if(i == tl.length-1) tral_duration = 'End the tour at '+curtime;
-  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s timeline__list--type${locationIndex}"><div class="timeline__picture" style="background-image: url('{{asset("imgs/7.jpg")}}')"><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${Object(locationdata.get(tmpLocationID[i])).de_name }</a></div><div class="star-votes"><span id="star"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star-half-alt text-warning"></i></span><span id="votes">2.290 votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${Object(locationdata.get(tmpLocationID[i])).de_name }" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon"><div class="parent-icon"><i class="fas fa-hotel"></i><span>Hotel</span></div><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
+  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s timeline__list--type${locationIndex}"><div class="timeline__list-after timeline__list--type${locationIndex}-after"></div><div class="timeline__picture" style="background-image: url('{{asset("imgs/7.jpg")}}')"><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${Object(locationdata.get(tmpLocationID[i])).de_name }</a></div><div class="star-votes"><span id="star"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star-half-alt text-warning"></i></span><span id="votes">2.290 votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${Object(locationdata.get(tmpLocationID[i])).de_name }" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon" value="${tmpLocationID[i]}"><div class="parent-icon"><i class="fas fa-hotel"></i><span>Hotel</span></div><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
   			`<div class="timeline__traveltime animated fadeInLeft delay-2s" ><span>${tral_duration}</span></div>`);
+
     }
     // <div><i class="fas fa-route"></i></div>
     $('.chip').css('display','inline-block');
     $('.timeline__list').last().addClass('timeline__list-lastelement');
+    nearByFind();
   }
 
-  function findres(){
-    fa = document.querySelectorAll('.fa-cutlery');
-    for( var i =0;i<fa.length;i++)
-      fa[i].addEventListener('click',function(){
-        var length = $(this.nextSibling.lastChild).find(":selected").val();
-        var val = parseInt(this.getAttribute('value'));
-        $('#map').css('display','block');
-        $('#timeline').css('display','none');
-        // $('#tab-map').css('color','#1a73e8');
-        
-        // Change color of map and timeline button
-        tablinks = document.getElementsByClassName('tablinks');
-        for (i = 0; i < tablinks.length; i++) {
-          tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-        document.getElementById('tab-map').className += " active";
+  function nearByFind(){
+		let fa = document.querySelectorAll('.parent-icon');
+		for(let i = 0;i<fa.length;i++)
+			fa[i].addEventListener('click',function(){
+				console.log(this)
+				// $('#clear-service').show();
+				let type = this.lastChild.innerText;
+				if(type == 'Restaurant'){
+					type = 'restaurant'
+				} else if(type == 'Store'){
+					type = 'store'
+				} else if(type == 'Coffee'){
+					type = 'cafe'
+				} else {
+					type = 'lodging'
+				}
+				let val = this.parentElement.getAttribute('value');
+				$('#clear_mark').show();
+				
+				var place = new google.maps.places.PlacesService(map);
+				place.nearbySearch({
+					location: Object(locationdata.get(val)).location,
+					radius: '500',
+					type: type,
+				}, (response, status) => {
+					for(let i = 0; i < nearMarks.length;i++)
+						nearMarks[i].setMap(null);
 
-        
-        var place = new google.maps.places.PlacesService(map);
-        place.nearbySearch({
-          location: idToData(locatsList[val],'LatLng'),
-          radius: '500',
-          type: 'restaurant'
-        }, (response, status) => {
-          // console.log(response);
-          if(response.length < length) 
-            length = response.length;
+					$('.map-marker-label[value="nearByPlace"]').remove();
+					
+					for (let i = 0; i <15; i++) 
+						nearByMarks(response[i]);
+					
+					map.setCenter(Object(locationdata.get(val)).location);
+					map.setZoom(18);
+				});
+			});  
+	}
+	function nearByMarks(place){
+		var icon = {
+				url: place.icon,
+				size: new google.maps.Size(71, 71),
+				origin: new google.maps.Point(0, 0),
+				anchor: new google.maps.Point(17, 34),
+				scaledSize: new google.maps.Size(25, 25),
+			};
 
-          for (let i = 0; i <length; i++) {
-            resMarker(response[i]);
-          }
-          map.setCenter(idToData(locatsList[val],'LatLng'));
-          map.setZoom(18);
-        });
-      });  
-  }
-  function resMarker(place){
-    var resMarker = new google.maps.Marker({
-      map,
-      position: place.geometry.location,
-      label: place.name
-    });
-    resmarkers.push(resMarker);
-    customLabel(resMarker);
-
-  }
+		let tmpMarker = new google.maps.Marker({
+			map,
+			position: place.geometry.location,
+			label: place.name,
+			icon: icon
+		});
+		nearMarks.push(tmpMarker);
+		customLabel(tmpMarker,'nearByPlace');
+	}
   // convert time in seconds and HH:MM format
   function converttime(time){
+  	if(time === 'duration'){
+		let duration = converttime(timeline[timeline.length-1]) - converttime(timeline[0])
+		return duration;
+  	}
     if(typeof(time) == "number"){
       var hours = Math.floor(time / 3600);
       time %= 3600;
@@ -983,17 +1134,18 @@ function initMap(){
 
 	function closeStart(){
 		$('#close-start').click(e=>{
-					$('#start-locat').attr('data-clsclk',1);
-					$('#start-locat span').text('Click chuột vào đây để chọn điểm bắt đầu');
-					$('#start-locat').attr('data-start',0);
-					let id = startLocat.id;
-					if(id != undefined) {
-						startLocat.marker.setMap(null);
-						$(`.map-marker-label[value="${id}"]`).remove();
-						startLocat = {};
-					}
-					$(e.currentTarget).remove();
-				})
+			updateRoute();
+			$('#start-locat').attr('data-clsclk',1);
+			$('#start-locat span').text('Click chuột vào đây để chọn điểm bắt đầu');
+			$('#start-locat').attr('data-start',0);
+			let id = startLocat.id;
+			if(id != undefined) {
+				startLocat.marker.setMap(null);
+				$(`.map-marker-label[value="${id}"]`).remove();
+				startLocat = {};
+			}
+			$(e.currentTarget).remove();
+		})
 	}
 
 	function showTimeCost(id){
@@ -1009,11 +1161,12 @@ function initMap(){
 		$('#duration-picker').trigger('change');
 		$('#location-dur-cost').text(Object(locationdata.get(id)).de_name);
 		$('#amount').val(Object(locationdata.get(id)).de_cost);
-		let money =idToData(id,'cost').toLocaleString(undefined,{ style: 'currency', currency: 'VND'});
-		$('.amount-text').text(money);
+		let money =idToData(id,'cost');
+		$('.amount-text').text(money.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + " VNĐ");
 	}
 
 	function processAddToList(){
+		updateRoute();
 		$('#add-waypoints').hide();	
 		let length = markerArray.size +1;
 		let id = $("#search-input").find(":selected").val();
@@ -1228,7 +1381,12 @@ function initMap(){
 			$('.name-place').text(name);
 			$('#description').text(descript);
 			$('.link-here').attr('href',link);
-
+			if(Object(locationdata.get(id)).de_description != undefined){
+				$(".parents-img > img").attr('src',Object(locationdata.get(id)).de_img);
+			} else {
+				$(".parents-img > img").attr('src',"{{ asset('imgs/image.jpg') }}");
+			}
+			$('#short_des').text(Object(locationdata.get(id)).de_shortdes);
 			$("#location-detail").show();
 			let height = $('#control-content').height()-$("#location-detail").height();
 			$('#bottom-height').height(height);
@@ -1253,6 +1411,7 @@ function initMap(){
 		  sortableList();
 		  for(let i=0,arr = $(".order"); i<arr.length;i++){
 					arr[i].innerText = i+1;
+					arr[i].parentElement.style.backgroundColor = colorlist[i];
 			}
 			if(!markerArray.has(id)) return;
 			//Remove marker
@@ -1262,6 +1421,7 @@ function initMap(){
 			id = $('.list-item').last().attr('value');
 			showTimeCost(id);
 			$('#get-route').show();
+			updateRoute();
 		});
 	}
 
@@ -1493,21 +1653,21 @@ function initMap(){
 			allRoutePosible = [];
 			//Check if recent results can reuse (Don't have to call api agian)
 			if(!recentLocatID.length){
-				recentLocatID = locationID;
+				recentLocatID = locationID.splice();
 				if(Object.entries(startLocat).length) 
 					recentStart = startLocat.id 
 				else 
 					recentStart = undefined;
 	 		} else {
 	 			// check nếu mảng mới kể cả điểm bắt đầu có ở mảng cũ chưa
-	 			let tmpLocationID = locationID.splice();
+	 			let tmpLocationID = locationID.slice();
 	 			if(Object.entries(startLocat).length) tmpLocationID.unshift(startLocat.id);
-	 			let tmprecentLocatID = recentLocatID.splice();
+	 			let tmprecentLocatID = recentLocatID.slice();
 	 			if(recentStart != undefined) tmprecentLocatID.unshift(recentStart); 
 				// if(locationID.every(e=>recentLocatID.includes(e))||(locationID.every(e=>recentLocatID.includes(e))&&(recentStart == startLocat.id || locationID.indexOf(recentStart)>=0))){
 				if(tmpLocationID.every(e=>tmprecentLocatID.includes(e))){ 
 					locationID.forEach(ele => Arr.push(
-						(locationID.every(e=>recentLocatID.includes(e))&&(recentStart == startLocat.id || locationID.indexOf(recentStart)>=0))?(recentLocatID.indexOf(ele)+1):(recentLocatID.indexOf(ele))
+						((recentStart == startLocat.id && recentStart != undefined) || locationID.indexOf(recentStart)>=0)?(recentLocatID.indexOf(ele)+1):(recentLocatID.indexOf(ele))
 					));
 
 					//Nếu điêm bắt đầu có tồn tại gán điểm bắt đầu = 0 nếu bằng điểm bắt đầu mới else gán bằng chi số trong mảng
@@ -1518,14 +1678,17 @@ function initMap(){
 							newStartIndex = recentLocatID.indexOf(recentStart);
 
 					}
+					arrPermutations(Arr.length,Arr);
+					bestWay();
+					return;
 				}
-				arrPermutations(Arr.length,Arr);
-				bestWay();
-				return;
 			}
 
-			recentStart = startLocat;
-			recentLocatID = locationID;
+			if(Object.entries(startLocat).length) 
+				recentStart = startLocat.id 
+			else 
+				recentStart = undefined;
+			recentLocatID = locationID.slice();
 			//init array [1,2,3,4,...n] with n is number of locations
 			for(var i = 0;i < locationID.length;i++)
 				Arr[i] = (Object.entries(startLocat).length)?(i+1):i;  
@@ -1783,7 +1946,6 @@ function initMap(){
 		for(var i=0;i<routeOptimized.route.length;i++)
 			tmp[i] = (Object.entries(startLocat).length)?tmpArr[routeOptimized.route[i]-1]:tmpArr[routeOptimized.route[i]];
 		locationID = tmp;
-
 		timeCheck(routeOptimized.value);	
 		
 	}
@@ -1879,7 +2041,6 @@ function initMap(){
 								method:"post",
 								data:{tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,val:val,nameTour:nameTour,star:star,options:options,recommend:recommend},
 								success:function(data){ 
-									//console.log(data);
 									if(data[0] == "no")
 										location.replace(data[3])
 									else if(data[0] == "yes")
@@ -2004,7 +2165,6 @@ function initMap(){
 								method:"post",
 								data:{tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,val:val,nameTour:nameTour,star:star,options:options,recommend:recommend},
 								success:function(data){ 
-									//console.log(data);
 									if(data[0] == "no")
 										location.replace(data[3])
 									else if(data[0] == "yes")
@@ -2037,7 +2197,6 @@ function initMap(){
 			                  method:"POST",
 			                  data:{_token:_token,routeId:routeId},
 			                  success:function(data){ 
-			                    //console.log(data);
 			                    $("input[name=nameTour]").val(data[0]);
 			                    $("#star_Share").val(data[1]);
 			                    if(data[1] == "1")

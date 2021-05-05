@@ -440,6 +440,24 @@ class AdminController extends Controller
             ->make(true);
         
     }
+    public function check()
+    {
+        $randomletter = substr(str_shuffle("abcdefghijklmnopqrstuvwxyz0123456789QAZXSWEDCRFVTGBYHNUJMIKLPO"), 0, 27);
+        $destination = new Destination();
+        $destination->de_name = "sdvsdv";
+        $destination->de_description = "";
+        $destination->de_shortdes = "";
+        $destination->de_id = "LVqMCehDXP2os3zQaRNKTmuw6pv";
+        $destination->de_remove = "LVqMCehDXP2os3zQaRNKTmuw6pv";
+        $destination->de_lat = "20.977098767834253";
+        $destination->de_lng = "105.7402403883746";
+        $destination->de_type = "1";
+        $destination->de_default = "0";
+        $destination->de_map = "http://www.google.com/maps/place/21.00588694602735,105.75650743775307";
+        $destination->de_link = "";
+        $destination->de_duration = floatval("3")*60*60;
+        $destination->save();
+    }
     public function postaddPlace(Request $req)
     {
     	if(is_null($req->de_name_en) && is_null($req->de_name_vn))
@@ -454,7 +472,6 @@ class AdminController extends Controller
                 $namePlaceVN = $req->de_name_en;
             if($req->de_name_en == "")
                 $namePlaceEN = $req->de_name_vn;
-            
             $randomletter = substr(str_shuffle("abcdefghijklmnopqrstuvwxyz0123456789QAZXSWEDCRFVTGBYHNUJMIKLPO"), 0, 27);
         	$destination = new Destination();
             $destination->de_name = $namePlaceVN;
@@ -462,10 +479,14 @@ class AdminController extends Controller
             $destination->de_shortdes = $req->de_shortdes_vn;
         	$destination->de_id = $randomletter;
         	$destination->de_remove = $randomletter;
-        	$destination->de_name = $namePlaceVN;
         	$destination->de_lat = $req->de_lat;
         	$destination->de_lng = $req->de_lng;
             $destination->de_type = $req->typePlace;
+            if($req->currency == "VNĐ")
+                $destination->de_cost = $req->de_cost;
+            else if($req->currency == "USD")
+                $destination->de_cost = intval($req->de_cost)*23000;
+            
             //total Place
             $typeplace = TypePlace::where("id",$req->typePlace)->first();
             $typeplace->totalPlace = intval($typeplace->totalPlace) + 1;
@@ -804,7 +825,9 @@ class AdminController extends Controller
                     else $image="";
                     $duration = floatval($de->de_duration)/60/60;
                     $langtype = Langtype::where("type_id",$typeplace->id)->where("language","en")->first();
-                    return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype];
+                    $cost = floatval($de->de_cost)/23000;
+                    $cost = strval(number_format((float)$cost, 2, '.', ''))." USD";
+                    return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype,$cost];
                 }
                 else
                 {
@@ -824,7 +847,9 @@ class AdminController extends Controller
                     else $image="";
                     $duration = floatval($de->de_duration)/60/60;
                     $langtype = Langtype::where("type_id",$typeplace->id)->where("language","vn")->first();
-                    return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype];
+                    $cost = $de->de_cost;
+                    $cost = strval($cost)." VNĐ";
+                    return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype,$cost];
                 }
                 else
                 {
@@ -845,7 +870,9 @@ class AdminController extends Controller
                     else $image="";
                     $duration = floatval($de->de_duration)/60/60;
                     $langtype = Langtype::where("type_id",$typeplace->id)->where("language","en")->first();
-                    return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype];
+                    $cost = floatval($de->de_cost)/23000;
+                    $cost = strval(number_format((float)$cost, 2, '.', ''))." USD";
+                    return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype,$cost];
                 }
                 else
                 {
@@ -864,7 +891,9 @@ class AdminController extends Controller
                     else $image="";
                     $duration = floatval($de->de_duration)/60/60;
                     $langtype = Langtype::where("type_id",$typeplace->id)->where("language","vn")->first();
-                    return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype];
+                    $cost = $de->de_cost;
+                    $cost = strval($cost)." VNĐ";
+                    return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$langtype->nametype,$cost];
                 }
                 else
                 {
@@ -1138,7 +1167,8 @@ class AdminController extends Controller
                         $image,
                         $de->de_type,
                         $langtype->nametype,
-                        $de->de_default
+                        $de->de_default,
+                        $de->de_cost
                     ];
                 }
                 else
@@ -1155,7 +1185,7 @@ class AdminController extends Controller
                 else $image="";
                 $duration = floatval($de->de_duration)/60/60;
                 $langtype = Langtype::select("nametype")->where("type_id",$de->de_type)->where("language","en")->first();
-                return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type,$langtype->nametype,$de->de_default];
+                return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type,$langtype->nametype,$de->de_default,$de->de_cost];
             }
             
         }
@@ -1174,7 +1204,7 @@ class AdminController extends Controller
                     else $image="";
                     $duration = floatval($de->de_duration)/60/60;
                     $langtype = Langtype::select("nametype")->where("type_id",$de->de_type)->where("language","vn")->first();
-                    return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type,$langtype->nametype,$de->de_default];
+                    return [$des->de_name,$de->de_lng,$de->de_lat,$des->de_description,$des->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type,$langtype->nametype,$de->de_default,$de->de_cost];
                 }
                 else
                 {
@@ -1190,12 +1220,13 @@ class AdminController extends Controller
                 else $image="";
                 $duration = floatval($de->de_duration)/60/60;
                 $langtype = Langtype::select("nametype")->where("type_id",$de->de_type)->where("language","vn")->first();
-                return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type,$langtype->nametype,$de->de_default];
+                return [$de->de_name,$de->de_lng,$de->de_lat,$de->de_description,$de->de_shortdes,$duration,$de->de_link,$de->de_map,$image,$de->de_type,$langtype->nametype,$de->de_default,$de->de_cost];
             }
         }
     }
     public function formEditPlace(Request $req,$remove,$lang)
     {
+        // $req->currency
         if($req->de_default == "0")
         {
             if($lang == "en")
@@ -1213,6 +1244,10 @@ class AdminController extends Controller
                     $de->de_lng=$req->longitude_edit;
                     $de->de_map=$req->link_edit;
                     $de->de_link=$req->de_link;
+                    if($req->currency == "VNĐ")
+                        $de->de_cost = $req->de_cost;
+                    else if($req->currency == "USD")
+                        $de->de_cost = floatval($req->de_cost)*23000;
                     if(isset($req->type))
                     {
                         if($de->de_type != $req->type)
@@ -1253,6 +1288,10 @@ class AdminController extends Controller
                     $de->de_lng=$req->longitude_edit;
                     $de->de_map=$req->link_edit;
                     $de->de_link=$req->de_link;
+                    if($req->currency == "VNĐ")
+                        $de->de_cost = $req->de_cost;
+                    else if($req->currency == "USD")
+                        $de->de_cost = floatval($req->de_cost)*23000;
                     if(isset($req->type))
                     {
                         if($de->de_type != $req->type)
@@ -1289,6 +1328,10 @@ class AdminController extends Controller
             $de->de_lng=$req->longitude_edit;
             $de->de_map=$req->link_edit;
             $de->de_link=$req->de_link;
+            if($req->currency == "VNĐ")
+                $de->de_cost = $req->de_cost;
+            else if($req->currency == "USD")
+                $de->de_cost = floatval($req->de_cost)*23000;
             if($req->file('image'))
             {
                 $image = $req->file('image');

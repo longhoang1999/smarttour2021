@@ -31,3 +31,26 @@ textarea{
   background: rgb(73,211,255);
   background: linear-gradient(90deg, rgba(73,211,255,1) 0%, rgba(60,74,218,1) 26%, rgba(153,138,235,1) 66%, rgba(0,168,255,1) 100%);
 }
+.enterCost_block{
+    position: relative;
+}
+#selectCurrency{
+  position: absolute;
+  top: 0;
+  width: 20%;
+  border: 2px solid #7cb6fb;
+}
+#inputCost{
+    padding-left: 7.5em;
+}
+.show_yourCost{
+    display: none;
+    font-style: italic;
+    font-size: 16px;
+    font-weight: bold;
+    margin-left: 1em;
+} 
+.show_money{
+    color: red;
+}
+#typePlaceUser{display: none;}
