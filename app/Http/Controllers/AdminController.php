@@ -1851,6 +1851,7 @@ class AdminController extends Controller
     }
     public function editTour($id)
     {
+
         if(Auth::check())
         {
             $route = Route::where("to_id",$id)->first();
@@ -1907,6 +1908,7 @@ class AdminController extends Controller
                     $duration_start = $des->de_duration;
                     $description_start = $des->de_description;
                     $cost_start = $des->de_cost;
+                    
                 }
                 else
                 {

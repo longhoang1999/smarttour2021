@@ -11,7 +11,6 @@
                 | Tour Advice
             @show
         </title>
-
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{{asset('assets/img/favicon.ico')}}" />
         <!-- Font Awesome icons (free version)-->

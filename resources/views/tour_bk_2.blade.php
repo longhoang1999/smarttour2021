@@ -756,7 +756,6 @@ function initMap(){
           }
           else
           {
-          	idToData($("#time-cost-picker").attr('value'),'setCost',$(this).val())
             $(".amount-text").text($(this).val().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") +" "+$(".currency").val());
             $(".text_money").show();
           }
@@ -984,28 +983,19 @@ function initMap(){
 			let timelineLeg = (Object.entries(startLocat).length)?i:i+1;
 			// timeline__list--type
 			polylines[i].addListener('mouseover', (e)=>{
-				let latlng;
-				if(e){
-					latlng = e.latLng
-				} else {
-					latlng = polylines[i].getPath().Nb[parseInt(polylines[i].getPath().Nb.length/2)]
-				}
-				infoWindow.setPosition(latlng);
+				infoWindow.setPosition(e.latLng);
 				infoWindow.setContent(content);
 				infoWindow.open(map);
-				after = Array.from(document.querySelectorAll('.timeline__list-after'))
-				let color = after[i].style.backgroundColor;
-				after[i].style.boxShadow = `0px 2px 10px 1.5px ${color}`
 				glowPolylines[i].setVisible(true);
-				$(`.timeline__list--type${timelineLeg}`).addClass(`timeline__list--active${timelineLeg}`);
+			$(`.timeline__list--type${timelineLeg}`).addClass(`timeline__list--active${timelineLeg}`);
+				console.log($(`.timeline__list--type${timelineLeg}`));
 			});
 
 		// Close the InfoWindow on mouseout:
-			polylines[i].addListener('mouseout', (e) => {
-			 	infoWindow.close();
-				glowPolylines[i].setVisible(false);
-				after = Array.from(document.querySelectorAll('.timeline__list-after'))
-				after[i].style.boxShadow = ''
+			polylines[i].addListener('mouseout', () => {
+				 infoWindow.close();
+				 glowPolylines[i].setVisible(false);
+				 $(`.timeline__list--type${timelineLeg}`).removeClass(`timeline__list--active${(Object.entries(startLocat).length?i:i+1)}`);
 			});
 		}
 
@@ -1013,46 +1003,29 @@ function initMap(){
   }
 
   function settimeline(tl){
-  	let tmpLocationID = locationID.slice(),
-  			index =0;
-
   	$(".timeline").children().remove();
-
+  	let tmpLocationID = locationID.slice();
   	if(Object.entries(startLocat).length)
   		tmpLocationID.unshift(startLocat.id);
-  	
+  	let locationIndex = 0;
+
+
   	for(let i = 0; i < tl.length; i++ ){
+  		if(Object.entries(startLocat).length) 
+  			locationIndex = i;
+  		else 
+  			locationIndex = i + 1;
   		let curtime = converttime(converttime(tl[i]) + Object(locationdata.get(tmpLocationID[i])).de_duration);
   		let tral_duration =curtime +' - '+ tl[i+1];
   		if(i == tl.length-1) tral_duration = 'End the tour at '+curtime;
-  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s "><div class="timeline__list-after"></div><div class="timeline__list-before "></div><div class="timeline__picture" style="background-image: url('{{asset("imgs/7.jpg")}}')"><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${Object(locationdata.get(tmpLocationID[i])).de_name }</a></div><div class="star-votes"><span id="star"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star-half-alt text-warning"></i></span><span id="votes">2.290 votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${Object(locationdata.get(tmpLocationID[i])).de_name }" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon" value="${tmpLocationID[i]}"><div class="parent-icon"><i class="fas fa-hotel"></i><span>Hotel</span></div><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
+  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s timeline__list--type${locationIndex}"><div class="timeline__list-after timeline__list--type${locationIndex}-after"></div><div class="timeline__picture" style="background-image: url('{{asset("imgs/7.jpg")}}')"><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${Object(locationdata.get(tmpLocationID[i])).de_name }</a></div><div class="star-votes"><span id="star"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star-half-alt text-warning"></i></span><span id="votes">2.290 votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${Object(locationdata.get(tmpLocationID[i])).de_name }" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon" value="${tmpLocationID[i]}"><div class="parent-icon"><i class="fas fa-hotel"></i><span>Hotel</span></div><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
   			`<div class="timeline__traveltime animated fadeInLeft delay-2s" ><span>${tral_duration}</span></div>`);
 
     }
     // <div><i class="fas fa-route"></i></div>
     $('.chip').css('display','inline-block');
     $('.timeline__list').last().addClass('timeline__list-lastelement');
-    setColorEventTimeLine(tl);
     nearByFind();
-  }
-
-  function setColorEventTimeLine(tl){
-  	let before = Array.from(document.querySelectorAll('.timeline__list-before')),
-  			after = Array.from(document.querySelectorAll('.timeline__list-after')),
-  			title = Array.from(document.querySelectorAll('.timeline__list__content__title > a'));
-  	for(let i = 0; i < tl.length; i++ ){
-  		(i>=5&&i%5 == 0)?index = 4:((Object.entries(startLocat).length)?index = (i%5)-1:index = (i%5));
-			if(Object.entries(startLocat).length && i==0) index = 5;
-			before[i].style.backgroundColor = colorlist[index]
-			after[i].style.backgroundColor = colorlist[index]
-			title[i].style.color = colorlist[index]
-			after[i].addEventListener('mouseover',()=>{
-			  google.maps.event.trigger(polylines[i], 'mouseover',{});
-			})
-			after[i].addEventListener('mouseout',()=>{
-			  google.maps.event.trigger(polylines[i], 'mouseout',{});
-			})
-		}
   }
 
   function nearByFind(){
@@ -1160,10 +1133,6 @@ function initMap(){
 		$("#get-route-pannel").show();
 		$('#duration-picker').val(parseInt(Object(locationdata.get(id)).de_duration));
 		$('#duration-picker').trigger('change');
-		$('#duration-picker').change(()=>{
-			idToData($("#time-cost-picker").attr('value'),'setDur',$('#duration-picker').val())
-			console.log(locationdata.get($("#time-cost-picker").attr('value')))
-		})
 		$('#location-dur-cost').text(Object(locationdata.get(id)).de_name);
 		$('#amount').val(Object(locationdata.get(id)).de_cost);
 		let money =idToData(id,'cost');
@@ -1396,9 +1365,9 @@ function initMap(){
 			$("#location-detail").show();
 			let height = $('#control-content').height()-$("#location-detail").height();
 			$('#bottom-height').height(height);
-			// $('#control-content').animate({
-			// 	scrollTop: $("#location-detail").offset().top
-			// }, 500);
+			$('#control-content').animate({
+				scrollTop: $("#location-detail").offset().top
+			}, 500);
 			showTimeCost(id);
 		});
 	}
@@ -2351,7 +2320,7 @@ function initMap(){
 					@if( $latlng_start != "")
 						locationdata.set("{{$placeId_start}}",{
 								de_cost: {{$cost_start}},
-								de_description: "{{$description_start}}",
+								de_description: {{$description_start}},
 								de_duration: {{$duration_start}},
 								de_link: "",
 								de_name: "{{$dename_start}}",

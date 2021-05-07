@@ -67,41 +67,14 @@ body{
   color: #1abc9c;
 }
 .menu_title_start:hover{color: white;}
-.lan_title {
-    cursor: pointer;
-    border-radius: 18px;
-    border: 2px solid white;
-    padding: .5em;
-    color: white;
-    width: 100%;
-    margin-top: 0.6rem;
-}
+
 .lan_title span {
     margin-right: .5rem;
     font-size: 1rem;
     font-weight: 700;
 }
-.Language{position: relative;max-width: 12%;}
-.lan_more {
-    position: absolute;
-    background: white;
-    border-radius: 15px;
-    top: 3.5em;
-    width: 100%;
-    color: #2c3e50;
-    overflow: hidden;
-    display: none;
-}
-.lan_more p {
-    margin: 0;
-    padding: .8rem .2rem;
-    text-align: center;
-    cursor: pointer;
-}
-.lan_more p:hover {
-    background: #2c3e50;
-    color: white;
-}
+
+
 .li_menu_acc{position: relative;}
 .menu_content{
   position: absolute;
@@ -258,4 +231,10 @@ header .slider div{width: 100%;min-height:40rem; }
 }
 a#btn-rating {
     display: none;
+}
+.short-des{
+  margin-bottom: 1em;
+}
+#short_des,#description{
+  font-weight: normal;
 }

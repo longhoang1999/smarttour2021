@@ -43,7 +43,6 @@ Route::group(
 		Route::post("searchPlaceSmart","UserController@searchPlaceSmart")->name("searchPlaceSmart");
 		Route::get("showDetailPlace/{idplace}","UserController@showDetailPlace")->name("showDetailPlace");
 		Route::get("listPlaceForType/{idtype}","UserController@listPlaceForType")->name("listPlaceForType");
-		Route::post("loadPlaceInfo","UserController@loadPlaceInfo")->name("loadPlaceInfo");
 		Route::get("viewShareFeedback","UserController@viewShareFeedback")->name("viewShareFeedback");
 		
 

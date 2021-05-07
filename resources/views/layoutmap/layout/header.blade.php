@@ -10,6 +10,10 @@
         padding: .5rem .6rem;
         display: block;
     }
+    .box-header{
+        height: 2.2em;
+    }
+    .show_btn{display: block;}
 </style>
 <div class="fixed-top">
     <!-- Navigation-->
