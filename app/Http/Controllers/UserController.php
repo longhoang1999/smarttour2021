@@ -387,6 +387,10 @@ class UserController extends Controller
         $route->to_des = $desId;
         $route->to_duration = $duration;
         $route->to_cost = $cost;
+        if($req->currency=="VNĐ")
+            $route->to_currency = "1";
+        else if($req->currency=="USD")
+            $route->to_currency = "2";
         $route->to_star = $req->star;
         $route->save();
         //share tour

@@ -1888,7 +1888,6 @@ class AdminController extends Controller
                         $j++;
                     }
                 }
-                ////// lỗi ----------------------------
                 //diuration
                 $pieces_3 = explode("|", $route->to_duration);
                 for ($i=0; $i < count($pieces_3)-1; $i++) {
@@ -1926,6 +1925,7 @@ class AdminController extends Controller
                     'to_endtime'=>$route->to_endtime,
                     'to_comback'=>$route->to_comback,
                     'to_optimized'=>$route->to_optimized,
+                    'to_currency'=>$route->to_currency,
                     'id'=>$id,
                     'latlng_new' => $latlng_new,
                     'dename_new' => $dename_new,
@@ -2076,6 +2076,10 @@ class AdminController extends Controller
         $new_route->to_des = $desId;
         $new_route->to_duration = $duration;
         $new_route->to_cost = $cost;
+        if($req->currency == "VNĐ")
+            $new_route->to_currency = "1";
+        else if($req->currency == "USD")
+            $new_route->to_currency = "2";
         $new_route->to_star = $req->star;
         $new_route->save();
         //share tour

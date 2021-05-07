@@ -752,7 +752,6 @@ function initMap(){
           if($(this).val() == "")
           {
           	$(".text_money").hide();
-            $(".amount-text").hide();
           }
           else
           {
@@ -760,6 +759,7 @@ function initMap(){
             $(".amount-text").text($(this).val().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") +" "+$(".currency").val());
             $(".text_money").show();
           }
+          updateRoute();
         });
         $(".currency").change(function(){
           var string_money = $(".amount-text").text();
@@ -865,7 +865,7 @@ function initMap(){
 	}
 
 	function updateRoute(){
-		if(disresponse != undefined){
+		if(polylines.length){
 			$("#get-route").show();
 			$("#get-route").text('Update');
 			// $("#get-route").removeClass("loading");
@@ -900,8 +900,10 @@ function initMap(){
 		var legs = response.routes[0].legs;
 		for(let i=0;i<polylines.length;i++){
 			polylines[i].setMap(null);
+			glowPolylines[i].setMap(null);
 		}
 		polylines = [];
+		glowPolylines = [];
 		for (i = 0; i < legs.length; i++) {
 			(i>=5&&i%5 == 0)?index = 4:((Object.entries(startLocat).length)?index = (i%5)-1:index = (i%5));
 			if(Object.entries(startLocat).length && i==0) index = 5;
@@ -979,7 +981,7 @@ function initMap(){
 		for(let i= 0;i<response.length;i++){
 			let infoWindow = new google.maps.InfoWindow();
 			let content = 
-			'<p>- Total time: '+converttime('duration')+'</p>'+
+			'<p>- Total time: '+converttime(null,'duration_second')+'</p>'+
 			'<p>- Total distance: '+totaldistance+'</p>';
 			let timelineLeg = (Object.entries(startLocat).length)?i:i+1;
 			// timeline__list--type
@@ -1020,12 +1022,20 @@ function initMap(){
 
   	if(Object.entries(startLocat).length)
   		tmpLocationID.unshift(startLocat.id);
-  	
+  	if($('#is-back').is(':checked'))
+  		tmpLocationID.push(tmpLocationID[0])
+
+
   	for(let i = 0; i < tl.length; i++ ){
   		let curtime = converttime(converttime(tl[i]) + Object(locationdata.get(tmpLocationID[i])).de_duration);
   		let tral_duration =curtime +' - '+ tl[i+1];
-  		if(i == tl.length-1) tral_duration = 'End the tour at '+curtime;
-  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s "><div class="timeline__list-after"></div><div class="timeline__list-before "></div><div class="timeline__picture" style="background-image: url('{{asset("imgs/7.jpg")}}')"><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${Object(locationdata.get(tmpLocationID[i])).de_name }</a></div><div class="star-votes"><span id="star"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star-half-alt text-warning"></i></span><span id="votes">2.290 votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${Object(locationdata.get(tmpLocationID[i])).de_name }" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon" value="${tmpLocationID[i]}"><div class="parent-icon"><i class="fas fa-hotel"></i><span>Hotel</span></div><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
+  		  		if(i == tl.length-1){
+  		  			tral_duration = 'End the tour at '+curtime;
+  		  			if($('#is-back').is(':checked')) 
+  		  				tral_duration = 'End the tour at '+tl[i];
+  		  		} 
+
+  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s "><div class="timeline__list-after"></div><div class="timeline__list-before "></div><div class="timeline__picture"><a data-fancybox="gallery" href="${Object(locationdata.get(tmpLocationID[i])).de_img}"><img class="img_timeline" src="${Object(locationdata.get(tmpLocationID[i])).de_img}" alt=""></a><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${Object(locationdata.get(tmpLocationID[i])).de_name }</a></div><div class="star-votes"><span id="star"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star-half-alt text-warning"></i></span><span id="votes">2.290 votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${Object(locationdata.get(tmpLocationID[i])).de_name }" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon" value="${tmpLocationID[i]}"><div class="parent-icon"><i class="fas fa-hotel"></i><span>Hotel</span></div><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
   			`<div class="timeline__traveltime animated fadeInLeft delay-2s" ><span>${tral_duration}</span></div>`);
 
     }
@@ -1112,11 +1122,27 @@ function initMap(){
 		customLabel(tmpMarker,'nearByPlace');
 	}
   // convert time in seconds and HH:MM format
-  function converttime(time){
-  	if(time === 'duration'){
+  function converttime(time,type){
+  	if(type === 'duration_second'){
 		let duration = converttime(timeline[timeline.length-1]) - converttime(timeline[0])
 		return duration;
   	}
+  	if(type === 'duration'){
+			let seconds = time;
+			var d = Math.floor(seconds / (3600*24));
+			seconds  -= d*3600*24;
+			let h   = Math.floor(seconds / 3600);
+			seconds  -= h*3600;
+			let m = Math.floor(seconds / 60);
+			seconds  -= m*60;
+			if(seconds>=30) m+=1;
+
+			let tmp = [];
+			if(d){(d==1)?tmp.push(d + ' Day'):tmp.push(d + ' Days')}
+			if(d || h){(h==1)?tmp.push(h + ' Hour'):tmp.push(h + ' Hours')};
+			if(d || h || m){(m==1)?tmp.push(m + ' Minute'):tmp.push(m + ' Minutes')};
+			return tmp.join(' ');
+		}
     if(typeof(time) == "number"){
       var hours = Math.floor(time / 3600);
       time %= 3600;
@@ -1163,6 +1189,7 @@ function initMap(){
 		$('#duration-picker').change(()=>{
 			idToData($("#time-cost-picker").attr('value'),'setDur',$('#duration-picker').val())
 			console.log(locationdata.get($("#time-cost-picker").attr('value')))
+			updateRoute()
 		})
 		$('#location-dur-cost').text(Object(locationdata.get(id)).de_name);
 		$('#amount').val(Object(locationdata.get(id)).de_cost);
@@ -1177,11 +1204,16 @@ function initMap(){
 		let id = $("#search-input").find(":selected").val();
 		let text = $("#search-input").find(":selected").text();
 
-		showTimeCost(id);
-	  //Disable selected option
-		$("#search-input").find(":selected").prop('disabled',true);
-		$('#search-input').val('').trigger('change');
-		$('#search-input').select2();
+		if($(".list-item").length != 5) {
+			showTimeCost(id);
+		  	//Disable selected option
+			$("#search-input").find(":selected").prop('disabled',true);
+			$('#search-input').val('').trigger('change');
+			$('#search-input').select2();
+		}else
+		{
+			alert("you have chosen more than 5 points");
+		}
 		if($('#start-locat').attr('data-start') === '1'){
 			$('#start-locat').html(`<span>${text}</span><div id="close-start" style="display: inline-flex; position: absolute; right: 0.5em;" ><i class="fas fa-times " ></i></div>`);
 			closeStart();
@@ -1258,7 +1290,17 @@ function initMap(){
 					});
 
 			marker.addListener('click',()=>{
-				marker.setIcon("{{asset('imgs/icon.jpg')}}");
+				let imglink;
+				if(Object(locationdata.get(id)).de_img != undefined){
+					imglink = "{{asset('imgs/icon.jpg')}}"
+				} else {
+					imglink = "{{asset('imgs/icon.jpg')}}"
+				}
+				let image = {
+					url: imglink,
+					// size: new google.maps.Size(150, 90),
+				}
+				marker.setIcon(image);
 				if(id != startLocat.id){
 					marker.setLabel('');
 				} else{
@@ -1995,7 +2037,7 @@ function initMap(){
 			let startlocat_duration = Object(locationdata.get(startLocat.id)).de_duration;
 			let formatCost = (Object(locationdata.get(startLocat.id)).de_cost).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 			let startlocat_cost = formatCost + $(".currency").val();
-			$(".content_modal_left").append('<div class="detail_tour"><div class="left_content"><a data-fancybox="gallery" href="'+startlocat_image+'"><img class="img-fluid rounded mb-5" style="width:100%;" src="'+startlocat_image+'" alt=""></a></div><div class="right_content"><p class="mb-1">Place name: <span class="font-italic text-danger">'+startlocat_name+'</span></p><p class="mb-1">Duration: <span class="font-italic text-danger">'+startlocat_duration+'</span></p><p class="mb-1">Cost: <span class="font-italic text-danger">'+startlocat_cost+'</span></p></div></div>');
+			$(".content_modal_left").append('<div class="detail_tour"><div class="left_content"><a data-fancybox="gallery" href="'+startlocat_image+'"><img class="img-fluid rounded mb-5" style="width:100%;" src="'+startlocat_image+'" alt=""></a></div><div class="right_content"><p class="mb-1">Place name: <span class="font-italic text-danger">'+startlocat_name+'</span></p><p class="mb-1">Duration: <span class="font-italic text-danger">'+converttime(startlocat_duration,'duration')+'</span></p><p class="mb-1">Cost: <span class="font-italic text-danger">'+startlocat_cost+'</span></p></div></div>');
 		}
 		//set detail
 		locationID.forEach(ele=>{
@@ -2008,7 +2050,7 @@ function initMap(){
 			let detail_duration = Object(locationdata.get(ele)).de_duration;
 			let formatCost = (Object(locationdata.get(ele)).de_cost).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 			let detail_cost = formatCost + $(".currency").val();
-			$(".content_modal_left").append('<div class="detail_tour"><div class="left_content"><a data-fancybox="gallery" href="'+detail_image+'"><img class="img-fluid rounded mb-5" style="width:100%;" src="'+detail_image+'" alt=""></a></div><div class="right_content"><p class="mb-1">Place name: <span class="font-italic text-danger">'+detail_name+'</span></p><p class="mb-1">Duration: <span class="font-italic text-danger">'+detail_duration+'</span></p><p class="mb-1">Cost: <span class="font-italic text-danger">'+detail_cost+'</span></p></div></div>');
+			$(".content_modal_left").append('<div class="detail_tour"><div class="left_content"><a data-fancybox="gallery" href="'+detail_image+'"><img class="img-fluid rounded mb-5" style="width:100%;" src="'+detail_image+'" alt=""></a></div><div class="right_content"><p class="mb-1">Place name: <span class="font-italic text-danger">'+detail_name+'</span></p><p class="mb-1">Duration: <span class="font-italic text-danger">'+converttime(detail_duration,'duration')+'</span></p><p class="mb-1">Cost: <span class="font-italic text-danger">'+detail_cost+'</span></p></div></div>');
 		})
 	}
 	(function (){
@@ -2037,7 +2079,7 @@ function initMap(){
 							else 
 								to_comback = "0";
 							let to_optimized = '1';
-
+							let currency = $(".currency").val();
 							let tmparr = [];
 							let val = {};
 							if(Object.entries(startLocat).length){
@@ -2074,7 +2116,7 @@ function initMap(){
 							$.ajax({
 								url:routeDetail,
 								method:"post",
-								data:{tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,val:val,nameTour:nameTour,star:star,options:options,recommend:recommend},
+								data:{tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,val:val,nameTour:nameTour,star:star,options:options,recommend:recommend,currency:currency},
 								success:function(data){ 
 									if(data[0] == "no")
 										location.replace(data[3])
@@ -2162,7 +2204,7 @@ function initMap(){
 							else 
 								to_comback = "0";
 							let to_optimized = '1';
-
+							let currency = $(".currency").val();
 							let tmparr = [];
 							let val = {};
 							if(Object.entries(startLocat).length){
@@ -2197,10 +2239,12 @@ function initMap(){
 					                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 					            }
 					        });
+					        //console.log(tmparr);
+					        ///
 							$.ajax({
 								url:routeDetail,
 								method:"post",
-								data:{tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,val:val,nameTour:nameTour,star:star,options:options,recommend:recommend},
+								data:{tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,val:val,nameTour:nameTour,star:star,options:options,recommend:recommend,currency:currency},
 								success:function(data){ 
 									if(data[0] == "no")
 										location.replace(data[3])
@@ -2221,6 +2265,7 @@ function initMap(){
 									}
 								}
 							});
+							///
 						}
 					}));
 					$("#saveTour").show();
@@ -2314,6 +2359,11 @@ function initMap(){
 
 					@if($to_comback == '1')
 						$('#is-back').prop('checked',true);
+					@endif
+					@if($to_currency == "1")
+						$(".currency").val("VNĐ")
+					@elseif($to_currency == "2")
+						$(".currency").val("USD")
 					@endif
 					// @if($to_optimized == '1')
 					// 	//$('.dur-dis[value="1"]').prop('checked', true);

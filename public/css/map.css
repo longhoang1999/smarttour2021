@@ -851,4 +851,9 @@ div#search-title label {
   font-weight: bold;
   max-width: 95px;
 }
-
+img.img_timeline {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    object-fit: cover;
+}
