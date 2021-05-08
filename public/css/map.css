@@ -53,6 +53,7 @@ body {
 }
 
 #add-waypoints{
+  margin-right: 1em;
   display: none;
   margin-top: 10px;
   font-size: 14px;

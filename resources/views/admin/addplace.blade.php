@@ -765,6 +765,9 @@
       $(document).ready(function(){
         $("#btn_addPlace").click(function(){
           $("#Form_add").css("display","block");
+          $("html, body").delay(200).animate({
+              scrollTop: $('#Form_add').offset().top 
+          }, 200);
           var latlng = checkLatLng().split(",");
           $("#inputLongitude").val(latlng[1]);
           $("#inputLatitude").val(latlng[0]);
@@ -793,6 +796,9 @@
 
         $("#btn_addPlace_2").click(function(){
           $("#Form_add").css("display","block");
+          $("html, body").delay(200).animate({
+              scrollTop: $('#Form_add').offset().top 
+          }, 200);
           $("#inputLongitude").val(Coordinates.lng);
           $("#inputLatitude").val(Coordinates.lat);
           let x = $("#inputLongitude").val();

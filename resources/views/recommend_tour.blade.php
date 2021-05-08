@@ -703,12 +703,14 @@ function initMap(){
 		$('#add-waypoints').click(processAddToList);
 		$('#search-input').on('select2:select',processAddToList);
 		$('#duration-picker').duration_picker(); 
-		$('#start-locat').click(()=>{
+		$('#start-locat').click((e)=>{
 
 			// data-start 0 là chưa có gì 1 là đang chờ để thêm địa điểm 2 là đã thêm điểm r ko cho thay đổi nữa
 			// data-clsclk click vào nút x #start-locat cũng nhận sự kiện
 			if($('#start-locat').attr('data-start') === '2'){
 				$("#time-cost-picker").show();
+				let height_time_cost = parseFloat($(e.currentTarget).last().offset().top) - 60;
+				$("#time-cost-picker").css("top",height_time_cost+"px");
 				return;
 			}
 			if($('#start-locat').attr('data-clsclk') === '1'){
@@ -765,12 +767,15 @@ function initMap(){
           var string_money = $(".amount-text").text();
           if(string_money.indexOf("VNĐ") != "-1")
           {
-
-            $(".amount-text").text(string_money.slice(0,string_money.indexOf("VNĐ")) + $(this).val());
+          	let new_money = parseFloat($("#amount").val())/23000;
+            $("#amount").val(parseFloat(new_money.toFixed(2)));
+          	$(".amount-text").text($("#amount").val().toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")+" "+$(this).val());
           }
           else if(string_money.indexOf("USD") != "-1")
           {
-            $(".amount-text").text(string_money.slice(0,string_money.indexOf("USD")) + $(this).val());
+            let new_money = parseFloat($("#amount").val())*23000;
+            $("#amount").val(parseFloat(new_money.toFixed(2)));
+          	$(".amount-text").text($("#amount").val().toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")+" "+$(this).val());
           }
         });
 		// $('#amount').keyup(e=>{
@@ -1184,6 +1189,7 @@ function initMap(){
 			}
 			$(e.currentTarget).remove();
 		})
+		$("#time-cost-picker").hide();
 	}
 
 	function showTimeCost(id){
@@ -1203,9 +1209,19 @@ function initMap(){
 			updateRoute()
 		})
 		$('#location-dur-cost').text(Object(locationdata.get(id)).de_name);
-		$('#amount').val(Object(locationdata.get(id)).de_cost);
-		let money =idToData(id,'cost');
-		$('.amount-text').text(money.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + " "+$(".currency").val());
+		if($(".currency").val() == "VNĐ")
+		{
+			$('#amount').val(Object(locationdata.get(id)).de_cost);
+			let money =idToData(id,'cost');
+			$('.amount-text').text(money.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + " "+$(".currency").val());
+		}
+		else if($(".currency").val() == "USD")
+		{
+			let new_money = parseFloat(Object(locationdata.get(id)).de_cost)/23000;
+			$("#amount").val(parseFloat(new_money.toFixed(2)));
+			let money =$("#amount").val();
+			$('.amount-text').text(money.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + " "+$(".currency").val());
+		}
 	}
 
 	function processAddToList(){
@@ -1229,7 +1245,8 @@ function initMap(){
 			$('#start-locat').html(`<span>${text}</span><div id="close-start" style="display: inline-flex; position: absolute; right: 0.5em;" ><i class="fas fa-times " ></i></div>`);
 			closeStart();
 			$('#start-locat').attr('data-start',2);
-
+			let height_time_cost = parseFloat($('#start-locat').offset().top) - 60;
+			$("#time-cost-picker").css("top",height_time_cost+"px");
 			startLocat.id = id;
 			startLocat.marker = newMarkOnClk.marker;
 			newMarkOnClk = {}
@@ -1358,7 +1375,9 @@ function initMap(){
 				`</div>`+
 			`</div>`
 		);
-			
+		let listItemHeight = ($(`.list-item`).length-1)*71;
+		let height_time_cost = parseFloat($(`.list-item`).offset().top) - 60 +listItemHeight;
+		$("#time-cost-picker").css("top",height_time_cost+"px");
 		deleteFromList();//delete event
 		showDetail();
 		sortableList();
@@ -1452,6 +1471,8 @@ function initMap(){
 			// $('#control-content').animate({
 			// 	scrollTop: $("#location-detail").offset().top
 			// }, 500);
+			let height_time_cost = parseFloat($(e.currentTarget).last().offset().top) - 60;
+			$("#time-cost-picker").css("top",height_time_cost+"px");
 			showTimeCost(id);
 		});
 	}

@@ -417,8 +417,10 @@ section{
     display: none;
 }*/
 
-#personalInfo{font-family: inherit !important;}
-#p_logout{font-family: inherit !important;}
+#personalInfo,#p_logout,#comback_admin
+{
+    font-family: inherit !important;
+}
 #detailTour{
     position: absolute;
     right: .5em;
