@@ -255,6 +255,7 @@ class ShareTourController extends Controller
             'to_endtime'=>$route->to_endtime,
             'to_comback'=>$route->to_comback,
             'to_optimized'=>$route->to_optimized,
+            'to_currency'=>$route->to_currency,
             'id'=>$id,
             'latlng_new' => $latlng_new,
             'dename_new' => $dename_new,

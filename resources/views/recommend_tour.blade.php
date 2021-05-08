@@ -47,8 +47,8 @@
 							</span>
 							<div id="myDropdown" class="dropdown-content">
 								<a href="#" id="btn-rating" data-toggle="modal" data-target="#modalRating">Rating</a>
-								<a href="#home">Home</a>
-								<a href="#about">About</a>
+								<a href="{{route('login')}}">Home</a>
+								<a href="{{route('about')}}">About</a>
 								<a href="#reset" id="reset_opt">Reset</a>
 								<a href="#reset" id="clear_mark" style="display: none;">Clear markers</a>
 							</div>
@@ -65,6 +65,38 @@
 					<span>Timeline</span>
 					</div>
 				</div>
+			<style>
+				#time-cost-picker{
+					top: 30%;
+					position: absolute;
+				    left: -84%;
+				    width: 25em;
+				    box-shadow: 0 0 12px #abaaaa;
+				    z-index: 10;
+				}
+				.jdp-input{
+					width: 100%;
+				}
+				.right > div {
+				    width: 100%;
+				    margin-top: 1em;
+				}
+				.icon_cost_picker{
+					position: absolute;
+				    right: -9px;
+				    top: 0;
+				    font-size: 25px;
+				    color: #ffffff;
+				}
+				#time-cost-container{
+					padding-left: 0;
+				}
+				.currency{
+					width: 20%;
+					background: white;
+					padding-right: 0;
+				}
+			</style>	
 			<div id="control-content">
 				<div id="start-locat-container" class="locat-container">
 					<button id="start-locat" data-start="0" data-clsclk="0" >
@@ -86,13 +118,14 @@
 					<!-- <div id="locat-container-height"></div> -->
 				</div>
 				<div id='time-cost-picker' class="option-control" style="display: none;">
+					<i class="fas fa-caret-right icon_cost_picker"></i>
 					<div class="ui">
 						<label style="font-size: 16px;"><b>Thời gian và chi phí tại: <label id='location-dur-cost'></label></b></label>
 					</div>
 					<div id='time-cost-container'>
 						<div class="left">
 							<span style="margin-top: 0.1em; width: 20%"><b>Ghé thăm trong:</b></span>
-							<div class="ui input" style="width: 80%">
+							<div class="ui input" style="width: 100%">
 					      <input type="text" id="duration-picker" value="3600">
 					    </div>
 						</div>
@@ -314,6 +347,12 @@
 	?>
 		<script type="text/javascript">
 			// part 1
+			$("#time-cost-picker").mouseleave(function(){
+			  $("#time-cost-picker").hide("fast");
+			});
+			$("#control-content").scroll(function(event) {
+				$("#time-cost-picker").hide("fast");
+			})
 			@if(Auth::check())
 				$("#saveTour").click(function(){
 					$("#enterNameTour").modal("show");
@@ -987,7 +1026,7 @@ function initMap(){
 			// timeline__list--type
 			polylines[i].addListener('mouseover', (e)=>{
 				let latlng;
-				if(e){
+				if(Object.entries(e).length){
 					latlng = e.latLng
 				} else {
 					latlng = polylines[i].getPath().Nb[parseInt(polylines[i].getPath().Nb.length/2)]
@@ -1034,8 +1073,14 @@ function initMap(){
   		  			if($('#is-back').is(':checked')) 
   		  				tral_duration = 'End the tour at '+tl[i];
   		  		} 
+  		let imglink;
+		if(Object(locationdata.get(tmpLocationID[i])).de_img != undefined){
+			imglink = `${Object(locationdata.get(tmpLocationID[i])).de_img}`
+		} else {
+			imglink = "{{asset('imgs/image.jpg')}}"
+		}
 
-  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s "><div class="timeline__list-after"></div><div class="timeline__list-before "></div><div class="timeline__picture"><a data-fancybox="gallery" href="${Object(locationdata.get(tmpLocationID[i])).de_img}"><img class="img_timeline" src="${Object(locationdata.get(tmpLocationID[i])).de_img}" alt=""></a><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${Object(locationdata.get(tmpLocationID[i])).de_name }</a></div><div class="star-votes"><span id="star"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star-half-alt text-warning"></i></span><span id="votes">2.290 votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${Object(locationdata.get(tmpLocationID[i])).de_name }" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon" value="${tmpLocationID[i]}"><div class="parent-icon"><i class="fas fa-hotel"></i><span>Hotel</span></div><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
+  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s "><div class="timeline__list-after"></div><div class="timeline__list-before "></div><div class="timeline__picture"><a data-fancybox="gallery" href="${imglink}"><img class="img_timeline" src="${imglink}" alt=""></a><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${Object(locationdata.get(tmpLocationID[i])).de_name }</a></div><div class="star-votes"><span id="star"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star-half-alt text-warning"></i></span><span id="votes">2.290 votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${Object(locationdata.get(tmpLocationID[i])).de_name }" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon" value="${tmpLocationID[i]}"><div class="parent-icon"><i class="fas fa-hotel"></i><span>Hotel</span></div><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
   			`<div class="timeline__traveltime animated fadeInLeft delay-2s" ><span>${tral_duration}</span></div>`);
 
     }
@@ -1188,7 +1233,7 @@ function initMap(){
 		$('#duration-picker').trigger('change');
 		$('#duration-picker').change(()=>{
 			idToData($("#time-cost-picker").attr('value'),'setDur',$('#duration-picker').val())
-			console.log(locationdata.get($("#time-cost-picker").attr('value')))
+			// console.log(locationdata.get($("#time-cost-picker").attr('value')))
 			updateRoute()
 		})
 		$('#location-dur-cost').text(Object(locationdata.get(id)).de_name);
@@ -1339,7 +1384,7 @@ function initMap(){
 	//add location to list
 	function addToList(id,color,index,text){
 		$("#list-container").append(
-			`<div class="list-item" value="${id}" title="${text}">`+
+			`<div data-target="#time-cost-picker" class="list-item" value="${id}" title="${text}">`+
 				`<div class="item-content" value="${id}" style="background-color: ${color};">`+
 					`<div class="order">${index}</div>`+
 					`<div class="item-content-text">${text}</div>`+
@@ -2415,11 +2460,11 @@ function initMap(){
 					@if( $latlng_start != "")
 						startLocat.id = "{{$placeId_start}}";
 						startLocat.marker = new google.maps.Marker({
-									label: idToData(startlocat,'text'),
+									label: idToData(startLocat.id,'name'),
 									map:map,
-									position: idToData(startlocat,'LatLng')
+									position: idToData(startLocat.id,'LatLng')
 						});
-						customLabel(staMarker,startLocat.id);
+						customLabel(startLocat.marker,startLocat.id);
 						$('#start-locat').html(`<span>Click trên bản đồ hoặc chọn trong ô tìm kiếm</span><div id="close-start" style="display: inline-flex; position: absolute; right: 0.5em;"><i class="fas fa-times " ></i></div>`);
 						$('#start-locat').attr('data-start',2);
 						$('#start-locat').attr('data-clsclk',0);
