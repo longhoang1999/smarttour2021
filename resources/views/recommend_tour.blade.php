@@ -13,20 +13,6 @@
 	<link 	rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 	<link 	rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 	<link rel="stylesheet" href="{{asset('css/retour.css')}}">
-	<style type="text/css">
-		#wrap{
-			margin-top: 5em;
-		}
-		#map{display: block !important;
-			height: 100%;
-		}
-		.footer{
-			margin-top: 4rem;
-		}
-		body:after {
-		   content: none;
-		}
-	</style>
 @stop
 @section('content')	
 	<!-- map -->
@@ -47,6 +33,9 @@
 							</span>
 							<div id="myDropdown" class="dropdown-content">
 								<a href="#" id="btn-rating" data-toggle="modal" data-target="#modalRating">Rating</a>
+								@if(isset($to_des))
+									<a href="{{route('user.maps')}}">Create a new tour</a>
+								@endif
 								<a href="{{route('login')}}">Home</a>
 								<a href="{{route('about')}}">About</a>
 								<a href="#reset" id="reset_opt">Reset</a>
@@ -65,38 +54,6 @@
 					<span>Timeline</span>
 					</div>
 				</div>
-			<style>
-				#time-cost-picker{
-					top: 30%;
-					position: absolute;
-				    left: -84%;
-				    width: 25em;
-				    box-shadow: 0 0 12px #abaaaa;
-				    z-index: 10;
-				}
-				.jdp-input{
-					width: 100%;
-				}
-				.right > div {
-				    width: 100%;
-				    margin-top: 1em;
-				}
-				.icon_cost_picker{
-					position: absolute;
-				    right: -9px;
-				    top: 0;
-				    font-size: 25px;
-				    color: #ffffff;
-				}
-				#time-cost-container{
-					padding-left: 0;
-				}
-				.currency{
-					width: 20%;
-					background: white;
-					padding-right: 0;
-				}
-			</style>	
 			<div id="control-content">
 				<div id="start-locat-container" class="locat-container">
 					<button id="start-locat" data-start="0" data-clsclk="0" >
@@ -137,7 +94,7 @@
 							  		<option selected="true" value="VNĐ">VNĐ</option>
 								 	<option value="USD">USD</option>
 							  </select>
-							  <span class="text_money">you entered: <span class="amount-text"></span></span>
+							  <span class="text_money">Bạn nhập: <span class="amount-text"></span></span>
 							</div>
 						</div>
 					</div>
@@ -747,9 +704,13 @@ function initMap(){
 		$('#search-input').on('select2:select',processAddToList);
 		$('#duration-picker').duration_picker(); 
 		$('#start-locat').click(()=>{
+
 			// data-start 0 là chưa có gì 1 là đang chờ để thêm địa điểm 2 là đã thêm điểm r ko cho thay đổi nữa
 			// data-clsclk click vào nút x #start-locat cũng nhận sự kiện
-			if($('#start-locat').attr('data-start') === '2') return;
+			if($('#start-locat').attr('data-start') === '2'){
+				$("#time-cost-picker").show();
+				return;
+			}
 			if($('#start-locat').attr('data-clsclk') === '1'){
 				$('#start-locat').attr('data-clsclk',0);
 				return;
@@ -804,6 +765,7 @@ function initMap(){
           var string_money = $(".amount-text").text();
           if(string_money.indexOf("VNĐ") != "-1")
           {
+
             $(".amount-text").text(string_money.slice(0,string_money.indexOf("VNĐ")) + $(this).val());
           }
           else if(string_money.indexOf("USD") != "-1")
@@ -857,10 +819,13 @@ function initMap(){
 			$('#get-route-pannel').hide();
 			$('#add-waypoints').hide();
 			$('.chip').hide();
+			$('#saveTour').hide();
 			$('#location-detail').hide();
 			$('#clear_mark').hide();
 			$('#clear_mark').trigger('click');
 			$("#search-input option").prop('disabled',false);
+			$('#get-route').show()
+			$('#get-route').text('Chỉ đường')
 
 			if(polylines.length){
 				for(let i =0; i<polylines.length;i++){
@@ -1212,6 +1177,7 @@ function initMap(){
 			$('#start-locat').attr('data-start',0);
 			let id = startLocat.id;
 			if(id != undefined) {
+				$(`option[value="${startLocat.id}"`)[0].disabled = false;
 				startLocat.marker.setMap(null);
 				$(`.map-marker-label[value="${id}"]`).remove();
 				startLocat = {};
@@ -1295,10 +1261,10 @@ function initMap(){
 		let marker,icon,label;
 		if(id == startLocat.id){
 			startLocat.marker =  	new google.maps.Marker({
-															position: Object(locationdata.get(id)).location,
-															label: Object(locationdata.get(id)).de_name,
-															map: map
-														});
+					position: Object(locationdata.get(id)).location,
+					label: Object(locationdata.get(id)).de_name,
+					map: map
+				});
 			customLabel(startLocat.marker,id);
 			marker = startLocat.marker;
 		} else {
@@ -2062,6 +2028,7 @@ function initMap(){
 				$("#timeAlert").modal("hide");
 				$('#get-route').show()
 			});
+			return;
 		} else {
 			idToData(null,'LatLngArr');
 			drawRoutes();

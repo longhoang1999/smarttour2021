@@ -125,7 +125,7 @@
                                 </div>
                                 <!-- /oldimage -->
                                 <div class="col-md-12 col-sm-12 col-12">
-                                    <p class="font-weight-bold font-italic mb-1">Photo to represent your tour</p>
+                                    <p class="font-weight-bold font-italic mb-1">Photo to represent your tour (optional)</p>
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-12 mb-3">
                                     <div class="Update_img_tour">Upload Image</div>

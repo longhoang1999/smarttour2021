@@ -238,3 +238,45 @@ a#btn-rating {
 #short_des,#description{
   font-weight: normal;
 }
+#wrap{
+  margin-top: 5em;
+}
+#map{display: block !important;
+  height: 100%;
+}
+.footer{
+  margin-top: 4rem;
+}
+body:after {
+   content: none;
+}
+#time-cost-picker{
+  top: 30%;
+  position: absolute;
+    left: -84%;
+    width: 25em;
+    box-shadow: 0 0 12px #abaaaa;
+    z-index: 10;
+}
+.jdp-input{
+  width: 100%;
+}
+.right > div {
+    width: 100%;
+    margin-top: 1em;
+}
+.icon_cost_picker{
+  position: absolute;
+    right: -9px;
+    top: 0;
+    font-size: 25px;
+    color: #ffffff;
+}
+#time-cost-container{
+  padding-left: 0;
+}
+.currency{
+  width: 20%;
+  background: white;
+  padding-right: 0;
+}
