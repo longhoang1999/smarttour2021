@@ -23,7 +23,7 @@ class MapDirectController {
         {
             $de = Language::where("language","vn")->get();
             foreach ($de as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_cost')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_cost','de_image')->where("de_remove",$value->des_id)->first();
                 $value["de_id"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
