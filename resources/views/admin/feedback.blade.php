@@ -1,6 +1,6 @@
 @extends('admin/layout/index')
 @section('title')
-    View Feedback
+    {{ trans('admin.feedbackInformation') }}
 @parent
 @stop
 @section('header_styles')
@@ -38,7 +38,7 @@
                       <th>{{ trans("admin.FullName") }}</th>
                       <th>{{ trans("admin.Content") }}</th>
                       <th>{{ trans("admin.Star") }}</th>
-                      <th>Share feedback</th>
+                      <th>{{ trans("admin.shareFeedback") }}</th>
                       <th>{{ trans("admin.Actions") }}</th>
                   </tr>
                   </thead>

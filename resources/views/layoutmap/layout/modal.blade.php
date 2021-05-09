@@ -58,7 +58,7 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="enterNameTourLabel">Save tour</h5>
+                <h5 class="modal-title" id="enterNameTourLabel">{{ trans('messages.SaveTour') }}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -71,12 +71,12 @@
                         <div class="container-fluid">
                             <div class="row mb-1 pt-0 pb-0">
                                 <div class="col-md-12 col-sm-12 col-12" id="tourExists">
-                                    <p class="m-0">Bạn đã có tour đi qua các điểm này trước đó. Bạn có thể sửa các tour đó ở dưới đây:</p>
+                                    <p class="m-0">{{ trans('messages.tourExit') }}</p>
                                     <div class="list_tourExists">
                                         <ul>
                                         </ul>
                                     </div>
-                                    <p class="font-italic">Hoặc bạn muốn tạo một tour mới:</p>
+                                    <p class="font-italic">{{ trans('messages.orMakeNewTour') }}</p>
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-12">
                                     <p class="font-weight-bold font-italic mb-0">{{ trans('messages.NameTour') }}</p>
@@ -85,7 +85,7 @@
                                     <input type="text" class="form-control" placeholder="{{ trans('messages.NameTour') }}" name="nameTour">
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-12">
-                                    <p class="font-weight-bold font-italic mb-1">Rating for your tour</p>
+                                    <p class="font-weight-bold font-italic mb-1">{{ trans('messages.ratingYourTour') }}</p>
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-12 mb-2" id="div_Starrank_tour">
                                     <i class="fas fa-star star_1 fa-2x star1"  data-value="1" style="cursor: pointer;"></i>
@@ -96,7 +96,7 @@
                                 </div>
                                 <input type="hidden" id="star_Share" name="star" value="0">
                                 <div class="col-md-12 col-sm-12 col-12">
-                                    <p class="font-weight-bold font-italic mb-1">Would you like to share the tour?</p>
+                                    <p class="font-weight-bold font-italic mb-1">{{ trans('messages.wantShareTour') }}</p>
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-12 mb-2">
                                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -112,23 +112,23 @@
                             <hr>
                             <div class="row inforForShare pt-0 pb-0">
                                 <div class="col-md-12 col-sm-12 col-12">
-                                    <p class="font-weight-bold font-italic mb-1">Recommend your tour</p>
+                                    <p class="font-weight-bold font-italic mb-1">{{ trans('messages.RecommendTour') }}</p>
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-12">
                                     <textarea class="form-control" placeholder="Recommend" name="recommend"></textarea>
                                 </div>
                                 <!-- old image -->
                                 <div class="col-md-12 col-sm-12 col-12" id="oldImageTitle">
-                                    <p class="font-weight-bold font-italic mb-1">Old image</p>
+                                    <p class="font-weight-bold font-italic mb-1">{{ trans('messages.oldImage') }}</p>
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-12" id="oldImageContent">
                                 </div>
                                 <!-- /oldimage -->
                                 <div class="col-md-12 col-sm-12 col-12">
-                                    <p class="font-weight-bold font-italic mb-1">Photo to represent your tour (optional)</p>
+                                    <p class="font-weight-bold font-italic mb-1">{{ trans('messages.photoForYourTour') }}</p>
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-12 mb-3">
-                                    <div class="Update_img_tour">Upload Image</div>
+                                    <div class="Update_img_tour">{{ trans('messages.Upload') }}</div>
                                     <p class="name_file_tour font-weight-bold font-italic"></p>
                                     <input accept="image/*" type="file" name="image_tour" class="form-control" id="img_input_Rank">
                                 </div>
@@ -159,7 +159,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Notification</h5>
+        <h5 class="modal-title" id="exampleModalLabel">{{ trans('messages.Notification') }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>

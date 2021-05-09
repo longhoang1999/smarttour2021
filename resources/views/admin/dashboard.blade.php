@@ -1,6 +1,6 @@
 @extends('admin/layout/index')
 @section('title')
-    View Account
+    {{ trans('admin.ViewAccount') }}
 @parent
 @stop
 @section('header_styles')
@@ -355,11 +355,11 @@
                     }
                     if(data[6] != "")
                     {
-                        $("#text_email").append(data[1]+"<span class='text-danger' style='font-style: italic;'> (Chưa xác minh)</span>");
+                        $("#text_email").append(data[1]+"<span class='text-danger' style='font-style: italic;'> ({{ trans('admin.notVerified') }})</span>");
                     }
                     if(data[6] == "")
                     {
-                        $("#text_email").append(data[1]+"<span class='text-success' style='font-style: italic;'> (Đã xác minh)</span>");
+                        $("#text_email").append(data[1]+"<span class='text-success' style='font-style: italic;'> ({{ trans('admin.Verified') }})</span>");
                     }
                     $(".id_fullName_user").append(data[2]);
                     $(".id_gender_user").append(data[3]);

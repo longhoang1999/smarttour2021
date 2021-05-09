@@ -1,6 +1,6 @@
 @extends('admin/layout/index')
 @section('title')
-    Edit Account
+    {{ trans('admin.editPlace') }}
 @parent
 @stop
 @section('header_styles')
@@ -37,7 +37,7 @@
               </select>
             </div>
             <div style="display: flex; margin-top: 1.5rem">
-              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Type of place</span> 
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('admin.typeOfPlace') }}</span> 
               <select id="selectType" class="form-control" style="width: 40%">
                 <option value="All">--All--</option>
                 @foreach($typeplace as $type)
@@ -53,7 +53,7 @@
                       <th>{{ trans('admin.Longitude') }}</th>
                       <th>{{ trans('admin.Latitude') }}</th>
                       <th>{{ trans('admin.Duration') }} ({{ trans('admin.hours') }})</th>
-                      <th>Created by</th>
+                      <th>{{ trans('admin.Createdby') }}</th>
                       <th>{{ trans('admin.Actions') }}</th>
                   </tr>
                   </thead>
@@ -85,7 +85,7 @@
             </div>
             <!-- type place -->
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Type of place</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.typeOfPlace') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6 text-justify" id="placeType">
             </div>
@@ -184,7 +184,7 @@
             </div>
             <!-- type place -->
             <div class="col-md-3 col-sm-6 col-6 mb-3">
-              <p class="font-weight-bold text-left mb-3">Type of place</p>
+              <p class="font-weight-bold text-left mb-3">{{ trans('admin.typeOfPlace') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6 mb-3">
                 <select id="selectType_edit" class="form-control" style="width: 40%" name="type">
@@ -192,7 +192,7 @@
                   <option value="{{$type->id}}">{{$type->nametype}}</option>
                   @endforeach
                 </select>
-                <span class="badge badge-success" id="typePlaceUser">Success</span>
+                <span class="badge badge-success" id="typePlaceUser">{{ trans('admin.Success') }}</span>
             </div>
             <!-- image -->
             <div class="col-md-3 col-sm-6 col-6">
@@ -244,7 +244,7 @@
               <p class="font-weight-bold text-left mb-3">{{ trans('admin.cost') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6 form-group">
-              <span class="show_yourCost"> -Bạn đã nhập: <span class="show_money"></span></span>
+              <span class="show_yourCost"> -{{ trans('admin.youEntered') }} <span class="show_money"></span></span>
               <div class="enterCost_block">
                 <select name="currency" class="form-control" id="selectCurrency">
                   <option selected="true" value="VNĐ">VNĐ</option>
@@ -446,7 +446,7 @@
               method:"GET",
               data:{_token:_token},
               success:function(data){ 
-                if(data =="Can not find data")
+                if(data =="{{ trans('admin.cantFinddata') }}")
                   alert(data)
                 else
                 {
@@ -503,7 +503,7 @@
               method:"GET",
               data:{_token:_token},
               success:function(data){ 
-                if(data =="Can not find data")
+                if(data =="{{ trans('admin.cantFinddata') }}")
                   alert(data)
                 else
                 {

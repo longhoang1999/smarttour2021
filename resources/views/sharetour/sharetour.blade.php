@@ -1,6 +1,6 @@
 @extends('sharetour/layout/index')
 @section('title')
-    Share Tour
+    {{ trans('newlang.tourDetail') }}
 @parent   
 @stop
 @section('header_styles')  
@@ -13,7 +13,7 @@
     <section class="page-section portfolio" id="portfolio">
         <div class="container">
             <!-- Portfolio Section Heading-->
-            <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Tour details</h2>
+            <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">{{ trans('newlang.tourDetail') }}</h2>
             <!-- Icon Divider-->
             <div class="divider-custom">
                 <div class="divider-custom-line"></div>
@@ -68,42 +68,42 @@
                         @else
                             data-target="#modalLogin"
                         @endif
-                        >Rating</button>
-                        <a href="{{route('share.viewSharetour',[$route->to_id,$share->sh_id])}}" class="btn btn-info">View tour</a>
+                        >{{ trans('newlang.Rating') }}</button>
+                        <a href="{{route('share.viewSharetour',[$route->to_id,$share->sh_id])}}" class="btn btn-info">{{ trans('newlang.viewTour') }}</a>
                     </div>
                     @if(Auth::check())
                         <?php $findVotes =  Uservotes::where("sh_id",$share->sh_id)->where("us_id",Auth::user()->us_id)->first(); ?>
                         @if(!empty($findVotes))
-                            <p><span class="font-weight-bold font-italic">Your votes: </span>
+                            <p><span class="font-weight-bold font-italic">{{ trans('newlang.Yourvotes') }}: </span>
                             <span>{{$findVotes->vote_number}} <i class="fas fa-star text-warning"></i></span></p>
                         @else
-                            <p><span class="font-weight-bold font-italic">Your votes: </span>
-                            <span class="badge badge-success">You do not have reviews for this tour</span></p>
+                            <p><span class="font-weight-bold font-italic">{{ trans('newlang.Yourvotes') }}: </span>
+                            <span class="badge badge-success">{{ trans('newlang.notHavereviews') }}</span></p>
                         @endif
                     @endif
-                    <p><span class="font-weight-bold font-italic">Introduce: </span>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.Introduce') }}: </span>
                     <span>{{$share->content}}</span></p>
-                    <p><span class="font-weight-bold font-italic">Average rating: </span>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.averageRating') }}: </span>
                     <span>{{$share->number_star}} <i class="fas fa-star text-warning"></i></span></p>
-                    <p><span class="font-weight-bold font-italic">Number of ratings: </span>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.numberofRatings') }}: </span>
                     <span>{{$share->numberReviews}} votes</span></p>
                     @if($route->to_startLocat != "")
                         <?php $des_startLocat = Destination::where("de_remove",$route->to_startLocat)->first(); ?>
-                        <p><span class="font-weight-bold font-italic">Start Location: </span>
+                        <p><span class="font-weight-bold font-italic">{{ trans('newlang.startLocation') }}: </span>
                         <span id="startLocation" data-id="{{$des_startLocat->de_remove}}"><i class="fas fa-street-view" style="color:#e74949;"></i> {{$des_startLocat->de_name}}</span></p>
                     @else
-                        <p><span class="font-weight-bold font-italic">Start Location: <span class="badge badge-warning">Not available</span></p>
+                        <p><span class="font-weight-bold font-italic">{{ trans('newlang.startLocation') }}: <span class="badge badge-warning">{{ trans('newlang.Notavailable') }}</span></p>
                     @endif
-                    <p class="font-weight-bold font-italic mb-0">Location:</p>
+                    <p class="font-weight-bold font-italic mb-0">{{ trans('newlang.Location') }}:</p>
                     <p id="detail_location"></p>
-                    <p><span class="font-weight-bold font-italic">Start time: </span>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.startTime') }}: </span>
                     <span>{{date('d/m/Y h:i a', strtotime($route->to_starttime))}}</span></p>
-                    <p><span class="font-weight-bold font-italic">Endtime time: </span>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.endtimeTime') }}: </span>
                     <span>{{date('d/m/Y h:i a', strtotime($route->to_endtime))}}</span></p>
                     <?php 
                         $total = Carbon\Carbon::parse($route->to_endtime)->diffInMinutes(Carbon\Carbon::parse($route->to_starttime));
                      ?>
-                    <p><span class="font-weight-bold font-italic">Total tour time: </span>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.totalTourTime') }}: </span>
                     <span class="total_time"></span></p>
                     <!-- js take total -->
                     <script type="text/javascript">
@@ -114,7 +114,7 @@
                     </script>
                     <!-- /endis -->
 
-                    <p><span class="font-weight-bold font-italic">Date created: </span>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.dateCreated') }}: </span>
                     <span>{{date('d/m/Y', strtotime($route->to_startDay))}}</span></p>
                 </div>
             </div>
@@ -125,15 +125,15 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Detail Place</h5>
+            <h5 class="modal-title" id="exampleModalLabel">{{ trans('newlang.DetailPlace') }}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="opSelection">
-                <div class="showImage">Show image</div>
-                <div class="showMap">Show Map</div>
+                <div class="showImage">{{ trans('newlang.Showimage') }}</div>
+                <div class="showMap">{{ trans('newlang.Showmap') }}</div>
             </div>
             <div class="imgPlace mt-4 mb-4">
             </div>
@@ -141,36 +141,36 @@
             <div class="container-fuild">
                 <div class="row">
                     <div class="col-md-4 col-sm-6 col-12 mb-4">
-                        <p class="font-weight-bold font-italic">Type of Place</p>
+                        <p class="font-weight-bold font-italic">{{ trans('newlang.TypeofPlace') }}</p>
                     </div>
                     <div class="col-md-8 col-sm-6 col-12 mb-4">
                         <p id="typePlace"></p>
                     </div>
                     <div class="col-md-4 col-sm-6 col-12 mb-4">
-                        <p class="font-weight-bold font-italic">Short description</p>
+                        <p class="font-weight-bold font-italic">{{ trans('newlang.shortDescription') }}</p>
                     </div>
                     <div class="col-md-8 col-sm-6 col-12 mb-4">
                         <p id="short"></p>
                     </div>
                     <div class="col-md-4 col-sm-6 col-12 mb-4">
-                        <p class="font-weight-bold font-italic">Description</p>
+                        <p class="font-weight-bold font-italic">{{ trans('newlang.Description') }}</p>
                     </div>
                     <div class="col-md-8 col-sm-6 col-12 mb-4">
                         <p id="description"></p>
                     </div>
                     <div class="col-md-4 col-sm-6 col-12 mb-4">
-                        <p class="font-weight-bold font-italic">Average travel time</p>
+                        <p class="font-weight-bold font-italic">{{ trans('newlang.averageTravelTime') }}</p>
                     </div>
                     <div class="col-md-8 col-sm-6 col-12 mb-4">
                         <p id="timeAvg"></p>
                     </div>
                     <div class="col-md-4 col-sm-6 col-12 mb-4">
-                        <p class="font-weight-bold font-italic">Link on google map</p>
+                        <p class="font-weight-bold font-italic">{{ trans('newlang.Linkongooglemap') }}</p>
                     </div>
                     <div class="col-md-8 col-sm-6 col-12 mb-4" id="linkMap">
                     </div>
                     <div class="col-md-4 col-sm-6 col-12 mb-4">
-                        <p class="font-weight-bold font-italic">Link on VR</p>
+                        <p class="font-weight-bold font-italic">{{ trans('newlang.LinkonVR') }}</p>
                     </div>
                     <div class="col-md-8 col-sm-6 col-12 mb-4" id="linkvr">
                     </div>
@@ -186,7 +186,7 @@
       <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Rating</h5>
+            <h5 class="modal-title" id="exampleModalLabel">{{ trans('newlang.Rating') }}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -195,7 +195,7 @@
             <div class="container-fuild">
                 <div class="row">
                   <div class="col-md-12 col-sm-12 col-12">
-                    <p class="font-weight-bold font-italic">Rating for your tour</p>
+                    <p class="font-weight-bold font-italic">{{ trans('newlang.ratingForTour') }}</p>
                   </div>
                   <div class="col-md-12 col-sm-12 col-12 mb-3" id="div_Starrank_tour">
                     <i class="fas fa-star star_1 fa-2x"  data-value="1" style="cursor: pointer;"></i>
@@ -209,7 +209,7 @@
               </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btn_Rating">Rating</button>
+            <button type="button" class="btn btn-primary" id="btn_Rating">{{ trans('newlang.Rating') }}</button>
           </div>
         </div>
       </div>
@@ -378,8 +378,8 @@
                       url:routeRating,
                       method:"POST",
                       data:{_token:_token,numberStar:numberStar,shareId:{{$share->sh_id}}},
-                      success:function(data){ 
-                        alert("You have successfully evaluated");
+                      success:function(data){
+                        alert("{{ trans('newlang.ratingSuccess') }}");
                         location.reload();
                      }
                 });
@@ -419,7 +419,7 @@
                                 }
                                 else
                                 {
-                                    $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='location with no photo'></a>");
+                                    $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='{{ trans('newlang.locationNoPhoto') }}'></a>");
                                 }
                                 $("#typePlace").empty();
                                 $("#typePlace").append(data[9]);
@@ -428,23 +428,23 @@
                                 if(data[4] != null)
                                     $("#short").append(data[4]);
                                 else
-                                    $("#short").append('<span class="badge badge-warning">Not available</span>');
+                                    $("#short").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
                                 if(data[5] != null)
                                     $("#description").append(data[5]);
                                 else
-                                    $("#description").append('<span class="badge badge-warning">Not available</span>');  
+                                    $("#description").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');  
 
                                 $("#timeAvg").html(parseFloat(data[6])/60/60+" hours");
                                 $("#linkMap").empty();
                                 if(data[7] != null)
                                     $("#linkMap").append('<a href="'+data[7]+'" target="_blank">Link here</a>');
                                 else
-                                    $("#linkMap").append('<span class="badge badge-warning">Not available</span>');
+                                    $("#linkMap").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
                                 $("#linkvr").empty();
                                 if(data[8] != null)
                                     $("#linkvr").append('<a href="'+data[8]+'" target="_blank">Link here</a>');
                                 else
-                                    $("#linkvr").append('<span class="badge badge-warning">Not available</span>');
+                                    $("#linkvr").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
                                 //vẽ map
                                 deleteMarker();
                                 let add = data[0]+","+data[1];
@@ -473,7 +473,7 @@
                             }
                             else
                             {
-                                $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='location with no photo'></a>");
+                                $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='{{ trans('newlang.locationNoPhoto') }}'></a>");
                             }
                             $("#typePlace").empty();
                             $("#typePlace").append(data[9]);
@@ -482,24 +482,24 @@
                             if(data[4] != null)
                                 $("#short").append(data[4]);
                             else
-                                $("#short").append('<span class="badge badge-warning">Not available</span>');
+                                $("#short").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
 
                             if(data[5] != null)
                                 $("#description").append(data[5]);
                             else
-                                $("#description").append('<span class="badge badge-warning">Not available</span>');  
+                                $("#description").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');  
 
                             $("#timeAvg").html(parseFloat(data[6])/60/60+" hours");
                             $("#linkMap").empty();
                             if(data[7] != null)
                                 $("#linkMap").append('<a href="'+data[7]+'" target="_blank">Link here</a>');
                             else
-                                $("#linkMap").append('<span class="badge badge-warning">Not available</span>');
+                                $("#linkMap").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
                             $("#linkvr").empty();
                             if(data[8] != null)
                                 $("#linkvr").append('<a href="'+data[8]+'" target="_blank">Link here</a>');
                             else
-                                $("#linkvr").append('<span class="badge badge-warning">Not available</span>');
+                                $("#linkvr").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
                             //vẽ map
                             deleteMarker();
                             let add = data[0]+","+data[1];
@@ -539,7 +539,7 @@
                     //đặt lại marker cào mảng để xóa
                     markers.push(staMarker);
                   } else {
-                    alert("Geocode was not successful for the following reason: " + status);
+                    alert("{{ trans('newlang.Geocode') }}: " + status);
                   }
                 });
             };

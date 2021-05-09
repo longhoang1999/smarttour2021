@@ -1,6 +1,6 @@
 @extends('admin/layout/index')
 @section('title')
-    View Account
+    {{ trans('admin.addPlace') }}
 @parent
 @stop
 @section('header_styles')
@@ -31,7 +31,7 @@
             <div style="display: flex;">
               <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('admin.languageShown') }}</span> 
               <select id="selectLang" class="form-control" style="width: 40%">
-                <option hidden="">--Your choice--</option>
+                <option hidden="">--{{ trans('admin.yourChoice') }}--</option>
                 <option selected="" value="en">{{ trans('admin.EN') }}</option>
                 <option value="vn">{{ trans('admin.VN') }}</option>
               </select>
@@ -265,8 +265,8 @@
               <!-- cost -->
               <div class="form-group">
                 <label for="inputCost">
-                  Cost
-                  <span class="show_yourCost"> -Bạn đã nhập: <span class="show_money"></span></span>
+                  {{ trans('admin.enterCost') }}
+                  <span class="show_yourCost"> -{{ trans('admin.youEntered') }} <span class="show_money"></span></span>
                 </label>
                 <div class="enterCost_block">
                   <select name="currency" class="form-control" id="selectCurrency">
@@ -440,7 +440,7 @@
               method:"GET",
               data:{_token:_token},
               success:function(data){ 
-                if(data =="Can not find data")
+                if(data =="{{ trans('admin.cantFinddata') }}")
                   alert(data)
                 else
                 {
@@ -548,7 +548,7 @@
             {
               if(link.lastIndexOf("https://www.google.com/maps/place") == '-1')
               {
-                alert("The path you entered is not the path of google map");
+                alert("{{ trans('admin.notGoogleMapLink') }}");
               }
               else
               {
@@ -557,7 +557,7 @@
             }
             else
             {
-              alert("Please enter a google map link");
+              alert("{{ trans('admin.enterGoogleMapLink') }}");
             }
           });
           function deleteMarker()
@@ -623,7 +623,7 @@
                     success: function(data){
                       if(data == "false")
                       {
-                        alert("you miss the name of the place");
+                        alert("{{ trans('admin.forgotEnterName') }}");
                       }
                       else
                       {
@@ -750,7 +750,7 @@
             document.getElementById("btn_addPlace").setAttribute("style","display:block");
             document.getElementById("btn_addPlace_2").setAttribute("style","display:none");
           } else {
-            alert("Geocode was not successful for the following reason: " + status);
+            alert("{{ trans('admin.geocodeNotSuccess') }} " + status);
           }
         });
       };

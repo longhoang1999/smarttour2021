@@ -53,7 +53,7 @@
 				</div>
 			</div>
 			<div class="dashboard box3">
-				<a href="{{route('admin.history')}}"><i class="fas fa-motorcycle"></i> Tour history</a>
+				<a href="{{route('admin.history')}}"><i class="fas fa-motorcycle"></i> {{ trans('admin.tourHistory') }}</a>
 			</div>
 			<div class="dashboard box4">
 				<a href="{{route('admin.feedback')}}"><i class="far fa-comments"></i> {{ trans('admin.feedbackInformation') }}</a>
@@ -286,11 +286,11 @@
                         }
                         if(data[6] != "")
                         {
-                            $("#text_email_person").append(data[1]+"<span class='text-danger' style='font-style: italic;'> (Chưa xác minh)</span>");
+                            $("#text_email_person").append(data[1]+"<span class='text-danger' style='font-style: italic;'> ({{ trans('messages.notVerified') }})</span>");
                         }
                         if(data[6] == "")
                         {
-                            $("#text_email_person").append(data[1]+"<span class='text-success' style='font-style: italic;'> (Đã xác minh)</span>");
+                            $("#text_email_person").append(data[1]+"<span class='text-success' style='font-style: italic;'> ({{trans('messages.Verified')}})</span>");
                         }
                         $("#text_fullName_person").append(data[2]);
                         $("#text_gender_person").append(data[3]);

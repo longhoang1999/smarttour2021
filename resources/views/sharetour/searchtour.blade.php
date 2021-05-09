@@ -1,6 +1,6 @@
 @extends('sharetour/layout/index')
 @section('title')
-    Search Tour
+    {{ trans('newlang.searchtour') }}
 @parent   
 @stop
 @section('header_styles')
@@ -271,7 +271,7 @@
           <div style="display: flex;margin-top: 1.5rem">
               <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('newlang.Places') }}</span> 
               <select id="selectPlaces" class="form-control" style="width: 60%;margin-right: 2rem;">
-                <option hidden="" value="">--Your choice--</option>
+                <option hidden="" value="">--{{ trans('newlang.yourChoice') }}--</option>
                 @foreach($lang as $la)
                   <option value="{{$la->des_id}}">{{$la->de_name}}</option>
                 @endforeach
@@ -330,7 +330,7 @@
           <div class="container-fuild">
               <div class="row">
                   <div class="col-md-4 col-sm-6 col-12 mb-4">
-                      <p class="font-weight-bold font-italic">Type of Place</p>
+                      <p class="font-weight-bold font-italic">{{ trans('newlang.TypeofPlace') }}</p>
                   </div>
                   <div class="col-md-8 col-sm-6 col-12 mb-4">
                       <p id="typePlace"></p>
@@ -813,18 +813,18 @@
                   }
                   else
                   {
-                    alert("You have selected all locations");
+                    alert("{{ trans('newlang.youSelectedAll') }}");
                   }
               }
             }
             else
             {
-              alert("You have chosen this location");
+              alert("{{ trans('newlang.chosenThisPlace') }}");
             }
           }
           else
           {
-            alert("Please select a location");
+            alert("{{ trans('newlang.PleaseSelect') }}");
           }
         });
         $(".list_content").on('click','span .remove_item',function(){
@@ -889,7 +889,7 @@
                     }
                     else
                     {
-                        $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='location with no photo'></a>");
+                        $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='{{ trans('newlang.locationNoPhoto') }}'></a>");
                     }
                     $("#typePlace").empty();
                     $("#typePlace").append(data[9]);

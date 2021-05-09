@@ -1,6 +1,6 @@
 @extends('admin/layout/index')
 @section('title')
-    View Feedback
+    {{ trans('admin.typeOfPlace') }}
 @parent
 @stop
 @section('header_styles')

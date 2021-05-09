@@ -1,6 +1,6 @@
 @extends('admin/layout/index')
 @section('title')
-    View Feedback
+    {{ trans('admin.tourHistory') }}
 @parent
 @stop
 @section('header_styles')
@@ -51,10 +51,10 @@
         </div>
     </div>
 <!-- star tour -->
-<div class="title"><p class="text-uppercase">The tours are shared and appreciated</p></div>
+<div class="title"><p class="text-uppercase">{{ trans('admin.tourShared') }}</p></div>
   <div class="AllClass_Table">
         <div class="AllClass_Table_title">
-          <p>The tours are shared and appreciated</p>
+          <p class="text-lowercase">{{ trans('admin.tourShared') }}</p>
         </div>
         <div class="AllClass_Table_content">
             <table class="table table-bordered table-striped" id="Table_AllClass_Star" style="margin-bottom: 10px;">
@@ -64,8 +64,8 @@
                       <th>{{ trans("admin.Tourname") }}</th>
                       <th>{{ trans("admin.Startlocation") }}</th>
                       <th>{{ trans("admin.DetailTour") }}</th>
-                      <th>Introduce</th>
-                      <th>Average rating</th>
+                      <th>{{ trans("admin.Introduce") }}</th>
+                      <th>{{ trans("admin.averageRating") }}</th>
                       <th>{{ trans("admin.Actions") }}</th>
                   </tr>
                   </thead>
@@ -80,18 +80,18 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+            <h5 class="modal-title" id="exampleModalLabel">{{ trans("admin.Warning") }}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <p class="font-weight-bold text-danger font-italic">This action cannot be undone</p>
-            <p>delete the tour from the category "shared tours"</p>
+            <p class="font-weight-bold text-danger font-italic">{{ trans("admin.canNotUndo") }}</p>
+            <p>{{ trans("admin.deleteShareTour") }}</p>
           </div>
           <div class="modal-footer">
-            <a href="#" class="btn btn-danger">Delete</a>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <a href="#" class="btn btn-danger">{{ trans("admin.Delete") }}</a>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans("admin.Close") }}</button>
           </div>
         </div>
       </div>
@@ -154,7 +154,7 @@
               </div>
               <!-- total time -->
               <div class="col-md-4 col-sm-6 col-6 mb-3">
-                <p class="font-weight-bold text-italic">Total tour time</p>
+                <p class="font-weight-bold text-italic">{{ trans('admin.totalTourTime') }}</p>
               </div>
               <div class="col-md-8 col-sm-6 col-6 mb-3">
                 <p id="textTotalTime"></p>
@@ -239,7 +239,7 @@
               </div>
               <!-- total time -->
               <div class="col-md-4 col-sm-6 col-6 mb-3">
-                <p class="font-weight-bold text-italic">Total tour time</p>
+                <p class="font-weight-bold text-italic">{{ trans('admin.totalTourTime') }}</p>
               </div>
               <div class="col-md-8 col-sm-6 col-6 mb-3">
                 <p id="textTotalTour_detail2"></p>
@@ -265,13 +265,13 @@
             <div class="row">
               
               <div class="col-md-4 col-sm-6 col-6 mb-3">
-                <p class="font-weight-bold text-italic">Introduce</p>
+                <p class="font-weight-bold text-italic">{{ trans('admin.Introduce') }}</p>
               </div>
               <div class="col-md-8 col-sm-6 col-6 mb-3">
                 <p id="introduce_detail2"></p>
               </div>
               <div class="col-md-4 col-sm-6 col-6 mb-3">
-                <p class="font-weight-bold text-italic">Average rating</p>
+                <p class="font-weight-bold text-italic">{{ trans('admin.averageRating') }}</p>
               </div>
               <div class="col-md-8 col-sm-6 col-6 mb-3">
                 <p id="number_star_detail2"></p>

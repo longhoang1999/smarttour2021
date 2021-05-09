@@ -1,6 +1,6 @@
 @extends('admin/layout/index')
 @section('title')
-    Remove Account
+    {{ trans('admin.deletePlace') }}
 @parent
 @stop
 @section('header_styles')
@@ -40,15 +40,15 @@
         </div>
         <div class="AllClass_Table_content">
             <div style="display: flex;">
-              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Language shown</span> 
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('admin.languageShown') }}</span> 
               <select id="selectLang" class="form-control" style="width: 40%">
-                <option hidden="">--Your choice--</option>
+                <option hidden="">--{{ trans('admin.yourChoice') }}--</option>
                 <option selected="" value="en">English</option>
                 <option value="vn">Tiếng việt</option>
               </select>
             </div>
             <div style="display: flex; margin-top: 1.5rem">
-              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">Type of place</span> 
+              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('admin.typeOfPlace') }}</span> 
               <select id="selectType" class="form-control" style="width: 40%">
                 <option value="All">--All--</option>
                 @foreach($typeplace as $type)
@@ -64,7 +64,7 @@
                       <th>{{ trans('admin.Longitude') }}</th>
                       <th>{{ trans('admin.Latitude') }}</th>
                       <th>{{ trans('admin.Duration') }} ({{ trans('admin.hours') }})</th>
-                      <th>Created by</th>
+                      <th>{{ trans('admin.Createdby') }}</th>
                       <th>{{ trans('admin.Actions') }}</th>
                   </tr>
                   </thead>
@@ -94,7 +94,7 @@
               <p class="text-justify pb-3" id="placeName"></p>
             </div>
             <div class="col-md-3 col-sm-6 col-6">
-              <p class="font-weight-bold text-left pb-3">Type of place</p>
+              <p class="font-weight-bold text-left pb-3">{{ trans('admin.typeOfPlace') }}</p>
             </div>
             <div class="col-md-9 col-sm-6 col-6 text-justify" id="placeType">
             </div>
@@ -273,7 +273,7 @@
               method:"GET",
               data:{_token:_token},
               success:function(data){ 
-                if(data =="Can not find data")
+                if(data =="{{ trans('admin.cantFinddata') }}")
                   alert(data)
                 else
                 {

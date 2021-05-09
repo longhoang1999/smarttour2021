@@ -1,6 +1,6 @@
 @extends('admin/layout/index')
 @section('title')
-    Edit Account
+    {{ trans('admin.Generalinfo') }}
 @parent
 @stop
 @section('header_styles')
@@ -136,7 +136,7 @@
         type: 'bar',
         data: {
           labels: [
-            '{{ trans("admin.chartTotalAcc") }}','{{ trans("admin.chartTotalPlace") }}','{{ trans("admin.StarAvg") }}','Total number of tours'
+            '{{ trans("admin.chartTotalAcc") }}','{{ trans("admin.chartTotalPlace") }}','{{ trans("admin.StarAvg") }}','{{ trans("admin.totalTour") }}'
           ],
           datasets: [{ 
               label: '{{ trans("admin.Generalinformation") }}',
