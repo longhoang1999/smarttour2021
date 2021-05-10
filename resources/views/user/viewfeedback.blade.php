@@ -1,6 +1,6 @@
 @extends('user/layout/index')
 @section('title')
-    Highly rater tour
+    {{ trans('messages.travelerReviews') }}
 @parent
 @stop
 @section('header_styles')
@@ -18,7 +18,7 @@
 	<section class="page-section" id="about">
         <div class="container">
             <!-- About Section Heading-->
-            <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">traveler reviews</h2>
+            <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">{{ trans('messages.travelerReviews') }}</h2>
             <!-- Icon Divider-->
             <div class="divider-custom">
                 <div class="divider-custom-line"></div>
@@ -45,8 +45,8 @@
                         <p class="font-weight-bold mb-0">
                             {{$use->us_fullName}}
                         </p>
-                        <p class="mb-0"><span class="font-weight-bold">Rating: </span><span>{{$fb->star}} <i class="fas fa-star text-warning"></i></span></p>
-                        <p class="mb-0"><span class="font-weight-bold">Feedback: </span><span>{{$fb->content}}</span></p>
+                        <p class="mb-0"><span class="font-weight-bold">{{ trans('messages.Rating') }}: </span><span>{{$fb->star}} <i class="fas fa-star text-warning"></i></span></p>
+                        <p class="mb-0"><span class="font-weight-bold">{{ trans('messages.Feedback') }}: </span><span>{{$fb->content}}</span></p>
                     </div>
                 </div>
                 <hr>

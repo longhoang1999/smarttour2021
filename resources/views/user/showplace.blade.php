@@ -1,12 +1,9 @@
 @extends('user/layout/index')
 @section('title')
-    Highly rater tour
+    {{ trans('messages.listPlace') }}
 @parent
 @stop
 @section('header_styles')
-	<style>
-
-	</style>
 @stop
 @section('content')
 	<section class="page-section" id="contact">
@@ -30,16 +27,16 @@
                     </div>
                 </div>
                 <div class="col-lg-7 mx-auto">
-                    <p><span class="font-weight-bold">Type Place: </span><span class="font-italic">{{$lang->nametype}}</span></p>
-                    <p><span class="font-weight-bold">Short description: </span><span class="font-italic">{{$lang->de_shortdes}}</span></p>
-                    <p><span class="font-weight-bold">Description: </span><span class="font-italic">{{$lang->de_description}}</span></p>
-                    <p><span class="font-weight-bold">Average travel time: </span><span class="font-italic">{{intval($lang->de_duration)/60/60}} hours</span></p>
-                    <p><span class="font-weight-bold">Link on google map: </span><a target="_blank" href="{{$lang->de_map}}" class="font-italic">Link here</a></p>
-                    <p><span class="font-weight-bold">Link on vr: </span>
+                    <p><span class="font-weight-bold">{{ trans('messages.TypePlace') }}: </span><span class="font-italic">{{$lang->nametype}}</span></p>
+                    <p><span class="font-weight-bold">{{ trans('messages.Shortdescription') }}: </span><span class="font-italic">{{$lang->de_shortdes}}</span></p>
+                    <p><span class="font-weight-bold">{{ trans('messages.Description') }}: </span><span class="font-italic">{{$lang->de_description}}</span></p>
+                    <p><span class="font-weight-bold">{{ trans('messages.Averagetraveltime') }}: </span><span class="font-italic">{{intval($lang->de_duration)/60/60}} hours</span></p>
+                    <p><span class="font-weight-bold">{{ trans('messages.Linkongooglemap') }}: </span><a target="_blank" href="{{$lang->de_map}}" class="font-italic">Link here</a></p>
+                    <p><span class="font-weight-bold">{{ trans('messages.LinkVR') }}: </span>
                         @if($lang->de_link != "")
                             <a target="_blank" href="{{$lang->de_link}}" class="font-italic">Link here</a>
                         @else
-                            <span class="badge badge-warning">Not available</span>
+                            <span class="badge badge-warning">{{ trans('messages.Notavailable') }}</span>
                         @endif
                     </p>
                 </div>

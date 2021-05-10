@@ -245,7 +245,53 @@
     </div>
   </div>
   <!-- modal rating -->
-  
+  <style type="text/css">
+    .search_nav_menu{
+      display: flex;
+      height: 2.5em;
+      line-height: 2.5em;
+    }
+    .search_nav_menu div{
+      height: 100%;
+      padding: 0 .5em;
+      border-top-width: 0;
+      cursor: pointer; 
+      color: #6093ff;
+      font-weight: 600;
+      transition: all .5s;
+    }
+    .search_nav_menu div:hover{
+      background: #e7e6e6;
+    }
+    .search_box1{
+      background: #e7e6e6;
+    }
+    .search_content{
+      padding: 2em 1em;
+    }
+    .right_block{
+      display: none;
+    }
+    #btn_searchforcost{display: none;}
+    #ModalSearch .modal-body{
+      padding-bottom: 2em !important;
+    }
+    #ModalSearch .modal-footer{
+      padding: 0em .5em 1em .5em !important;
+    }
+    .block_minimum,.block_maximum{display: flex;position: relative;}
+    .block_minimum > span,.block_maximum > span{
+      font-size: 1.2rem;width: 15%;
+    }
+    .detail_money {
+        position: absolute;
+        bottom: -1.4em;
+        left: 16%;
+        color: red;
+        font-style: italic;
+        font-size: 14px;
+    }
+  </style>
   <!-- modal search -->
   <div class="modal fade" id="ModalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalSearchLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -256,37 +302,72 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-          <div style="display: flex;">
-              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('newlang.Typeofplace') }}</span> 
-              <select id="selectType" class="form-control" style="width: 60%">
-                <option value="All">--{{ trans('newlang.All') }}--</option>
-                <option value="0">{{ trans('newlang.scenicSpots') }}</option>
-                <option value="1">{{ trans('newlang.Restaurant') }}</option>
-                <option value="2">{{ trans('newlang.Hotel') }}</option>
-                <option value="3">{{ trans('newlang.Schools') }}</option>
-                <option value="4">--{{ trans('newlang.Other') }}</option>
-              </select>
-          </div>
-          <div style="display: flex;margin-top: 1.5rem">
-              <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('newlang.Places') }}</span> 
-              <select id="selectPlaces" class="form-control" style="width: 60%;margin-right: 2rem;">
-                <option hidden="" value="">--{{ trans('newlang.yourChoice') }}--</option>
-                @foreach($lang as $la)
-                  <option value="{{$la->des_id}}">{{$la->de_name}}</option>
-                @endforeach
-              </select>
-              <button class="btn btn-primary" id="btn_add_place">{{ trans('newlang.addLocation') }}</button>
-          </div>
-          <div class="list_location mt-4">
-            <p class="lead font-weight-bold font-italic">{{ trans('newlang.listPlace') }}</p>
-            <div class="list_content">
-                <!-- append content -->
+        <div class="modal-body" style="border-top: 1px solid lightgray;">
+          <nav class="search_nav_menu bg-light">
+              <div class="search_box1">Tour đi qua các địa điểm</div>
+              <div class="search_box2">Tìm kiếm theo tổng chi phí</div>
+          </nav>
+          <div class="search_content">
+            <div class="left_block">
+              <div style="display: flex;">
+                  <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('newlang.Typeofplace') }}</span> 
+                  <select id="selectType" class="form-control" style="width: 60%">
+                    <option value="All">--{{ trans('newlang.All') }}--</option>
+                    @foreach($allTypePlace as $typePlace)
+                    <option value="{{$typePlace->id}}">{{$typePlace->nameType}}</option>
+                    @endforeach
+                  </select>
+              </div>
+              <div style="display: flex;margin-top: 1.5rem">
+                  <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('newlang.Places') }}</span> 
+                  <select id="selectPlaces" class="form-control" style="width: 60%;margin-right: 2rem;">
+                    <option hidden="" value="">--{{ trans('newlang.yourChoice') }}--</option>
+                    @foreach($lang as $la)
+                      <option value="{{$la->des_id}}">{{$la->de_name}}</option>
+                    @endforeach
+                  </select>
+                  <!-- <button class="btn-sm btn btn-primary" id="btn_add_place">{{ trans('newlang.addLocation') }}</button> -->
+              </div>
+              <div class="list_location mt-4">
+                <p class="lead font-weight-bold font-italic">{{ trans('newlang.listPlace') }}</p>
+                <div class="list_content">
+                    <!-- append content -->
+                </div>
+              </div>
+            </div>
+            <div class="right_block">
+              <h5 class="font-weight-bold font-italic">Nhập chi phí bạn có thể dùng:</h5>
+              <div style="display: flex;" class="mb-3 mt-3"> 
+                  <span style="font-size: 1.2rem;width: 15%" class="font-weight-bold font-italic">Mệnh giá: </span> 
+                  <select name="currency" class="form-control currency" style="width: 12%">
+                    @if(Session::has('website_language') && Session::get('website_language') == "vi")
+                      <option selected="true" value="VNĐ">VNĐ</option>
+                      <option value="USD">USD</option>
+                    @else
+                      <option value="VNĐ">VNĐ</option>
+                      <option selected="true" value="USD">USD</option>
+                    @endif
+                  </select>
+              </div>
+              <style>
+                .detail_money_minimum,.detail_money_maximum{display: none;}
+              </style>
+              <div class="block_minimum mb-4">
+                  <span class="font-weight-bold font-italic">Tối thiểu: </span> 
+                  <input type="number" class="form-control" id="minimum" style="width: 70%" placeholder="Tối thiểu">
+                  <p class="detail_money detail_money_minimum">sdvsdv</p>
+              </div>
+              <div class="block_maximum">
+                  <span class="font-weight-bold font-italic">Tối đa: </span> 
+                  <input type="number" class="form-control" id="maximum" style="width: 70%" placeholder="Tối đa">
+                  <p class="detail_money detail_money_maximum">sdvsdv</p>
+              </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" id="btn_searchforlisst">{{ trans('newlang.searchtour') }}</button>
+          <button type="button" class="btn btn-success" id="btn_searchforlist">{{ trans('newlang.searchtour') }}</button>
+          <button type="button" class="btn btn-success" id="btn_searchforcost">{{ trans('newlang.searchtour') }}</button>
         </div>
       </div>
     </div>
@@ -371,7 +452,51 @@
   </div>
   <!-- /Model -->
 @stop
-@section('footer-js')     
+@section('footer-js')
+<script type="text/javascript">
+  $(document).ready(function(){
+    // detail_money
+    $("#minimum").keyup(function(){
+      if($(this).val() == "")
+      {
+        $(".detail_money_minimum").css("display","none");
+      }
+      else
+      {
+        $(".detail_money_minimum").text($(this).val().toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") +" "+$(".currency").val());
+        $(".detail_money_minimum").css("display","block");
+      }
+    });
+    $("#maximum").keyup(function(e){
+      if($(this).val() == "")
+      {
+        $(".detail_money_maximum").css("display","none");
+      }
+      else
+      {
+        $(".detail_money_maximum").text($(this).val().toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") +" "+$(".currency").val());
+        $(".detail_money_maximum").css("display","block");
+      }
+    });
+    //search_box
+    $(".search_box1").click(function(){
+      $(".left_block").slideDown();
+      $(".right_block").slideUp();
+      $("#btn_searchforcost").hide();
+      $("#btn_searchforlist").show();
+      $(".search_box2").css("background","transparent");
+      $(this).css("background","#e7e6e6");
+    });
+    $(".search_box2").click(function(){
+      $(".right_block").slideDown();
+      $(".left_block").slideUp();
+      $("#btn_searchforcost").show();
+      $("#btn_searchforlist").hide();
+      $(".search_box1").css("background","transparent");
+      $(this).css("background","#e7e6e6");
+    });
+  });
+</script> 
 <script type="text/javascript">
     var listIdSearch = [];
     $(document).ready(function(){
@@ -558,7 +683,7 @@
           $(".openModalSearch").click(function(){
             $("#ModalSearch").modal("show");
           });
-          $("#btn_searchforlisst").click(function(){
+          $("#btn_searchforlist").click(function(){
             let type = $("#selectType").val();
             let _token = $('meta[name="csrf-token"]').attr('content');
             let $url_path = '{!! url('/') !!}';
@@ -786,7 +911,7 @@
                  }
             });
         });
-        $("#btn_add_place").click(function(){
+        $("#selectPlaces").change(function(){
           if($("#selectPlaces").val() != "")
           {
             var attr = $('#selectPlaces option:selected').attr('disabled');

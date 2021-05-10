@@ -3,7 +3,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Notification</h5>
+        <h5 class="modal-title" id="exampleModalLabel">{{ trans('messages.Notification') }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -133,8 +133,8 @@
                     </div>
                     <div class="col-md-9 col-sm-6 col-6 mb-3">
                         <select class="form-control" name="gender">
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
+                            <option value="Male">{{ trans('messages.Male') }}</option>
+                            <option value="Female">{{ trans('messages.Female') }}</option>
                         </select>
                     </div>
                     <div class="col-md-3 col-sm-6 col-6 mb-3">

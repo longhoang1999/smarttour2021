@@ -276,6 +276,21 @@ class UserController extends Controller
             return view('user.listplacetype',['listPlace'=>$listPlace,'langType'=>$langType->nametype]);
         }
     }
+    public function loadPlaceInfo(Request $req)
+    {
+        if(Session::has('website_language') && Session::get('website_language') == "vi")
+            $lang = Language::where("language","vn")->where("des_id",$req->idPlace)->first();
+        else
+            $lang = Language::where("language","en")->where("des_id",$req->idPlace)->first();
+        $findDes = Destination::where("de_remove",$req->idPlace)->first();
+        if($findDes->de_image != "")
+            $lang['de_image'] = asset($findDes->de_image);
+        else $lang['de_image'] = "";
+        $lang['de_duration'] = intval($findDes->de_duration)/60/60;
+        $lang['de_link'] = $findDes->de_link;
+        $lang['de_map'] = $findDes->de_map;
+        return $lang; 
+    }
     public function logout(){
         Auth::logout();
         session()->flush();

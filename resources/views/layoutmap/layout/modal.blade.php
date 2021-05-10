@@ -290,8 +290,8 @@
                                         </div>
                                         <div class="col-md-9 col-sm-6 col-6 mb-3">
                                                 <select class="form-control" name="gender">
-                                                        <option value="Male">Male</option>
-                                                        <option value="Female">Female</option>
+                                                        <option value="Male">{{ trans('messages.Male') }}</option>
+                                                        <option value="Female">{{ trans('messages.Female') }}</option>
                                                 </select>
                                         </div>
                                         <div class="col-md-3 col-sm-6 col-6 mb-3">

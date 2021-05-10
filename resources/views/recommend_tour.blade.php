@@ -16,7 +16,8 @@
 @stop
 @section('content')	
 	<!-- map -->
-	<div id="wrap"> 
+	<div id="wrap">
+		<input id="pac-input" class="controls" type="text" placeholder="Search Box"> 
 		<div id="map"></div>
 		<div id='control-column'>
 			<div id="search-box">
@@ -664,8 +665,22 @@ function initMap(){
 						}),
 				directionsService	= new google.maps.DirectionsService(),
 				geocoder 	= new google.maps.Geocoder(),
-				distanceService = new google.maps.DistanceMatrixService();;
-	
+				distanceService = new google.maps.DistanceMatrixService();
+
+	// var searchBox = new google.maps.places.SearchBox(document.getElementById('pac-input'));
+ //   map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('pac-input'));
+ //   google.maps.event.addListener(searchBox, 'places_changed', function() {
+ //     var places = searchBox.getPlaces();
+ //     geocoderCallBack(places)
+ //   });
+	const searchBox = new google.maps.places.SearchBox(document.getElementById('pac-input'));
+   map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('pac-input'));
+   google.maps.event.addListener(searchBox, 'places_changed', function() {
+     let places = searchBox.getPlaces();
+     console.log(places)
+     $('#add-waypoints').show();
+     geocoderCallBack(places)
+   });
 	setEvent();
 //===========================================
 
@@ -778,31 +793,7 @@ function initMap(){
           	$(".amount-text").text($("#amount").val().toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")+" "+$(this).val());
           }
         });
-		// $('#amount').keyup(e=>{
-		// 		let val = ''+$('#amount').val();
-		// 		// if(e.key !== 'Backspace')
-		// 		//  val+=e.key
-		// 		// else 
-		// 		// 	val = val.substring(0,val.length - 1);
-
-		// 	  if(['1','2','3','4','5', '6', '7', '8', '9', '0','Backspace'].indexOf(e.key) === -1)
-		// 	    e.preventDefault();		
-		// 	  else {
-		// 	  // 	if(val == ''){
-		// 			// $('.amount-text').text(''); 
-		// 	  // 		return;
-		// 	  // 	} 
-		// 	  // 	let id = $('#time-cost-picker').attr('value')
-		// 	  // 	idToData(id,'setCost',parseInt(val));
-		//   	// 	val = parseInt(val).toLocaleString(undefined,{ style: 'currency', currency: 'VND'});
-		//   	// 	$('.amount-text').text(val);
-		// 	  	var notification_money=val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-		// 		 	$('.amount-text').text(notification_money + $('.currency-select').find(":selected").text() );
-		// 	  }
-		// 	 // var notification_money=val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-		// 	 // $('.amount-text').text(notification_money);
-
-		// 	});
+		// Test brancg git
 		$('#clear_mark').click(()=>{
 			 if(nearMarks.length)
 			 	nearMarks.forEach(ele=>ele.setMap(null));
@@ -819,6 +810,7 @@ function initMap(){
 			$("#start-locat").html("<span>Click chuột vào đây để chọn điểm bắt đầu</span>");
 			$("#start-locat").attr('data-start',0);
 			$("#start-locat").attr('data-clsclk',0);
+			$('#pac-input').val('')
 			$('#list-container').empty();
 			$('#time-cost-picker').hide();
 			$('#get-route-pannel').hide();
@@ -844,6 +836,10 @@ function initMap(){
 					value.setMap(null);
 					markerArray.delete(key);
 				});
+			}
+
+			if(Object.entries(newMarkOnClk.size).length){
+				newMarkOnClk.marker.setMap(null);
 			}
 
 			if(Object.entries(startLocat).length){

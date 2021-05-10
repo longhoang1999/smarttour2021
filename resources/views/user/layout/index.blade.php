@@ -122,7 +122,7 @@
                             {
                                 $(".result_search").show();
                                 $(".result_search ul").empty();
-                                $(".result_search ul").append('<li class="select_id"><img src="{{asset("assets/img/portfolio/cabin.png")}}" alt="" />Not having any results for you</li>');
+                                $(".result_search ul").append('<li class="select_id"><img src="{{asset("assets/img/portfolio/cabin.png")}}" alt="" />{{ trans("messages.notHaveAnyResults") }}</li>');
                             }
                          }
                     });
@@ -315,7 +315,7 @@
                         }
                         if(data == "false")
                         {
-                            alert("Cannot send email");
+                            alert("{{ trans('messages.cantSendEmail') }}");
                         }
                      }
                 });
@@ -390,11 +390,11 @@
                             }
                             if(data[6] != "")
                             {
-                                $("#text_email").append(data[1]+"<span class='text-danger' style='font-style: italic;'> (Chưa xác minh)</span>");
+                                $("#text_email").append(data[1]+"<span class='text-danger' style='font-style: italic;'> ({{ trans('messages.notVerified') }})</span>");
                             }
                             if(data[6] == "")
                             {
-                                $("#text_email").append(data[1]+"<span class='text-success' style='font-style: italic;'> (Đã xác minh)</span>");
+                                $("#text_email").append(data[1]+"<span class='text-success' style='font-style: italic;'> ({{ trans('messages.Verified') }})</span>");
                             }
                             $("#text_fullName").append(data[2]);
                             $("#text_gender").append(data[3]);

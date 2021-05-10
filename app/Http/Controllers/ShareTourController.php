@@ -298,12 +298,28 @@ class ShareTourController extends Controller
         {
             $lang = Language::select('de_name','des_id')->where("language","en")->get();
         }
+        $allTypePlace = TypePlace::where('status','<>','1')->get();
+        if(Session::has('website_language') && Session::get('website_language') == "vi")
+        {
+            foreach ($allTypePlace as $value) {
+                $findNameType = Langtype::where('type_id',$value->id)->where("language","vn")->first();
+                $value['nameType'] = $findNameType->nametype;
+            }
+        }
+        else
+        {
+            foreach ($allTypePlace as $value) {
+                $findNameType = Langtype::where('type_id',$value->id)->where("language","en")->first();
+                $value['nameType'] = $findNameType->nametype;
+            }
+        }
         return view('sharetour.searchtour',[
             'votes_over' => $votes_over,
             'votes_number' => $votes_number,
             'thismonth' => $findThisMon,
             'votes_total_time' => $votes_total_time->count(),
-            'lang' => $lang
+            'lang' => $lang,
+            'allTypePlace' => $allTypePlace
         ]);
     }
     // div_1

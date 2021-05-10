@@ -1,6 +1,6 @@
 @extends('user/layout/index')
 @section('title')
-    Highly rater tour
+    {{ trans('messages.Feedback') }}
 @parent
 @stop
 @section('header_styles')
@@ -47,13 +47,13 @@
                         <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                         <div class="control-group">
                             <div class="form-group floating-label-form-group controls mb-0 pb-2">
-                                <input class="form-control" id="name" type="number" placeholder="{{ trans('messages.Star') }}" required="required" data-validation-required-message="Please enter your star" min=0 max=5 name="star"/>
+                                <input class="form-control" id="name" type="number" placeholder="{{ trans('messages.Star') }}" required="required" data-validation-required-message="{{ trans('messages.PleaseEnterStar') }}" min=0 max=5 name="star"/>
                                 <p class="help-block text-danger"></p>
                             </div>
                         </div>
                         <div class="control-group">
                             <div class="form-group floating-label-form-group controls mb-0 pb-2">
-                                <textarea class="form-control" placeholder="{{ trans('messages.Feedback') }}" required="required" data-validation-required-message="Please enter your feedback." name="feedback"></textarea>
+                                <textarea class="form-control" placeholder="{{ trans('messages.Feedback') }}" required="required" data-validation-required-message="{{ trans('messages.PleaseEnterFeedback') }}" name="feedback"></textarea>
                                 <p class="help-block text-danger"></p>
                             </div>
                         </div>

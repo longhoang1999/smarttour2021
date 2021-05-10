@@ -1,6 +1,6 @@
 @extends('user/layout/index')
 @section('title')
-    Highly rater tour
+    {{ trans('messages.listPlace') }}
 @parent
 @stop
 @section('header_styles')
@@ -47,29 +47,28 @@
                 <div class="col-lg-9 mx-auto">
                     <div class="div_detail">
                         <div class="imgItem item">
-                            <p class="font-weight-bold">Image: </p>
+                            <p class="font-weight-bold">{{ trans('messages.Image') }}: </p>
                             <a data-fancybox="gallery" id="place_a" href="#">
                                 <img class="img-fluid rounded mb-5" id="place_img" src="" alt="">
                             </a>
                         </div>
                         <div class="contentItem item">
                             <p class="text-justify"><span class="font-weight-bold">
-                                {{$langType}}
-                                name: 
+                                {{$langType}}:
                             </span><span class="font-italic" id="placeName"></span></p>
-                            <p class="text-justify"><span class="font-weight-bold">Short description: </span>
+                            <p class="text-justify"><span class="font-weight-bold">{{ trans('messages.Shortdescription') }}: </span>
                                 <span class="font-italic" id="placeShort"></span>
                             </p>
-                            <p class="text-justify"><span class="font-weight-bold">Description: </span>
+                            <p class="text-justify"><span class="font-weight-bold">{{ trans('messages.Description') }}: </span>
                                 <span class="font-italic" id="placeDescrip"></span>
                             </p>
-                            <p class="text-justify"><span class="font-weight-bold">Average travel time: </span>
+                            <p class="text-justify"><span class="font-weight-bold">{{ trans('messages.Averagetraveltime') }}: </span>
                                 <span class="font-italic" id="placeTime"></span>
                             </p>
-                            <p class="text-justify"><span class="font-weight-bold">Link on google map: </span>
+                            <p class="text-justify"><span class="font-weight-bold">{{ trans('messages.Linkongooglemap') }}: </span>
                                 <a href="#" class="font-italic" id="placeMap" target="_blank">Link here</a>
                             </p>
-                            <p class="text-justify"><span class="font-weight-bold">Link on vr: </span>
+                            <p class="text-justify"><span class="font-weight-bold">{{ trans('messages.LinkVR') }}: </span>
                                 <a href="#" class="font-italic" id="placeVr" target="_blank">Link here</a>
                             </p>
                         </div>

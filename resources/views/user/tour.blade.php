@@ -1,6 +1,6 @@
 @extends('user/layout/index')
 @section('title')
-    Highly rater tour
+    {{ trans('messages.Highlyratertour') }}
 @parent
 @stop
 @section('header_styles')
@@ -19,7 +19,7 @@
 	<section class="page-section portfolio" id="introduce">
         <div class="container">
             <!-- About Section Heading-->
-            <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">highly rated tours</h2>
+            <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">{{ trans('messages.Highlyratertour') }}</h2>
             <!-- Icon Divider-->
             <div class="divider-custom">
                 <div class="divider-custom-line"></div>
@@ -38,14 +38,14 @@
                             @if($value->image != "")
                                 <img src="{{asset($value->image)}}" alt="" class="img_open_model{{$value->sh_id}}">
                             @else
-                                <img src="{{asset('imgPlace/empty.png')}}" alt="" title="location with no photo" class="img_open_model{{$value->sh_id}}"/>
+                                <img src="{{asset('imgPlace/empty.png')}}" alt="" title="{{ trans('messages.locationwithnophoto') }}" class="img_open_model{{$value->sh_id}}"/>
                             @endif
                         </div>
                     </div>
                 @endforeach
                 <div class="col-md-12 col-sm-12 col-12" id="div_loadMore">
                     <?php $type="notlogin" ?>
-                    <a href="{{route('searchTour')}}" id="loadMoreTour">--- See more <i class="fas fa-angle-double-right pt-2"></i> ---</a>
+                    <a href="{{route('searchTour')}}" id="loadMoreTour">--- {{ trans('messages.searchTour') }} <i class="fas fa-angle-double-right pt-2"></i> ---</a>
                 </div>
             </div>
             <div class="row">
@@ -64,7 +64,7 @@
               <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Tour name: {{$route->to_name}}</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">{{ trans('messages.Tourname') }}: {{$route->to_name}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -111,13 +111,13 @@
                     <div class="container-fuild">
                         <div class="row">
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Start Location</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.StartLocation') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{$start}}</p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Location</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Location') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12 mb-2">
                                 @foreach($detailLocation as $detail)
@@ -128,23 +128,23 @@
                                 @endforeach
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Time start</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Timestart') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{date('d/m/Y h:i a', strtotime($route->to_starttime))}}</p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Time end</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Timeend') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 @if($route->to_endtime != "")
                                     <p>{{date('d/m/Y h:i a', strtotime($route->to_endtime))}}</p>
                                 @else
-                                    <span class="badge badge-warning">Not available</span>
+                                    <span class="badge badge-warning">{{ trans('messages.Notavailable') }}</span>
                                 @endif
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Total tour time</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Totaltourtime') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12 total_time">
                             </div>
@@ -160,7 +160,7 @@
                             </script>
                             <!-- /endis -->
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Comeback</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Comeback') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 @if($route->to_comback == "0")
@@ -170,7 +170,7 @@
                                 @endif
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Date created</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Startday') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{date('d/m/Y', strtotime($route->to_startDay))}}</p>
@@ -179,25 +179,25 @@
                         <hr>
                         <div class="row">
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Introduce</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Introduce') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{$value->content}}</p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Average number of stars</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.avgStar') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{$value->number_star}} <i class="fas fa-star text-warning"></i></p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Number of ratings</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.numRating') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{$value->numberReviews}}</p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Your vote: </p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Yourvote') }}: </p>
                             </div>
                             <?php $findVotes =  Uservotes::where("sh_id",$value->sh_id)->where("us_id",Auth::user()->us_id)->first(); ?>
                             @if(!empty($findVotes))
@@ -206,14 +206,14 @@
                                 </div>
                             @else
                                 <div class="col-md-8 col-sm-6 col-12">
-                                    <span class="badge badge-success">You do not have reviews for this tour</span>
+                                    <span class="badge badge-success">{{ trans('messages.dontHavereviews') }}</span>
                                 </div>
                             @endif
                         </div>
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <a href="{{route('viewtour',$value->sh_id)}}" class="btn btn-success">View tour</a>
+                    <a href="{{route('viewtour',$value->sh_id)}}" class="btn btn-success">{{ trans('messages.Viewtour') }}</a>
                   </div>
                 </div>
               </div>
@@ -225,7 +225,7 @@
               <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Tour name: {{$route->to_name}}</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">{{ trans('messages.Tourname') }}: {{$route->to_name}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -239,7 +239,7 @@
                         }
                         else
                         {
-                            $start = "Not available";
+                            $start = "{{ trans('messages.Notavailable') }}";
                         }
 
                         $pieces = explode("|", $route->to_des);
@@ -273,25 +273,25 @@
                     <div class="container-fuild">
                         <div class="row">
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Start Location</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.StartLocation') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{$start}}</p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Location</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Location') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{$detailLocation}}</p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Time start</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Timestart') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{date('d/m/Y h:i a', strtotime($route->to_starttime))}}</p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Time end</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Timeend') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 @if($route->to_endtime != "")
@@ -301,7 +301,7 @@
                                 @endif
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Total tour time</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Totaltourtime') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12 total_time">
                             </div>
@@ -317,7 +317,7 @@
                             </script>
                             <!-- /endis -->
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Comeback</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Comeback') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 @if($route->to_comback == "0")
@@ -327,7 +327,7 @@
                                 @endif
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Date created</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Startday') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{date('d/m/Y', strtotime($route->to_startDay))}}</p>
@@ -336,26 +336,26 @@
                         <hr>
                         <div class="row">
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Introduce</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.Introduce') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{$value->content}}</p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Average number of stars</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.avgStar') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{$value->number_star}} <i class="fas fa-star text-warning"></i></p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
-                                <p class="font-weight-bold font-italic">Number of ratings</p>
+                                <p class="font-weight-bold font-italic">{{ trans('messages.numRating') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
                                 <p>{{$value->numberReviews}}</p>
                             </div>
                             @if(Auth::check())
                                 <div class="col-md-4 col-sm-6 col-12">
-                                    <p class="font-weight-bold font-italic">Your vote: </p>
+                                    <p class="font-weight-bold font-italic">{{ trans('messages.Yourvote') }}: </p>
                                 </div>
                                 <?php $findVotes =  Uservotes::where("sh_id",$value->sh_id)->where("us_id",Auth::user()->us_id)->first(); ?>
                                 @if(!empty($findVotes))
@@ -364,7 +364,7 @@
                                     </div>
                                 @else
                                     <div class="col-md-8 col-sm-6 col-12">
-                                        <span class="badge badge-success">You do not have reviews for this tour</span>
+                                        <span class="badge badge-success">{{ trans('messages.dontHavereviews') }}</span>
                                     </div>
                                 @endif
                             @endif
@@ -372,7 +372,7 @@
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <a href="{{route('viewtour',$value->sh_id)}}" class="btn btn-success">View tour</a>
+                    <a href="{{route('viewtour',$value->sh_id)}}" class="btn btn-success">{{ trans('messages.Viewtour') }}</a>
                   </div>
                 </div>
               </div>

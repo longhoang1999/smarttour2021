@@ -1,6 +1,6 @@
 @extends('user/layout/index')
 @section('title')
-    Highly rater tour
+    {{ trans('messages.Places') }}
 @parent
 @stop
 @section('header_styles')

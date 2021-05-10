@@ -1,6 +1,6 @@
 @extends('user/layout/index_dashboard')
 @section('title')
-    Start tour
+    {{ trans('messages.Home') }}
 @parent
 @stop
 @section('header_styles')
@@ -28,13 +28,13 @@
                     <div class="div-search">
                         <div id="text_title">
                             <h4 class="title-page text-uppercase mb-2">
-                                Let's create a tour and experience
+                                {{ trans('messages.homeTitle') }}
                             </h4>
-                            <p>Explore places, create tours, you will get the best advice from us</p>
+                            <p>{{ trans('messages.smallTitle') }}</p>
                         </div>
                         <div id="div_search">
                             <div id="content_search">
-                                <input type="text" class="navbar-brand js-scroll-trigger form-control" placeholder="Search place" id="searchPlace">
+                                <input type="text" class="navbar-brand js-scroll-trigger form-control" placeholder="{{ trans('messages.searchPlace') }}" id="searchPlace">
                                 <div class="result_search">
                                     <ul>
                                     </ul>
@@ -45,14 +45,14 @@
                 </div>
                 <!-- Portfolio Item 1-->
                 <div class="col-md-12 col-lg-12 mb-5" id="starttour">
-                    <span class="title_start_tour text-uppercase">Create a new tour for you</span>
+                    <span class="title_start_tour text-uppercase">{{ trans('messages.createTourTitle') }}</span>
                     <div class="start_tour">
                         <div class="start_tour_left">
-                            <p>Create a new tour</p>
+                            <p>{{ trans('messages.createNewTour') }}</p>
                             <div class="icon">
                                 <div class="parent-icon">
                                     <i class="fas fa-map-marker-alt"></i>
-                                    <span>Place</span>
+                                    <span>Places</span>
                                 </div>
                                 <div class="parent-icon">
                                     <i class="fas fa-utensils"></i>
@@ -70,16 +70,16 @@
                         </div>
                         <div class="start_tour_right">
                             <img src="{{asset('images/tourha.jpg')}}" alt="">
-                            <div id="StarttourNow">Start tour</div>
+                            <div id="StarttourNow">{{ trans('messages.Startour') }}</div>
                         </div>
                     </div>
                 </div>
                 <!-- Portfolio Item 2-->
                 <div class="col-md-12 col-lg-12 mb-5 previous-tour" id="previoustour">
-                    <span class="title_start_tour text-uppercase mt-5">PREVIOUS TOURS</span>
+                    <span class="title_start_tour text-uppercase mt-5">{{ trans('messages.PREVIOUSTOURS') }}</span>
                     <div class="start_tour">
                         <div class="start_tour_left bg-green">
-                            <p>See your previous tours</p>
+                            <p>{{ trans('messages.seeYourPrevious') }}</p>
                             <div class="icon align-items">
                                 <div class="parent-icon mr-0 mt-4">
                                     <i class="fas fa-car-side"></i>
@@ -102,17 +102,17 @@
                             @else
                                 data-target="#modalLogin"
                             @endif
-                            >Previous tours</div>
+                            >{{ trans('messages.PREVIOUSTOURS') }}</div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Portfolio Item 3-->
                 <div class="col-md-12 col-lg-12 mb-5 search-tour" id="searchtour">
-                    <span class="title_start_tour text-uppercase mt-5">SEARCH TOURS</span>
+                    <span class="title_start_tour text-uppercase mt-5">{{ trans('messages.SEARCHTOURS') }}</span>
                     <div class="start_tour">
                         <div class="start_tour_left bg-blue">
-                            <p>Find the tour to your liking</p>
+                            <p>{{ trans('messages.titleSearchTour') }}</p>
                             <div class="icon align-items">
                                 <div class="parent-icon mr-0 mt-4">
                                     <i class="fas fa-map-marker-alt"></i>
@@ -129,13 +129,13 @@
                         </div>
                         <div class="start_tour_right">
                             <img src="{{asset('images/search.jpg')}}" alt="">
-                            <div id="StarttourNow" class="searchTour">Search tours</div>
+                            <div id="StarttourNow" class="searchTour">{{ trans('messages.SEARCHTOURS') }}</div>
                         </div>
                     </div>
                 </div>  
                 <!-- Portfolio Item 4-->
                 <div class="col-md-12 col-lg-12 mb-5 slide-show" id="slideshow">
-                    <span class="title_start_tour text-uppercase mt-5">THE TOURS ARE HIGHLIGHTS</span>
+                    <span class="title_start_tour text-uppercase mt-5">{{ trans('messages.HIGHLIGHTS_TOUR') }}</span>
                     <div class="slide-show-tour">
                         @foreach($shareTour as $value)
                         <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
@@ -233,13 +233,13 @@
                                                         <p class="text-left big-size tour" data-id="{{$value->to_id}}" title="{{$value->to_name}}">
                                                             <span>
                                                             @if(empty($findShare))
-                                                                {{$value->to_star}} <i class="fas fa-star text-warning"></i> <span class="font-italic">-- No share</span>
+                                                                {{$value->to_star}} <i class="fas fa-star text-warning"></i> <span class="font-italic">-- {{ trans('messages.NoShare') }}</span>
                                                             @else
-                                                                {{$findShare->number_star}} <i class="fas fa-star text-warning"></i> <span class="font-italic">-- Shared</span>
+                                                                {{$findShare->number_star}} <i class="fas fa-star text-warning"></i> <span class="font-italic">-- {{ trans('messages.Shared') }}</span>
                                                             @endif
                                                             </span>
                                                             {{$value->to_name}}
-                                                            <a href="{{route('user.editTour',$value->to_id)}}" class="btn btn-link btn-sm" id="detailTour">Detail</a>
+                                                            <a href="{{route('user.editTour',$value->to_id)}}" class="btn btn-link btn-sm" id="detailTour">{{ trans('messages.Detail') }}</a>
                                                         </p>
                                                         <div class="detail-tour">
                                                             @foreach($des_1 as $des)
@@ -250,7 +250,7 @@
                                                             @endforeach
                                                             <!-- delete array -->
                                                             <?php $des_1=array(); ?>
-                                                            <p><span class="font-italic">Start day</span>: {{date('d/m/Y', strtotime($value->to_startDay))}}</p>
+                                                            <p><span class="font-italic">{{ trans('messages.Startday') }}</span>: {{date('d/m/Y', strtotime($value->to_startDay))}}</p>
                                                         </div>
                                                     </div>
                                                 @endif
@@ -262,7 +262,7 @@
                                             </p>
                                             @endif 
                                         </div>
-                                        <a href="{{route('user.tourhistory')}}" class="btn btn-primary">--- See more <i class="fas fa-angle-double-right pt-1"></i> ---</a>
+                                        <a href="{{route('user.tourhistory')}}" class="btn btn-primary">--- {{ trans('messages.seeMore') }}<i class="fas fa-angle-double-right pt-1"></i> ---</a>
                                     </div>
                                 </div>
                             </div>
