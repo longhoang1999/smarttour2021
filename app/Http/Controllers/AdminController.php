@@ -2162,6 +2162,13 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'TotalPlace',
+                function ($typePlace) {
+                    $TotalPlace = Destination::where("de_type",$typePlace->id)->count();
+                    return $TotalPlace;
+                }
+            )
+            ->addColumn(
                 'nametype',
                 function ($typePlace) {
                     $langtype = Langtype::where("language","en")->where("type_id",$typePlace->id)->first();
@@ -2174,7 +2181,8 @@ class AdminController extends Controller
                     $actions = '<button class="btn btn-block btn-warning btn-sm" data-id="'.$typePlace->id.'" data-toggle="modal" data-target="#modaEditType">'.trans("admin.Edit").'</button>';
                     if($typePlace->status == "0")
                     {
-                        if($typePlace->totalPlace == "0")
+                        $totalDes = Destination::where('de_type',$typePlace->id)->count();
+                        if($totalDes == "0")
                             $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-id="'.$typePlace->id.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
                     }
                     return $actions;
@@ -2192,6 +2200,13 @@ class AdminController extends Controller
                 function ($typePlace) {
                     $stt = "";
                     return $stt;
+                }
+            )
+            ->addColumn(
+                'TotalPlace',
+                function ($typePlace) {
+                    $TotalPlace = Destination::where("de_type",$typePlace->id)->count();
+                    return $TotalPlace;
                 }
             )
             ->addColumn(
@@ -2220,7 +2235,8 @@ class AdminController extends Controller
                 'actions',
                 function ($typePlace) {
                     $actions = '<button class="btn btn-block btn-warning btn-sm" data-id="'.$typePlace->id.'" data-toggle="modal" data-target="#modaEditType">'.trans("admin.Edit").'</button>';
-                    if($typePlace->totalPlace == "0")
+                    $totalDes = Destination::where('de_type',$typePlace->id)->count();
+                    if($totalDes == "0")
                         $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-id="'.$typePlace->id.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
                     return $actions;
                 }
@@ -2259,7 +2275,8 @@ class AdminController extends Controller
     public function deleteTypePlace(Request $req)
     {
         $typePlace = TypePlace::where("id",$req->id)->first();
-        if($typePlace->totalPlace == "0")
+        $totalPlace = Destination::where("de_type", $typePlace->id)->count();
+        if($totalPlace == "0")
         {
             $langtype = Langtype::where("type_id",$req->id)->get();
             foreach ($langtype as $value) {

@@ -72,6 +72,7 @@ Route::group(
 		Route::post("takeDetailRoute","ShareTourController@takeDetailRoute")->name('share.takeDetailRoute');
 		Route::post("selectPlaceForType","ShareTourController@selectPlaceForType")->name('share.selectPlaceForType');
 		Route::post("selectTourForPlace","ShareTourController@selectTourForPlace")->name('share.selectTourForPlace');
+		Route::post("selectTourForCost","ShareTourController@selectTourForCost")->name('share.selectTourForCost');
 		Route::get("searchListPlace/{array}","ShareTourController@searchListPlace")->name('share.searchListPlace');
 	}
 );

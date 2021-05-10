@@ -4,29 +4,7 @@
 @parent   
 @stop
 @section('header_styles')
-  <style>
-    #detail_location span{
-      display: block;
-    }
-    .startlocat_class{
-      width: 10rem !important;
-    }
-    #site_searchtour a {
-        background: lightblue !important;
-        color: #117964 !important;
-    }
-    #div_1,#div_2,#div_3,#div_4{
-      cursor: pointer;
-      border-bottom-color: white;
-      border-top-color: white;
-      border-right-color: white;
-    }
-    p{margin: 0}
-    th,td{text-align: center;}
-    td.detaillocat_class{
-      text-align: justify;
-    }
-  </style>
+  <link rel="stylesheet" href="{{asset('css/searchtour_2.css')}}">
 @stop
 @section('content')
   <div class="main-search">
@@ -203,6 +181,8 @@
                     <span id="end_time"></span></p>
                     <p><span class="font-weight-bold font-italic">{{ trans('newlang.totalTourTime') }}: </span>
                     <span id="total_time"></span></p>
+                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.TotalCost') }}: </span>
+                    <span id="total_cost"></span></p>
                     <p><span class="font-weight-bold font-italic">{{ trans('newlang.dateCreated') }}: </span>
                     <span id="date_created"></span></p>
                 </div>
@@ -245,53 +225,6 @@
     </div>
   </div>
   <!-- modal rating -->
-  <style type="text/css">
-    .search_nav_menu{
-      display: flex;
-      height: 2.5em;
-      line-height: 2.5em;
-    }
-    .search_nav_menu div{
-      height: 100%;
-      padding: 0 .5em;
-      border-top-width: 0;
-      cursor: pointer; 
-      color: #6093ff;
-      font-weight: 600;
-      transition: all .5s;
-    }
-    .search_nav_menu div:hover{
-      background: #e7e6e6;
-    }
-    .search_box1{
-      background: #e7e6e6;
-    }
-    .search_content{
-      padding: 2em 1em;
-    }
-    .right_block{
-      display: none;
-    }
-    #btn_searchforcost{display: none;}
-    #ModalSearch .modal-body{
-      padding-bottom: 2em !important;
-    }
-    #ModalSearch .modal-footer{
-      padding: 0em .5em 1em .5em !important;
-    }
-    .block_minimum,.block_maximum{display: flex;position: relative;}
-    .block_minimum > span,.block_maximum > span{
-      font-size: 1.2rem;width: 15%;
-    }
-    .detail_money {
-        position: absolute;
-        bottom: -1.4em;
-        left: 16%;
-        color: red;
-        font-style: italic;
-        font-size: 14px;
-    }
-  </style>
   <!-- modal search -->
   <div class="modal fade" id="ModalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalSearchLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -304,8 +237,8 @@
         </div>
         <div class="modal-body" style="border-top: 1px solid lightgray;">
           <nav class="search_nav_menu bg-light">
-              <div class="search_box1">Tour đi qua các địa điểm</div>
-              <div class="search_box2">Tìm kiếm theo tổng chi phí</div>
+              <div class="search_box1">{{ trans('newlang.throughPlace') }}</div>
+              <div class="search_box2">{{ trans('newlang.searchTotalCost') }}</div>
           </nav>
           <div class="search_content">
             <div class="left_block">
@@ -336,9 +269,9 @@
               </div>
             </div>
             <div class="right_block">
-              <h5 class="font-weight-bold font-italic">Nhập chi phí bạn có thể dùng:</h5>
+              <h5 class="font-weight-bold font-italic">{{ trans('newlang.enterCostUse') }}:</h5>
               <div style="display: flex;" class="mb-3 mt-3"> 
-                  <span style="font-size: 1.2rem;width: 15%" class="font-weight-bold font-italic">Mệnh giá: </span> 
+                  <span style="font-size: 1.2rem;width: 20%" class="font-weight-bold font-italic">{{ trans('newlang.Denominations') }}: </span> 
                   <select name="currency" class="form-control currency" style="width: 12%">
                     @if(Session::has('website_language') && Session::get('website_language') == "vi")
                       <option selected="true" value="VNĐ">VNĐ</option>
@@ -349,18 +282,15 @@
                     @endif
                   </select>
               </div>
-              <style>
-                .detail_money_minimum,.detail_money_maximum{display: none;}
-              </style>
               <div class="block_minimum mb-4">
-                  <span class="font-weight-bold font-italic">Tối thiểu: </span> 
-                  <input type="number" class="form-control" id="minimum" style="width: 70%" placeholder="Tối thiểu">
-                  <p class="detail_money detail_money_minimum">sdvsdv</p>
+                  <span class="font-weight-bold font-italic">{{ trans('newlang.Minimum') }}: </span> 
+                  <input type="number" class="form-control" id="minimum" style="width: 70%" placeholder="{{ trans('newlang.Minimum') }}">
+                  <p class="detail_money detail_money_minimum"></p>
               </div>
               <div class="block_maximum">
-                  <span class="font-weight-bold font-italic">Tối đa: </span> 
-                  <input type="number" class="form-control" id="maximum" style="width: 70%" placeholder="Tối đa">
-                  <p class="detail_money detail_money_maximum">sdvsdv</p>
+                  <span class="font-weight-bold font-italic">{{ trans('newlang.Maximum') }}: </span> 
+                  <input type="number" class="form-control" id="maximum" style="width: 70%" placeholder="{{ trans('newlang.Maximum') }}">
+                  <p class="detail_money detail_money_maximum"></p>
               </div>
             </div>
           </div>
@@ -384,7 +314,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <span class="font-weight-bold font-italic text-danger">{{ trans('newlang.weAreSorry') }}</span>
+          <span class="font-weight-bold font-italic text-danger" id="notFound_notification"></span>
         </div>
       </div>
     </div>
@@ -460,9 +390,11 @@
       if($(this).val() == "")
       {
         $(".detail_money_minimum").css("display","none");
+        $("#ModalSearch .modal-footer").css("display","none");
       }
       else
       {
+        $("#ModalSearch .modal-footer").css("display","flex");
         $(".detail_money_minimum").text($(this).val().toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") +" "+$(".currency").val());
         $(".detail_money_minimum").css("display","block");
       }
@@ -478,6 +410,23 @@
         $(".detail_money_maximum").css("display","block");
       }
     });
+    $(".currency").change(function(){
+      let string_money;
+      if($(".detail_money_maximum").text() != "")
+        string_money = $(".detail_money_maximum").text();
+      else
+        string_money = $(".detail_money_minimum").text();
+      if(string_money.indexOf("VNĐ") != "-1")
+      {
+        $(".detail_money_maximum").text(string_money.slice(0,string_money.indexOf("VNĐ")) + $(this).val());
+        $(".detail_money_minimum").text(string_money.slice(0,string_money.indexOf("VNĐ")) + $(this).val());
+      }
+      else if(string_money.indexOf("USD") != "-1")
+      {
+        $(".detail_money_maximum").text(string_money.slice(0,string_money.indexOf("USD")) + $(this).val());
+        $(".detail_money_minimum").text(string_money.slice(0,string_money.indexOf("USD")) + $(this).val());
+      }
+    })
     //search_box
     $(".search_box1").click(function(){
       $(".left_block").slideDown();
@@ -697,6 +646,7 @@
                     if(data.length == 0)
                     {
                       $("#notFound").modal("show");
+                      $("#notFound_notification").text("{{ trans('newlang.weAreSorry') }}");
                       $("#ModalSearch").modal("hide");
                     }
                     else
@@ -711,6 +661,45 @@
                     }
                  }
             });
+          });
+          $("#btn_searchforcost").click(function(){
+            if(parseFloat($("#maximum").val()) < parseFloat($("#minimum").val()))
+            {
+              alert("Bạn nhập giá tối đa nhỏ hơn giá tối thiểu");
+            }
+            else
+            {
+              let currency = $(".currency").val();
+              let minimum = $("#minimum").val();
+              let maximum = $("#maximum").val();
+              let _token = $('meta[name="csrf-token"]').attr('content');
+              let $url_path = '{!! url('/') !!}';
+              let routeSearchPlace=$url_path+"/selectTourForCost";
+              $.ajax({
+                    url:routeSearchPlace,
+                    method:"POST",
+                    data:{_token:_token,minimum:minimum,maximum:maximum,currency:currency},
+                    success:function(data){
+                      //console.log(data);
+                      if(data.length == 0)
+                      {
+                        $("#notFound").modal("show");
+                        $("#notFound_notification").text("{{ trans('newlang.weAreSorryCost') }}");
+                        $("#ModalSearch").modal("hide");
+                      }
+                      else
+                      {
+                        $("#ModalSearch").modal("hide");
+                        $(".AllClass_Table").show();
+                        $("html, body").animate({
+                            scrollTop: $('.AllClass_Table').offset().top - '130'
+                        }, 200);
+                        var routeForPlace = $url_path+"/searchListPlace/"+data;
+                        table.ajax.url( routeForPlace ).load();
+                      }
+                   }
+              });
+            }
           });
           $('#notFound').on('hidden.bs.modal', function (e) {
             $("#ModalSearch").modal("show");
@@ -779,6 +768,8 @@
                     var duration = moment.duration(data[13], 'minutes');
                     var durationString = duration.days() + 'd ' + duration.hours() + 'h ' + duration.minutes() + 'm';
                     $("#total_time").append(durationString);
+                    // php check
+                      $("#total_cost").text(data[15].toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
                  }
             });
           });

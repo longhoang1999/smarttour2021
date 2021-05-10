@@ -144,7 +144,7 @@
             columns: [
                 { data: 'stt', name: 'stt' },
                 { data: 'nametype', name: 'nametype' },
-                { data: 'totalPlace', name: 'totalPlace' },
+                { data: 'TotalPlace', name: 'TotalPlace' },
                 { data: 'DateCreated', name: 'DateCreated' },
                 { data: 'status', name: 'status' },
                 { data: 'actions', name: 'actions' },

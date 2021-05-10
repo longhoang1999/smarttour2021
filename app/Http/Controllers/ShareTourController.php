@@ -207,6 +207,7 @@ class ShareTourController extends Controller
         $dename_new = array();
         $placeId_new = array();
         $duration_new = array();
+        $description_new = array();
         $cost_new = array();
         $j = 0;
         foreach ($array as $value) {
@@ -217,6 +218,14 @@ class ShareTourController extends Controller
                 $latlng_new = Arr::add($latlng_new, $j ,$latlng);
                 $dename_new = Arr::add($dename_new, $j ,$desCheck->de_name);
                 $placeId_new = Arr::add($placeId_new, $j ,$desCheck->de_remove);
+                if($desCheck->de_description != "")
+                {
+                    $description_new = Arr::add($description_new, $j ,$desCheck->de_description);
+                }
+                else
+                {
+                    $description_new = Arr::add($description_new, $j ,"");
+                }
                 $j++;
             }
         }
@@ -261,6 +270,7 @@ class ShareTourController extends Controller
             'dename_new' => $dename_new,
             'placeId_new' => $placeId_new,
             'duration_new' => $duration_new,
+            'description_new' => $description_new,
             'cost_new' => $cost_new,
             'latlng_start' => $latlng_start,
             'dename_start' => $dename_start,
@@ -1311,6 +1321,30 @@ class ShareTourController extends Controller
         for ($i=0; $i < count($pieces)-1; $i++) {
             $array = Arr::add($array, $i ,$pieces[$i]);
         }
+        //cost total
+        
+        if(Session::has('website_language') && Session::get('website_language') == "vi")
+        {
+            $pieces_cost = explode("|", $route->to_cost);
+            $totalCost = 0;
+            for ($i=0; $i < count($pieces_cost)-1; $i++) {
+                $totalCost = $totalCost + intval($pieces_cost[$i]);
+            }
+            if($route->to_currency == "2")
+                $totalCost = $totalCost*23000;
+            $totalCost = $totalCost." VNĐ";
+        }
+        else
+        {
+            $pieces_cost = explode("|", $route->to_cost);
+            $totalCost = 0;
+            for ($i=0; $i < count($pieces_cost)-1; $i++) {
+                $totalCost = $totalCost + intval($pieces_cost[$i]);
+            }
+            if($route->to_currency == "1")
+                $totalCost = round($totalCost/23000, 2);
+            $totalCost = $totalCost." USD";
+        }
         foreach ($array as $ar) {
             $findDes = Destination::where("de_remove",$ar)->first();
             if($findDes->de_default=="0")
@@ -1384,7 +1418,8 @@ class ShareTourController extends Controller
             date('d/m/Y', strtotime($route->to_startDay)),
             $link_view_tour,
             Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime)),
-            $sharetour->sh_id
+            $sharetour->sh_id,
+            $totalCost
         ];
     }
     public function takeDetail($array)
@@ -1477,6 +1512,97 @@ class ShareTourController extends Controller
             {
                 array_push($saveListId, $value->to_id);
             }
+        }
+        return $saveListId;
+    }
+    public function selectTourForCost(Request $req)
+    {
+        $route = DB::table('tour')->rightJoin('sharetour', 'sharetour.sh_to_id', '=', 'tour.to_id')->get();
+        if($req->currency == "VNĐ")
+        {
+            foreach($route as $key => $ro)
+            {
+                $pieces = explode("|", $ro->to_cost);
+                $totalCost = 0;
+                if($ro->to_currency == "1")
+                {
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $totalCost = $totalCost+intval($pieces[$i]);
+                    }
+                    if(!isset($req->maximum))
+                    {
+                        if($totalCost < $req->minimum )
+                            $route->forget($key);
+                    }
+                    else
+                    {
+                        //sss
+                        if($totalCost < $req->minimum || $totalCost > $req->maximum)
+                            $route->forget($key);
+                    }
+                }
+                else if($ro->to_currency == "2")
+                {
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $totalCost = $totalCost+intval($pieces[$i]);
+                    }
+                    $totalCost = $totalCost * 23000;
+                    if(!isset($req->maximum))
+                    {
+                        if($totalCost < $req->minimum )
+                            $route->forget($key);
+                    }
+                    else
+                    {
+                        if($totalCost < $req->minimum || $totalCost > $req->maximum)
+                            $route->forget($key);
+                    }
+                }
+            }
+        }
+        else if($req->currency == "USD")
+        {
+            foreach($route as $key => $ro)
+            {
+                $pieces = explode("|", $ro->to_cost);
+                $totalCost = 0;
+                if($ro->to_currency == "1")
+                {
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $totalCost = $totalCost+intval($pieces[$i]);
+                    }
+                    $totalCost = $totalCost / 23000;
+                    if(!isset($req->maximum))
+                    {
+                        if($totalCost < $req->minimum )
+                            $route->forget($key);
+                    }
+                    else
+                    {
+                        if($totalCost < $req->minimum || $totalCost > $req->maximum)
+                            $route->forget($key);
+                    }
+                }
+                else if($ro->to_currency == "2")
+                {
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $totalCost = $totalCost+intval($pieces[$i]);
+                    }
+                    if(!isset($req->maximum))
+                    {
+                        $route->forget($key);
+                    }
+                    else
+                    {
+                        if($totalCost < $req->minimum || $totalCost > $req->maximum)
+                            $route->forget($key);
+                    }
+                }
+            }
+        }
+        $saveListId = array();
+        foreach ($route as $value) {
+            array_push($saveListId, $value->to_id);
         }
         return $saveListId;
     }
