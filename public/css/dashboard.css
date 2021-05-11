@@ -42,8 +42,8 @@
 }
 #text_img img{width: 100%}
 .text_content{
-    font-weight: bold;
-    margin-bottom: 2rem;
+    font-weight: bold !important;
+    margin-bottom: 2rem !important;
 }
 .btn_upload{
     width: 15%;

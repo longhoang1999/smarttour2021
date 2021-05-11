@@ -173,6 +173,7 @@
     </div>
   </div>
   <div class="mapBorder">
+    <input id="pac-input" class="controls" type="text" placeholder="Search Box"/>
     <div id="map" class="tabcontent"></div>
   </div>
   <button class="btn btn-info" id="btn_addPlace">{{ trans('admin.addplaceForlink') }}</button>
@@ -492,6 +493,7 @@
     var Coordinates;
     //biến lưu mảng marker để xóa
     var markers=[];
+    var namePlace;
     //ajax của js
     function getNamePlace(geocoder,map)
       {
@@ -522,9 +524,57 @@
           var map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 12.5,
                 center: { lat: 21.0226586, lng: 105.8179091 },
-                gestureHandling: 'greedy',
+                // gestureHandling: 'greedy',
               }),
           directionsService = new google.maps.DirectionsService();
+          // Create the search box and link it to the UI element.
+          const input = document.getElementById("pac-input");
+          const searchBox = new google.maps.places.SearchBox(input);
+          map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+          map.addListener("bounds_changed", () => {
+            searchBox.setBounds(map.getBounds());
+          });
+          // Listen for the event fired when the user selects a prediction and retrieve
+          // more details for that place.
+          searchBox.addListener("places_changed", () => {
+            const places = searchBox.getPlaces();
+            if (places.length == 0) {
+              return;
+            }
+            // Clear out the old markers.
+            markers.forEach((marker) => {
+                marker.setMap(null);
+            });
+            markers = [];
+            // For each place, get the icon, name and location.
+            const bounds = new google.maps.LatLngBounds();
+            places.forEach((place) => {
+              if (!place.geometry || !place.geometry.location) {
+                console.log("Returned place contains no geometry");
+                return;
+              }
+              var staMarker = new google.maps.Marker({
+                label: place.name,
+              });
+              staMarker.setMap(map);
+              staMarker.setPosition(place.geometry.location);
+              customLabel(staMarker);
+              //push marker vào mảng để xóa
+              markers.push(staMarker);
+              Coordinates = place.geometry.location;
+              namePlace = place.name;
+              document.getElementById("btn_addPlace_2").setAttribute("style","display:block");
+              document.getElementById("btn_addPlace").setAttribute("style","display:none");
+              if (place.geometry.viewport) {
+                // Only geocodes have viewport.
+                bounds.union(place.geometry.viewport);
+              } else {
+                bounds.extend(place.geometry.location);
+              }
+            });
+            map.fitBounds(bounds);
+          });
+          // end search box
           map.addListener('click',function(evt){
             var staMarker = new google.maps.Marker({
               label: 'Your location',
@@ -801,6 +851,11 @@
           }, 200);
           $("#inputLongitude").val(Coordinates.lng);
           $("#inputLatitude").val(Coordinates.lat);
+          if(namePlace != undefined)
+          {
+            $("#inputName").val(namePlace);
+            $("#inputName_vn").val(namePlace);
+          }
           let x = $("#inputLongitude").val();
           let y = $("#inputLatitude").val();
           $("#googleLink").val("http://www.google.com/maps/place/"+y.toString()+","+x.toString());
@@ -808,5 +863,5 @@
       });
       
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBgbjwIY5Q1eZ-Ejqur0a8avEQWowfA39s&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBgbjwIY5Q1eZ-Ejqur0a8avEQWowfA39s&callback=initMap&libraries=places" async defer></script>
 @stop

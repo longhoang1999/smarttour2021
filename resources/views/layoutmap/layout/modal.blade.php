@@ -1,58 +1,4 @@
-<style>
-    #tourExists{
-        background: #ea7373;
-        color: white;
-        padding: .5rem 2rem;
-        border-radius: .5rem;
-        margin-bottom: 1.2em;
-        display: none;
-    }
-    #tourExists ul{margin: 0;list-style: circle}
-    div#tourExists a {
-        color: #ffffff;
-        font-weight: 500;
-        text-decoration: underline;
-        font-style: italic;
-    }
-    .content_modal{
-        display: flex;
-    }
-    .content_modal_left{
-        width: 50%;
-        margin: 1rem 1rem;
-    }
-    #upload_form{
-        width: 50%;
-    }
-    .content_modal_left{
-        height: 35em;
-        overflow-y: auto;
-    }
-    #upload_form{
-        height: 35em;
-        overflow-y: auto;
-        margin-right: 1em;
-    }
-    .left_content{
-        width: 30%;
-        border-radius: 5px;
-        overflow: hidden;
-    }
-    .detail_tour{
-        display: flex;
-        height: 10em;
-        margin-bottom: 1em;
-    }
-    .left_content img{
-        width: 100%;
-        height: 100%;
-    }
-    .right_content{
-        padding: .5em;
-        padding-left: 1.5em;
-        width: 70%;
-    }
-</style>    
+<link rel="stylesheet" href="{{asset('css/modallayoutmap.css')}}">  
 <!-- map -->
 <div class="modal fade" id="enterNameTour" tabindex="-1" role="dialog" aria-labelledby="enterNameTourLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -117,6 +63,7 @@
                                 <div class="col-md-12 col-sm-12 col-12">
                                     <textarea class="form-control" placeholder="Recommend" name="recommend"></textarea>
                                 </div>
+                                @if(isset($to_des))
                                 <!-- old image -->
                                 <div class="col-md-12 col-sm-12 col-12" id="oldImageTitle">
                                     <p class="font-weight-bold font-italic mb-1">{{ trans('messages.oldImage') }}</p>
@@ -132,6 +79,7 @@
                                     <p class="name_file_tour font-weight-bold font-italic"></p>
                                     <input accept="image/*" type="file" name="image_tour" class="form-control" id="img_input_Rank">
                                 </div>
+                                @endif
                             </div>
                         </div>
                     </div>

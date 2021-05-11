@@ -1296,11 +1296,11 @@ function initMap(){
 				fontSize: '20px' 
 			};
 
-					
+				
 			marker = 	new google.maps.Marker({
 										map: map,
 										position: Object(locationdata.get(id)).location,
-										label: label,
+										// label: label,
 										icon: icon
 								});
 
@@ -1335,7 +1335,7 @@ function initMap(){
 
 			infowindow.addListener('closeclick',()=>{
 				if(id != startLocat.id){
-					marker.setLabel(label);
+					//marker.setLabel(label);
 				} else {
 					$(`.map-marker-label[value="${id}"]`).show();
 				}
