@@ -41,6 +41,7 @@ Route::group(
 		Route::get("about","UserController@about")->name("about");
 		Route::get("feedback","UserController@viewfeedback")->name("feedback");
 		Route::post("searchPlaceSmart","UserController@searchPlaceSmart")->name("searchPlaceSmart");
+		Route::post("searchTourSmart","UserController@searchTourSmart")->name("searchTourSmart");
 		Route::get("showDetailPlace/{idplace}","UserController@showDetailPlace")->name("showDetailPlace");
 		Route::get("listPlaceForType/{idtype}","UserController@listPlaceForType")->name("listPlaceForType");
 		Route::post("loadPlaceInfo","UserController@loadPlaceInfo")->name("loadPlaceInfo");
@@ -61,6 +62,7 @@ Route::group(
 		Route::get("editTour/{id}","AdminController@editTour")->name('admin.editTour');
 		Route::get("searchTour","ShareTourController@searchTour")->name('searchTour');
 		Route::get("searchTourTable","ShareTourController@searchTourTable")->name('share.searchTourTable');
+		Route::get("searchTourName/{idShareTour}","ShareTourController@searchTourName")->name('share.searchTourName');
 		Route::get("searchTourYouShared","ShareTourController@searchTourYouShared")->name('share.searchTourYouShared');
 		Route::get("searchMostVotes","ShareTourController@searchMostVotes")->name('share.searchMostVotes');
 		Route::get("searchThisMonth","ShareTourController@searchThisMonth")->name('share.searchThisMonth');
@@ -84,7 +86,7 @@ Route::group(
 		//user
 		Route::get("dashboard","UserController@dashboard")->name("user.dashboard");
 		Route::post("feedback","UserController@feedback")->name("user.feedback");
-		Route::post("saveTour","UserController@saveTour")->name("user.saveTour");
+		Route::get("saveTour","UserController@saveTour")->name("user.saveTour");
 		Route::post("saveImgShareTour/{idShareTour}","UserController@saveImgShareTour")->name("user.saveImgShareTour");
 		Route::post("checkTour","UserController@checkTour")->name("user.checkTour");
 		Route::post("checkUser","UserController@checkUser")->name("user.checkUser");

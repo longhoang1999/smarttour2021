@@ -232,7 +232,8 @@ p.tourName {
 p{font-family: auto !important;}
 h2{line-height: 3.5rem !important;}
 .page-section {
-    padding: 8rem 0;
+    padding-top: 7rem
+    padding-bottom: 8rem;
 }
 .child_header{
     padding: .4rem 0;display: flex;

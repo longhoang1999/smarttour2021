@@ -332,10 +332,10 @@ class ShareTourController extends Controller
             'allTypePlace' => $allTypePlace
         ]);
     }
-    // div_1
-    public function searchTourTable()
+    //search for name
+    public function searchTourName($idShareTour)
     {
-        $votes_over = ShareTour::where("number_star",">=","4")->orderBy('number_star', 'DESC')->get();
+        $votes_over = ShareTour::where("sh_id",$idShareTour)->orderBy('number_star', 'DESC')->get();
         return DataTables::of($votes_over)
             ->addColumn(
                 'stt',
@@ -369,17 +369,16 @@ class ShareTourController extends Controller
                 }
             )
             ->addColumn(
-                'rating',
+                'evaluate',
                 function ($votes_over) {
-                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
-                    return $rating;
-                }
-            )
-            ->addColumn(
-                'votes',
-                function ($votes_over) {
-                    $votes = $votes_over->numberReviews.' votes';
-                    return $votes;
+                    $evaluate = '';
+                    for ($i=1; $i <= 5; $i++) { 
+                        if($i <= $votes_over->number_star)
+                        {
+                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+                        }
+                    }
+                    return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
             ->addColumn(
@@ -430,7 +429,107 @@ class ShareTourController extends Controller
                     return $Detail;
                 }
             )
-            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
+            ->make(true);
+    }
+    // div_1
+    public function searchTourTable()
+    {
+        $votes_over = ShareTour::where("number_star",">=","4")->orderBy('number_star', 'DESC')->get();
+        return DataTables::of($votes_over)
+            ->addColumn(
+                'stt',
+                function ($votes_over) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'tourName',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $tourName = $route->to_name;
+                    return $tourName;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'evaluate',
+                function ($votes_over) {
+                    $evaluate = '';
+                    for ($i=1; $i <= 5; $i++) { 
+                        if($i <= $votes_over->number_star)
+                        {
+                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+                        }
+                    }
+                    return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($votes_over) {
+                    $route = Route::where("to_id",$votes_over->sh_to_id)->first();
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
             ->make(true);
     }
     //div_2
@@ -470,17 +569,16 @@ class ShareTourController extends Controller
                 }
             )
             ->addColumn(
-                'rating',
+                'evaluate',
                 function ($votes_over) {
-                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
-                    return $rating;
-                }
-            )
-            ->addColumn(
-                'votes',
-                function ($votes_over) {
-                    $votes = $votes_over->numberReviews.' votes';
-                    return $votes;
+                    $evaluate = '';
+                    for ($i=1; $i <= 5; $i++) { 
+                        if($i <= $votes_over->number_star)
+                        {
+                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+                        }
+                    }
+                    return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
             ->addColumn(
@@ -531,7 +629,7 @@ class ShareTourController extends Controller
                     return $Detail;
                 }
             )
-            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
             ->make(true);
     }
     // div_3
@@ -580,17 +678,16 @@ class ShareTourController extends Controller
                 }
             )
             ->addColumn(
-                'rating',
+                'evaluate',
                 function ($votes_over) {
-                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
-                    return $rating;
-                }
-            )
-            ->addColumn(
-                'votes',
-                function ($votes_over) {
-                    $votes = $votes_over->numberReviews.' votes';
-                    return $votes;
+                    $evaluate = '';
+                    for ($i=1; $i <= 5; $i++) { 
+                        if($i <= $votes_over->number_star)
+                        {
+                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+                        }
+                    }
+                    return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
             ->addColumn(
@@ -641,7 +738,7 @@ class ShareTourController extends Controller
                     return $Detail;
                 }
             )
-            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
             ->make(true);
     }
     //div_4
@@ -686,17 +783,16 @@ class ShareTourController extends Controller
                 }
             )
             ->addColumn(
-                'rating',
+                'evaluate',
                 function ($votes_over) {
-                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
-                    return $rating;
-                }
-            )
-            ->addColumn(
-                'votes',
-                function ($votes_over) {
-                    $votes = $votes_over->numberReviews.' votes';
-                    return $votes;
+                    $evaluate = '';
+                    for ($i=1; $i <= 5; $i++) { 
+                        if($i <= $votes_over->number_star)
+                        {
+                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+                        }
+                    }
+                    return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
             ->addColumn(
@@ -747,7 +843,7 @@ class ShareTourController extends Controller
                     return $Detail;
                 }
             )
-            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
             ->make(true);
     }
     //max total
@@ -792,17 +888,16 @@ class ShareTourController extends Controller
                 }
             )
             ->addColumn(
-                'rating',
+                'evaluate',
                 function ($votes_over) {
-                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
-                    return $rating;
-                }
-            )
-            ->addColumn(
-                'votes',
-                function ($votes_over) {
-                    $votes = $votes_over->numberReviews.' votes';
-                    return $votes;
+                    $evaluate = '';
+                    for ($i=1; $i <= 5; $i++) { 
+                        if($i <= $votes_over->number_star)
+                        {
+                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+                        }
+                    }
+                    return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
             ->addColumn(
@@ -853,7 +948,7 @@ class ShareTourController extends Controller
                     return $Detail;
                 }
             )
-            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
             ->make(true);
     }
     //min total
@@ -898,17 +993,16 @@ class ShareTourController extends Controller
                 }
             )
             ->addColumn(
-                'rating',
+                'evaluate',
                 function ($votes_over) {
-                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
-                    return $rating;
-                }
-            )
-            ->addColumn(
-                'votes',
-                function ($votes_over) {
-                    $votes = $votes_over->numberReviews.' votes';
-                    return $votes;
+                    $evaluate = '';
+                    for ($i=1; $i <= 5; $i++) { 
+                        if($i <= $votes_over->number_star)
+                        {
+                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+                        }
+                    }
+                    return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
             ->addColumn(
@@ -959,7 +1053,7 @@ class ShareTourController extends Controller
                     return $Detail;
                 }
             )
-            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
             ->make(true);
     }
     //last month
@@ -1008,17 +1102,16 @@ class ShareTourController extends Controller
                 }
             )
             ->addColumn(
-                'rating',
+                'evaluate',
                 function ($votes_over) {
-                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
-                    return $rating;
-                }
-            )
-            ->addColumn(
-                'votes',
-                function ($votes_over) {
-                    $votes = $votes_over->numberReviews.' votes';
-                    return $votes;
+                    $evaluate = '';
+                    for ($i=1; $i <= 5; $i++) { 
+                        if($i <= $votes_over->number_star)
+                        {
+                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+                        }
+                    }
+                    return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
             ->addColumn(
@@ -1069,7 +1162,7 @@ class ShareTourController extends Controller
                     return $Detail;
                 }
             )
-            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
             ->make(true);
     }
     // tour you shared
@@ -1117,17 +1210,16 @@ class ShareTourController extends Controller
                 }
             )
             ->addColumn(
-                'rating',
+                'evaluate',
                 function ($votes_over) {
-                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
-                    return $rating;
-                }
-            )
-            ->addColumn(
-                'votes',
-                function ($votes_over) {
-                    $votes = $votes_over->numberReviews.' votes';
-                    return $votes;
+                    $evaluate = '';
+                    for ($i=1; $i <= 5; $i++) { 
+                        if($i <= $votes_over->number_star)
+                        {
+                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+                        }
+                    }
+                    return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
             ->addColumn(
@@ -1178,7 +1270,7 @@ class ShareTourController extends Controller
                     return $Detail;
                 }
             )
-            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
             ->make(true);
     }
     public function searchAnyMonth($date)
@@ -1231,17 +1323,16 @@ class ShareTourController extends Controller
                 }
             )
             ->addColumn(
-                'rating',
+                'evaluate',
                 function ($votes_over) {
-                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
-                    return $rating;
-                }
-            )
-            ->addColumn(
-                'votes',
-                function ($votes_over) {
-                    $votes = $votes_over->numberReviews.' votes';
-                    return $votes;
+                    $evaluate = '';
+                    for ($i=1; $i <= 5; $i++) { 
+                        if($i <= $votes_over->number_star)
+                        {
+                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+                        }
+                    }
+                    return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
             ->addColumn(
@@ -1292,7 +1383,7 @@ class ShareTourController extends Controller
                     return $Detail;
                 }
             )
-            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
             ->make(true);
     }
 
@@ -1643,17 +1734,16 @@ class ShareTourController extends Controller
                 }
             )
             ->addColumn(
-                'rating',
+                'evaluate',
                 function ($votes_over) {
-                    $rating = $votes_over->number_star.' <i class="fas fa-star text-warning"></i>';
-                    return $rating;
-                }
-            )
-            ->addColumn(
-                'votes',
-                function ($votes_over) {
-                    $votes = $votes_over->numberReviews.' votes';
-                    return $votes;
+                    $evaluate = '';
+                    for ($i=1; $i <= 5; $i++) { 
+                        if($i <= $votes_over->number_star)
+                        {
+                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+                        }
+                    }
+                    return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
             ->addColumn(
@@ -1704,7 +1794,7 @@ class ShareTourController extends Controller
                     return $Detail;
                 }
             )
-            ->rawColumns(['stt','tourName','startLocat','detailPlace','rating','votes','totalTime'])
+            ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
             ->make(true);
     }
     public function tourhistory()

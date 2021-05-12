@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="{{asset('css/modallayoutmap.css')}}">  
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
 <!-- map -->
 <div class="modal fade" id="enterNameTour" tabindex="-1" role="dialog" aria-labelledby="enterNameTourLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -63,7 +64,12 @@
                                 <div class="col-md-12 col-sm-12 col-12">
                                     <textarea class="form-control" placeholder="Recommend" name="recommend"></textarea>
                                 </div>
-                                @if(isset($to_des))
+                                <div class="col-md-12 col-sm-12 col-12 mt-2 mb-2">
+                                    <div class="custom-control custom-switch">
+                                        <p class="font-weight-bold font-italic m-0 mr-2">Do you want to upload images?</p>
+                                        <input type="checkbox" data-toggle="toggle" data-size="xs" id="checkImage" data-on="Yes" data-off="No">
+                                    </div>
+                                </div>
                                 <!-- old image -->
                                 <div class="col-md-12 col-sm-12 col-12" id="oldImageTitle">
                                     <p class="font-weight-bold font-italic mb-1">{{ trans('messages.oldImage') }}</p>
@@ -71,15 +77,15 @@
                                 <div class="col-md-12 col-sm-12 col-12" id="oldImageContent">
                                 </div>
                                 <!-- /oldimage -->
-                                <div class="col-md-12 col-sm-12 col-12">
+                                <div class="col-md-12 col-sm-12 col-12" id="uploadImageTitle">
                                     <p class="font-weight-bold font-italic mb-1">{{ trans('messages.photoForYourTour') }}</p>
                                 </div>
-                                <div class="col-md-12 col-sm-12 col-12 mb-3">
+                                <div class="col-md-12 col-sm-12 col-12 mb-3" id="uploadImageBtn">
                                     <div class="Update_img_tour">{{ trans('messages.Upload') }}</div>
                                     <p class="name_file_tour font-weight-bold font-italic"></p>
                                     <input accept="image/*" type="file" name="image_tour" class="form-control" id="img_input_Rank">
                                 </div>
-                                @endif
+                                
                             </div>
                         </div>
                     </div>

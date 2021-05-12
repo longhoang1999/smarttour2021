@@ -20,6 +20,15 @@
                 <li id="site_history"><a href="#" id="user_tour_history">{{ trans('newlang.tourhistory') }}</a></li>
                 <li id="site_searchtour"><a href="{{route('searchTour')}}">{{ trans('newlang.searchtour') }}</a></li>
             </ul>
+            <span id="site_searchName">--Search for name</span>
+            <div id="content_searchName">
+                <input type="text" class="form-control" placeholder="Search tour" id="searchTourName">
+                <div class="result_search_tour">
+                    <ul>
+                    </ul>
+                </div>
+            </div>
+
             <span id="site_searchTitle">--{{ trans('newlang.Search') }}</span>
             <div id="content_search">
                 @if(Auth::check())
@@ -129,8 +138,7 @@
                               <th>{{ trans('newlang.Tourname') }}</th>
                               <th>{{ trans('newlang.startLocation') }}</th>
                               <th>{{ trans('newlang.detailPlaces') }}</th>
-                              <th>{{ trans('newlang.averageRating') }}</th>
-                              <th>{{ trans('newlang.Votes') }}</th>
+                              <th>Evaluate</th>
                               <th>{{ trans('newlang.totalTime') }}</th>
                           </tr>
                           </thead>
@@ -501,6 +509,7 @@
           "order": [[ 1, 'asc' ]],
           "columnDefs": [
               { className: "id_class", "targets": [ 1 ] },
+              { className: "id_tourname", "targets": [ 2 ] },
               { className: "startlocat_class", "targets": [ 3 ] },
               { className: "detaillocat_class", "targets": [ 4 ] }
             ],
@@ -514,8 +523,7 @@
                 { data: 'tourName', name: 'tourName' },
                 { data: 'startLocat', name: 'startLocat' },
                 { data: 'detailPlace', name: 'detailPlace' },
-                { data: 'rating', name: 'rating' },
-                { data: 'votes', name: 'votes' },
+                { data: 'evaluate', name: 'evaluate' },
                 { data: 'totalTime', name: 'totalTime' },
                 ]
             });
@@ -554,6 +562,66 @@
                 table.ajax.url( routeYouShared ).load();
             });
           @endif
+          //search tour
+          $("#searchTourName").keyup(function(){
+              if($(this).val() != "")
+              {
+                  let $url_path = '{!! url('/') !!}';
+                  let _token = $('meta[name="csrf-token"]').attr('content');
+                  let routeSraechSmart=$url_path+"/searchTourSmart";
+                  $.ajax({
+                        url:routeSraechSmart,
+                        method:"POST",
+                        data:{_token:_token,key:$(this).val()},
+                        success:function(data){ 
+                          if(data.length)
+                          {
+                              $(".result_search_tour").show();
+                              $(".result_search_tour ul").empty();
+                              data.forEach(myFunction);
+                              function myFunction(item, index) {
+
+                                  if(item["image"] != null)
+                                  {
+                                    $(".result_search_tour ul").append('<li class="select_id_tour" data-id="'+item['sh_id']+'"><img src="'+$url_path+"/"+item["image"]+'" alt="" /><span>'+item['to_name']+'</span></li>');
+                                  }
+                                  else
+                                  {
+                                    $(".result_search_tour ul").append('<li class="select_id_tour" data-id="'+item['sh_id']+'"><img src="'+$url_path+"/imgPlace/empty.png"+'" alt="" /><span>'+item['to_name']+'</span></li>');
+                                  }
+                              }
+                          }
+                          else
+                          {
+                              $(".result_search_tour").show();
+                              $(".result_search_tour ul").empty();
+                              $(".result_search_tour ul").append('<li class="select_id"><img src="{{asset("assets/img/portfolio/cabin.png")}}" alt="" />{{ trans("messages.notHaveAnyResults") }}</li>');
+                          }
+                       }
+                  });
+              }
+              else
+              {
+                $(".result_search_tour").hide();
+              }
+          });
+          $(".result_search_tour ul").on('click','.select_id_tour',function(){
+              $(".AllClass_Table").show();
+              $("html, body").animate({
+                  scrollTop: $('.AllClass_Table').offset().top - '130'
+              }, 200);
+              let $url_path = '{!! url('/') !!}';
+              var routeForName = $url_path+"/searchTourName/"+$(this).attr("data-id");
+              table.ajax.url( routeForName ).load();
+          })
+          $(document).click(function (e)
+          {
+              var container = $("#content_searchName");
+              if (!container.is(e.target) && container.has(e.target).length === 0)
+              {
+                  $(".result_search_tour").hide();
+              }
+          });
           $("#div_2").click(function(){
               $(".AllClass_Table").show();
               $("html, body").animate({

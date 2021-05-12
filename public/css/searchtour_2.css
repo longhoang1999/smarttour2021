@@ -59,9 +59,18 @@ td.detaillocat_class{
 .detail_money {
     position: absolute;
     bottom: -1.4em;
-    left: 16%;
+    left: 22%;
     color: red;
     font-style: italic;
     font-size: 14px;
 }
 .detail_money_minimum,.detail_money_maximum{display: none;}
+table#Table_AllClass {
+    font-size: 14px;
+}
+td.detaillocat_class {
+    width: 17em;
+}
+td.id_tourname {
+    width: 9em;
+}

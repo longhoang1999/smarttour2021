@@ -209,6 +209,12 @@ class UserController extends Controller
         $result = DB::select("select langplace.des_id,langplace.de_name,destination.de_image FROM langplace,destination WHERE langplace.language='vn' and langplace.de_name like '%".$req->key."%' and langplace.des_id=destination.de_remove ORDER BY RAND() limit 5");
         return $result;
     }
+    public function searchTourSmart(Request $req)
+    {
+        $result = DB::select("select sharetour.sh_id,sharetour.image,tour.to_name FROM tour,sharetour WHERE sharetour.sh_to_id=tour.to_id and tour.to_name like '%".$req->key."%' ORDER BY RAND() limit 5");
+        return $result;
+    }
+    
     public function showDetailPlace($idplace)
     {
         $de = Destination::
@@ -328,27 +334,30 @@ class UserController extends Controller
     }
     public function saveTour(Request $req)
     {
-
         if(!empty($req->val))
         {
-            $des = new Destination();
-            $des->de_id = $req->val['de_id'];
-            $des->de_remove = $req->val['de_id'];
-            $latlng = explode("|", $req->val['location']);
-            $des->de_lat = $latlng[0];
-            $des->de_lng = $latlng[1];
-            $des->de_name = $req->val['de_name'];
-            $des->de_duration = $req->val['de_duration'];
-            $des->de_cost = $req->val['de_cost'];
-            $des->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
-            $des->de_default = "1";
-            // plus
-            $findType = TypePlace::select("id","totalPlace")->where("status","1")->first();
-            $findType->totalPlace = intval($findType->totalPlace) + 1;
-            $findType->save();
-            //type des
-            $des->de_type = $findType->id;
-            $des->save();
+            $finddes = Destination::where('de_id',$req->val['de_id'])->first();
+            if(empty($finddes))
+            {
+                $des = new Destination();
+                $des->de_id = $req->val['de_id'];
+                $des->de_remove = $req->val['de_id'];
+                $latlng = explode("|", $req->val['location']);
+                $des->de_lat = $latlng[0];
+                $des->de_lng = $latlng[1];
+                $des->de_name = $req->val['de_name'];
+                $des->de_duration = $req->val['de_duration'];
+                $des->de_cost = $req->val['de_cost'];
+                $des->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
+                $des->de_default = "1";
+                // plus
+                $findType = TypePlace::select("id","totalPlace")->where("status","1")->first();
+                $findType->totalPlace = intval($findType->totalPlace) + 1;
+                $findType->save();
+                //type des
+                $des->de_type = $findType->id;
+                $des->save();
+            }
         }
         $user = Auth::user();
         $route = new Route();
@@ -368,31 +377,35 @@ class UserController extends Controller
         $duration = "";
         $cost = "";
         foreach ($req->tmparr as  $value) {
-            if(empty($value['de_default']))
+            if($value['de_default'] == "0")
             {
                 $desId = $desId.$value['de_id']."|";
                 $i++;
             }
             else if($value['de_default'] == "1")
             {
-                $desNewPlace = new Destination();
-                $desNewPlace->de_id = $value['de_id'];
-                $desNewPlace->de_remove = $value['de_id'];
-                $latlng = explode("|", $value['location']);
-                $desNewPlace->de_lat = $latlng[0];
-                $desNewPlace->de_lng = $latlng[1];
-                $desNewPlace->de_name = $value['de_name'];
-                $desNewPlace->de_duration = $value['de_duration'];
-                $desNewPlace->de_cost = $value['de_cost'];
-                $desNewPlace->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
-                $desNewPlace->de_default = "1";
-                // plus
-                $findType = TypePlace::select("id","totalPlace")->where("status","1")->first();
-                $findType->totalPlace = intval($findType->totalPlace) + 1;
-                $findType->save();
-                //find type place has de_default
-                $desNewPlace->de_type = $findType->id;
-                $desNewPlace->save();
+                $finddesNewPlace = Destination::where('de_id',$value['de_id'])->first();
+                if(empty($finddesNewPlace))
+                {
+                    $desNewPlace = new Destination();
+                    $desNewPlace->de_id = $value['de_id'];
+                    $desNewPlace->de_remove = $value['de_id'];
+                    $latlng = explode("|", $value['location']);
+                    $desNewPlace->de_lat = $latlng[0];
+                    $desNewPlace->de_lng = $latlng[1];
+                    $desNewPlace->de_name = $value['de_name'];
+                    $desNewPlace->de_duration = $value['de_duration'];
+                    $desNewPlace->de_cost = $value['de_cost'];
+                    $desNewPlace->de_map = 'http://www.google.com/maps/place/'.$latlng[0].','.$latlng[1];
+                    $desNewPlace->de_default = "1";
+                    // plus
+                    $findType = TypePlace::select("id","totalPlace")->where("status","1")->first();
+                    $findType->totalPlace = intval($findType->totalPlace) + 1;
+                    $findType->save();
+                    //find type place has de_default
+                    $desNewPlace->de_type = $findType->id;
+                    $desNewPlace->save();
+                }
                 $desId = $desId.$value['de_id']."|";
                 $i++;
             }

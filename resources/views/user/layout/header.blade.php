@@ -71,13 +71,13 @@
     </nav>
     <nav class="nav_more">
         <div class="container-fuild child_header">
-            <div id="div_search">
+            <!-- <div id="div_search">
                 <input type="text" class="navbar-brand js-scroll-trigger form-control" placeholder="{{ trans('messages.searchPlace') }}" id="searchPlace">
                 <div class="result_search">
                     <ul>
                     </ul>
                 </div>
-            </div>
+            </div> -->
             
             <div class="box-header" id="searchTour">
                 <i class="fas fa-search"></i> {{ trans('messages.searchTour') }}

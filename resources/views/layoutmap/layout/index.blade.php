@@ -51,6 +51,7 @@
         @include('layoutmap.layout.modal')
         <!-- Third party plugin JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
         <!-- Contact form JS-->
         <script src="{{asset('assets/mail/jqBootstrapValidation.js')}}"></script>
@@ -62,6 +63,28 @@
         <!-- <script src="{{asset('js/Scripts/jquery-migrate-1.2.1.min.js')}}"></script>
         <script src="{{asset('js/Scripts/slick.min.js')}}"></script> -->
         <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                // console.log(document.getElementById('checkImage').checked);
+                $("#checkImage").change(function(){
+                    console.log(document.getElementById('checkImage').checked);
+                    if(document.getElementById('checkImage').checked == true)
+                    {
+                        $("#oldImageTitle").show();
+                        $("#oldImageContent").show();
+                        $("#uploadImageTitle").show();
+                        $("#uploadImageBtn").show();
+                    }
+                    else if(document.getElementById('checkImage').checked == false)
+                    {
+                        $("#oldImageTitle").hide();
+                        $("#oldImageContent").hide();
+                        $("#uploadImageTitle").hide();
+                        $("#uploadImageBtn").hide();
+                    }
+                });
+            });
+        </script>
         <script type="text/javascript">
             $("#searchTour").click(function(){
                 location.replace("{{route('searchTour')}}");

@@ -51,3 +51,11 @@ div#tourExists a {
     padding-left: 1.5em;
     width: 70%;
 }
+.custom-switch{
+    padding: 0;
+    display: flex;
+}
+.toggle{width: 4em !important;border-radius: 1em !important;}
+#oldImageTitle,#oldImageContent,#uploadImageTitle,#uploadImageBtn{
+    display: none;
+}

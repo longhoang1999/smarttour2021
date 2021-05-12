@@ -66,8 +66,8 @@
         <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
         <script type="text/javascript">
             $(window).scroll(function(){
-                var aTop = $('#mainNav').height();
-                if($(this).scrollTop() >= aTop){
+                // var aTop = $('#mainNav').height();
+                if($(this).scrollTop() >= 20){
                     $('.up_btn').trigger('click');
                     $('#mainNav').css("border-bottom","1px solid #efe1e1");
                     $("#mainNav").removeClass("change-background");

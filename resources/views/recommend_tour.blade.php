@@ -2128,7 +2128,7 @@ function initMap(){
 									location: coor.lat+"|"+coor.lng,
 									de_name: Object(locationdata.get(ele)).de_name,
 									de_duration: Object(locationdata.get(ele)).de_duration,
-									de_default: Object(locationdata.get(ele)).de_default,
+									de_default: (Object(locationdata.get(ele)).de_default == 1) ? Object(locationdata.get(ele)).de_default:0,
 									de_cost: Object(locationdata.get(ele)).de_cost
 								})
 							})
@@ -2144,7 +2144,7 @@ function initMap(){
 					        });
 							$.ajax({
 								url:routeDetail,
-								method:"post",
+								method:"get",
 								data:{tmparr:tmparr,timeStart:timeStart,timeEnd:timeEnd,to_comback:to_comback,to_optimized:to_optimized,val:val,nameTour:nameTour,star:star,options:options,recommend:recommend,currency:currency},
 								success:function(data){ 
 									if(data[0] == "no")
