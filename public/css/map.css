@@ -588,13 +588,7 @@ div#search-title label {
 .right{
   position: relative;
 }
-.currency{
-  position: absolute;
-  width: 21%;
-  top: -8px;
-  left: 20%;
-  border: 0;
-}
+
 
 .right > div{
   width: 65% ;

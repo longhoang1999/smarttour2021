@@ -71,7 +71,7 @@ Route::group(
 		Route::get("searchMinTotal","ShareTourController@searchMinTotal")->name('share.searchMinTotal');
 		Route::get("searchLastMonth","ShareTourController@searchLastMonth")->name('share.searchLastMonth');
 		Route::get("searchAnyMonth/{date}","ShareTourController@searchAnyMonth")->name('share.searchAnyMonth');
-		Route::post("takeDetailRoute","ShareTourController@takeDetailRoute")->name('share.takeDetailRoute');
+		Route::get("takeDetailRoute","ShareTourController@takeDetailRoute")->name('share.takeDetailRoute');
 		Route::post("selectPlaceForType","ShareTourController@selectPlaceForType")->name('share.selectPlaceForType');
 		Route::post("selectTourForPlace","ShareTourController@selectTourForPlace")->name('share.selectTourForPlace');
 		Route::post("selectTourForCost","ShareTourController@selectTourForCost")->name('share.selectTourForCost');

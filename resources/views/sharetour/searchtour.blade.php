@@ -171,12 +171,8 @@
                     <p><span class="font-weight-bold font-italic">{{ trans('newlang.Introduce') }}: </span>
                     <span id="text_intro"></span></p>
 
-                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.averageRating') }}: </span>
-                    <span id="text_avgRating"></span></p>
-
-                    <p><span class="font-weight-bold font-italic">{{ trans('newlang.numberofRatings') }}: </span>
-                    <span id="text_number_rates"></span></p>
-
+                    <p><span class="font-weight-bold font-italic">Evaluate: </span>
+                    <span id="text_evaluate"></span></p>
                     <p><span class="font-weight-bold font-italic">{{ trans('newlang.startLocation') }}: </span>
                     <span id="startLocation"></span></p>
 
@@ -191,6 +187,10 @@
                     <span id="total_time"></span></p>
                     <p><span class="font-weight-bold font-italic">{{ trans('newlang.TotalCost') }}: </span>
                     <span id="total_cost"></span></p>
+
+                    <p><span class="font-weight-bold font-italic">Tour creator: </span>
+                    <span id="tour_creator"></span></p>
+
                     <p><span class="font-weight-bold font-italic">{{ trans('newlang.dateCreated') }}: </span>
                     <span id="date_created"></span></p>
                 </div>
@@ -782,7 +782,7 @@
             let routeDetail=$url_path+"/takeDetailRoute";
             $.ajax({
                   url:routeDetail,
-                  method:"POST",
+                  method:"GET",
                   data:{_token:_token,idShareTour:idShareTour},
                   success:function(data){ 
                     idShare = data[14];
@@ -814,12 +814,9 @@
                     @endif
                     $("#text_intro").empty();
                     $("#text_intro").append(data[4]);
-                    $("#text_avgRating").empty();
-                    $("#text_avgRating").append(data[5]);
-                    $("#text_number_rates").empty();
-                    $("#text_number_rates").append(data[6]);
+                    $("#text_evaluate").empty();
+                    $("#text_evaluate").append(data[17])
                     $("#startLocation").empty();
-                    
                     $("#startLocation").append(data[7]);
                     $("#detail_location").empty();
                     $("#detail_location").append(data[8]);
@@ -838,6 +835,8 @@
                     $("#total_time").append(durationString);
                     // php check
                       $("#total_cost").text(data[15].toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                    $("#tour_creator").empty();
+                    $("#tour_creator").append(data[16]);
                  }
             });
           });

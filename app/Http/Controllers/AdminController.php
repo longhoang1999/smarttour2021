@@ -1862,6 +1862,7 @@ class AdminController extends Controller
                 for ($i=0; $i < count($pieces_2)-1; $i++) {
                     $array = Arr::add($array, $i ,$pieces_2[$i]);
                 }
+                
                 $latlng_new = array();
                 $dename_new = array();
                 $placeId_new = array();

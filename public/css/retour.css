@@ -276,7 +276,30 @@ body:after {
   padding-left: 0;
 }
 .currency{
-  width: 20%;
+  width: 21%;
   background: white;
   padding-right: 0;
+}
+.block_input_cost{
+  display: flex;
+  position: relative;
+}
+.currency{
+  position: absolute;
+  border: 2px solid #22d4b1;
+}
+#inputTotalCost{
+  padding-left: 7.5em;
+}
+span.show_yourCost {
+    display: none;
+    position: absolute;
+    bottom: -1.7em;
+    left: 20%;
+    font-size: 13px;
+    font-style: italic;
+    font-weight: normal;
+}
+.show_money{
+  color: red;
 }

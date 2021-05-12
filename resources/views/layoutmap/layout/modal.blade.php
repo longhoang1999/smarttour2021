@@ -1,5 +1,36 @@
 <link rel="stylesheet" href="{{asset('css/modallayoutmap.css')}}">  
 <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+@if(!isset($justview))
+<!-- total cost -->
+<div class="modal fade" id="totalCostModal" tabindex="-1" role="dialog" aria-labelledby="totalCostModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="totalCostModalLabel">Chi phí cả tour</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <label for="inputTotalCost">Ước lượng tổng chi phí mà bạn có thể chi:</label>
+            <div class="block_input_cost">
+                <select class="form-control currency">
+                    <option selected="true" value="VNĐ">VNĐ</option>
+                    <option value="USD">USD</option>
+                </select>
+                <input type="number" class="form-control" id="inputTotalCost" placeholder="Total cost">
+                <span class="show_yourCost"> -{{ trans('admin.youEntered') }} <span class="show_money"></span></span>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+@endif
 <!-- map -->
 <div class="modal fade" id="enterNameTour" tabindex="-1" role="dialog" aria-labelledby="enterNameTourLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">

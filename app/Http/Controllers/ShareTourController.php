@@ -245,6 +245,7 @@ class ShareTourController extends Controller
             $dename_start = $des->de_name;
             $placeId_start =  $des->de_remove;
             $duration_start = $des->de_duration;
+            $description_start = $des->de_description;
             $cost_start = $des->de_cost;
         }
         else
@@ -254,6 +255,7 @@ class ShareTourController extends Controller
             $placeId_start =  "";
             $duration_start = "";
             $cost_start = "";
+            $description_start = "";
         }
         //$user = Auth::user();
         return view('recommend_tour',[
@@ -277,6 +279,7 @@ class ShareTourController extends Controller
             'placeId_start' => $placeId_start,
             'cost_start' => $cost_start,
             'duration_start' => $duration_start,
+            'description_start' => $description_start,
             'justview' => 'justview'
         ]);
     }
@@ -1472,17 +1475,31 @@ class ShareTourController extends Controller
                 }
             }
         }
+        $your_votes = "";
         // your votes
         if(Auth::check())
         {
             $findVotes = Uservotes::where("us_id",Auth::user()->us_id)->where("sh_id",$sharetour->sh_id)->first();
             if(!empty($findVotes))
-                $your_votes =  $findVotes->vote_number. ' <i class="fas fa-star text-warning"></i>';
+                for ($i=1; $i <= 5; $i++) { 
+                    if($i <= $findVotes->vote_number)
+                    {
+                        $your_votes = $your_votes.' <i class="fas fa-star text-warning"></i>';
+                    }
+                }
             else
                 $your_votes = '<span class="badge badge-warning">Not available</span>';
         }
-        else $your_votes = "";
         // other
+        $evaluate = "";
+        for ($i=1; $i <= 5; $i++) { 
+            if($i <= $sharetour->number_star)
+            {
+                $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
+            }
+        }
+        $evaluate = $evaluate.' <span class="font-italic">-'.$sharetour->numberReviews.' votes</span>';
+        // ignore 
         $avgRating = $sharetour->number_star. '<i class="fas fa-star text-warning"></i>';
         $number_rate = $sharetour->numberReviews. ' votes';
         // start locat
@@ -1494,7 +1511,8 @@ class ShareTourController extends Controller
         else
             $startLocat = '<span class="badge badge-warning">Not available</span>';
         $link_view_tour = route('share.viewSharetour',[$route->to_id,$sharetour->sh_id]);
-
+        //tour_creator
+        $find_tour_creator = User::select('us_fullName')->where("us_id",$route->to_id_user)->first();
         return [$arrayImg,
             $arrayLabel,
             $route->to_name,
@@ -1510,7 +1528,9 @@ class ShareTourController extends Controller
             $link_view_tour,
             Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime)),
             $sharetour->sh_id,
-            $totalCost
+            $totalCost,
+            $find_tour_creator->us_fullName,
+            $evaluate
         ];
     }
     public function takeDetail($array)

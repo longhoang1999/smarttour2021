@@ -33,6 +33,9 @@
 								</svg>
 							</span>
 							<div id="myDropdown" class="dropdown-content">
+								@if(!isset($justview))
+									<a href="#" data-toggle="modal" data-target="#totalCostModal">Reset Total Cost</a>
+								@endif
 								<a href="#" id="btn-rating" data-toggle="modal" data-target="#modalRating">Rating</a>
 								@if(isset($to_des))
 									<a href="{{route('user.maps')}}">Create a new tour</a>
@@ -91,10 +94,6 @@
 							<span class="font-weight-bold">Chi phí:</span>	
 							<div class="form-group input_money">
 							  <input type="number" id="amount" class="form-control">
-							  <select class="form-control currency">
-							  		<option selected="true" value="VNĐ">VNĐ</option>
-								 	<option value="USD">USD</option>
-							  </select>
 							  <span class="text_money">Bạn nhập: <span class="amount-text"></span></span>
 							</div>
 						</div>
@@ -304,6 +303,33 @@
 		use Illuminate\Support\Facades\Auth;
 	?>
 		<script type="text/javascript">
+			@if(!isset($to_des))
+				$("#totalCostModal").modal("show");
+			@endif
+			@if(!isset($justview))
+			$("#inputTotalCost").keyup(function(){
+	          if($(this).val() == "")
+	          {
+	            $(".show_yourCost").hide();
+	          }
+	          else
+	          {
+	            $(".show_money").text($(this).val().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") +" "+$(".currency").val());
+	            $(".show_yourCost").show();
+	          }
+	        });
+	        $(".currency").change(function(){
+	          var string_money = $(".show_money").text();
+	          if(string_money.indexOf("VNĐ") != "-1")
+	          {
+	            $(".show_money").text(string_money.slice(0,string_money.indexOf("VNĐ")) + $(this).val());
+	          }
+	          else if(string_money.indexOf("USD") != "-1")
+	          {
+	            $(".show_money").text(string_money.slice(0,string_money.indexOf("USD")) + $(this).val());
+	          }
+	        });
+	        @endif
 			// part 1
 			$("#time-cost-picker").mouseleave(function(){
 			  $("#time-cost-picker").hide("fast");
@@ -666,13 +692,6 @@ function initMap(){
 				directionsService	= new google.maps.DirectionsService(),
 				geocoder 	= new google.maps.Geocoder(),
 				distanceService = new google.maps.DistanceMatrixService();
-
-	// var searchBox = new google.maps.places.SearchBox(document.getElementById('pac-input'));
- //   map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('pac-input'));
- //   google.maps.event.addListener(searchBox, 'places_changed', function() {
- //     var places = searchBox.getPlaces();
- //     geocoderCallBack(places)
- //   });
 	const searchBox = new google.maps.places.SearchBox(document.getElementById('pac-input'));
    map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('pac-input'));
    google.maps.event.addListener(searchBox, 'places_changed', function() {
@@ -681,6 +700,17 @@ function initMap(){
      $('#add-waypoints').show();
      geocoderCallBack(places)
    });
+
+ //   const searchBox = new google.maps.places.Autocomplete(document.getElementById('pac-input'),{
+	//   componentRestrictions: { country: "vn" },location: { lat: 21.0226586, lng: 105.8179091 }
+	// })
+ //   map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('pac-input'));
+ //   google.maps.event.addListener(searchBox, 'place_changed', function() {
+ //     let places = searchBox.getPlace();
+ //     $('#add-waypoints').show();
+ //     geocoderCallBack(places)
+ //   });
+
 	setEvent();
 //===========================================
 
