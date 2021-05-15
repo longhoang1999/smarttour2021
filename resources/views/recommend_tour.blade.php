@@ -656,7 +656,8 @@ var newMarkOnClk = {},
 		recentLocatID = [],
 		recentStart,
 		newStartIndex,
-		nearMarks = [];
+		nearMarks = [],
+		nearIW= [];
 
 function initMap(){
 //==================Main progress========================
@@ -692,24 +693,17 @@ function initMap(){
 				directionsService	= new google.maps.DirectionsService(),
 				geocoder 	= new google.maps.Geocoder(),
 				distanceService = new google.maps.DistanceMatrixService();
-	const searchBox = new google.maps.places.SearchBox(document.getElementById('pac-input'));
-   map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('pac-input'));
-   google.maps.event.addListener(searchBox, 'places_changed', function() {
-     let places = searchBox.getPlaces();
-     console.log(places)
-     $('#add-waypoints').show();
-     geocoderCallBack(places)
-   });
+	const placesService  = new google.maps.places.PlacesService(map)
 
- //   const searchBox = new google.maps.places.Autocomplete(document.getElementById('pac-input'),{
-	//   componentRestrictions: { country: "vn" },location: { lat: 21.0226586, lng: 105.8179091 }
-	// })
- //   map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('pac-input'));
- //   google.maps.event.addListener(searchBox, 'place_changed', function() {
- //     let places = searchBox.getPlace();
- //     $('#add-waypoints').show();
- //     geocoderCallBack(places)
- //   });
+   const searchBox = new google.maps.places.Autocomplete(document.getElementById('pac-input'),{
+	  componentRestrictions: { country: "vn" },location: { lat: 21.0226586, lng: 105.8179091 }
+	})
+   map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('pac-input'));
+   google.maps.event.addListener(searchBox, 'place_changed', function() {
+     let places = searchBox.getPlace();
+     $('#add-waypoints').show();
+     geocoderCallBack([places,''])
+   });
 
 	setEvent();
 //===========================================
@@ -825,8 +819,11 @@ function initMap(){
         });
 		// Test brancg git
 		$('#clear_mark').click(()=>{
-			 if(nearMarks.length)
+			 if(nearMarks.length){
 			 	nearMarks.forEach(ele=>ele.setMap(null));
+			 	nearIW.forEach(ele=>ele.setMap(null));
+			 }
+			 	
 
 			 $('.map-marker-label[value="nearByPlace"]').remove();
 
@@ -891,6 +888,7 @@ function initMap(){
 			allRoutePosible = []
 			recentLocatID = []
 			nearMarks = []
+			nearIW = []
 			isopt = 1
 			isAuDel = 0
 			disresponse = undefined
@@ -1125,18 +1123,20 @@ function initMap(){
 				let val = this.parentElement.getAttribute('value');
 				$('#clear_mark').show();
 				
-				var place = new google.maps.places.PlacesService(map);
-				place.nearbySearch({
+				placesService.nearbySearch({
 					location: Object(locationdata.get(val)).location,
 					radius: '500',
 					type: type,
 				}, (response, status) => {
-					for(let i = 0; i < nearMarks.length;i++)
+					for(let i = 0; i < nearMarks.length;i++){
 						nearMarks[i].setMap(null);
-
+						if(nearIW[i]!=undefined) nearIW[i].setMap(null);
+					}
+						
+					console.log(response)
 					$('.map-marker-label[value="nearByPlace"]').remove();
 					
-					for (let i = 0; i <15; i++) 
+					for (let i = 0; i <10; i++) 
 						nearByMarks(response[i]);
 					
 					map.setCenter(Object(locationdata.get(val)).location);
@@ -1159,9 +1159,73 @@ function initMap(){
 			label: place.name,
 			icon: icon
 		});
+		
 		nearMarks.push(tmpMarker);
+		
 		customLabel(tmpMarker,'nearByPlace');
+		placesService.getDetails({
+      placeId: place.place_id
+    },(res, status) => {
+      if (status !== google.maps.places.PlacesServiceStatus.OK) {
+        return;
+      }
+      let  infoWindow = new google.maps.InfoWindow(); 
+      nearIW.push(infoWindow)
+      buildIWContent(res,infoWindow,tmpMarker);
+    });
 	}
+
+	function buildIWContent(place,infoWindow,tmpMarker) {
+		let place_name ='',
+		place_phone ='',
+		place_rate ='',
+		place_website ='',
+		hostnameRegexp = new RegExp('^https?://.+?/');;
+
+  place_name = '<b><a href="' + place.url +
+    '">' + place.name + '</a></b>';
+  place_vicinity =`<span><b>Địa chỉ: </b>${place.vicinity}</span>`;
+
+  if (place.formatted_phone_number) {
+     place_phone =`<span><b>Số điện thoại: </b>${place.formatted_phone_number}</span>`;
+  } 
+  // Assign a five-star rating to the hotel, using a black star ('&#10029;')
+  // to indicate the rating the hotel has earned, and a white star ('&#10025;')
+  // for the rating points not achieved.
+  if (place.rating) {
+    var ratingHtml = '';
+    for (var i = 0; i < 5; i++) {
+      if (place.rating < (i + 0.5)) {
+        ratingHtml += '&#10025;';
+      } else {
+        ratingHtml += '&#10029;';
+      }
+      place_rate =`<span><b>Đánh giá: </b><span style="color: #ffc107;">${ratingHtml}</span></span>`;
+    }
+  }
+
+  // The regexp isolates the first part of the URL (domain plus subdomain)
+  // to give a short URL for displaying in the info window.
+  if (place.website) {
+    var fullUrl = place.website;
+    var website = hostnameRegexp.exec(place.website);
+    if (website === null) {
+      website = 'http://' + place.website + '/';
+      fullUrl = website;
+    }
+     place_website =`<span><b>Website: <a target="_blank" href="${website}"> ${website} </a></b></span>`;
+  } 
+
+  infoWindow.setContent([
+        	place_name,
+			place_phone,
+			place_rate,
+			place_website].join("<br />"));
+    infoWindow.open(map, tmpMarker);
+    tmpMarker.addListener('click',()=>{
+  		infoWindow.open(map, tmpMarker);
+  	})
+}
   // convert time in seconds and HH:MM format
   function converttime(time,type){
   	if(type === 'duration_second'){

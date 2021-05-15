@@ -381,11 +381,11 @@
                                 $("#text_img").css("background-size","cover");
                                 $("#text_img").css("background-repeat","no-repeat");
                             }
-                            if(data[6] != "")
+                            if(data[6] != "" && data[6] != null)
                             {
                                 $("#text_email").append(data[1]+"<span class='text-danger' style='font-style: italic;'> ({{ trans('messages.notVerified') }})</span>");
                             }
-                            if(data[6] == "")
+                            if(data[6] == "" ||  data[6] == null)
                             {
                                 $("#text_email").append(data[1]+"<span class='text-success' style='font-style: italic;'> ({{ trans('messages.Verified') }})</span>");
                             }

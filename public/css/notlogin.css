@@ -46,11 +46,15 @@ form .txt_field{
 .txt_field input:valid ~ span::before{
     width: 100%;
 }
-.div_submit{text-align: center;
+.div_submit {
+    text-align: center;
     margin: auto;
     width: 100%;
+    display: flex;
+    justify-content: center;
 }
 .div_submit input[type="submit"] {
+    flex-basis: 30%;
     margin-right: 1rem;
     padding: .6rem 2rem;
     border-radius: 2rem;
@@ -59,13 +63,12 @@ form .txt_field{
     font-size: 18px;
     font-family: auto;
     background: #304dc6;
-
 }
 .div_submit input[type="submit"]:hover{
     background: #5576ff;
 }
 .div_submit input[type="button"] {
-    margin-right: 1rem;
+    flex-basis: 30%;
     padding: .6rem 2rem;
     border-radius: 2rem;
     color: white;
@@ -73,7 +76,6 @@ form .txt_field{
     font-size: 18px;
     font-family: auto;
     background: #304dc6;
-
 }
 .div_submit input[type="button"]:hover{
     background: #5576ff;
@@ -131,3 +133,23 @@ form .txt_field{
     cursor: pointer;
 }
 .inforForShare{display: none;}
+.btn-loginFB {
+    width: 100%;
+    text-align: center;
+    margin-top: 1em;
+}
+#link_login {
+    font-weight: normal;
+    width: 65%;
+    padding: .6rem 2rem;
+    border-radius: 2rem;
+    color: white;
+    border: none;
+    font-size: 18px;
+    font-family: auto;
+    background: #304dc6;
+    box-sizing: border-box;
+    text-decoration: none;
+    display: block;
+    margin: auto;
+}

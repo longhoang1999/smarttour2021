@@ -216,7 +216,12 @@
                                     <input type="submit" value="{{ trans('messages.Login') }}"> 
                                     <input type="button" id="btn_register" data-toggle="modal" data-target="#modalRegis" value="{{ trans('messages.Registration') }}">
                                 </div>
-
+                                <div class="btn-loginFB">
+                                    <a href="#" id="link_login">
+                                        <i class="fab fa-facebook-square"></i>
+                                        Login with Facebook
+                                    </a>
+                                </div>
                                 <div class="pass">
                                     {{ trans('messages.forgotPassword') }}
                                 </div>

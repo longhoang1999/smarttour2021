@@ -20,9 +20,93 @@ use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use PHPMailer;
+use Socialite;
+
 
 class UserController extends Controller
 {
+    //fb
+    public function getInfor($social)
+    {
+        return Socialite::driver($social)->redirect();
+    }
+    // login by FB
+    public function checkInfor($social)
+    {
+        $info = Socialite::driver($social)->user();
+        $user = User::where('provider',$social)->where('provider_user_id',$info->getId())->first();
+        if(!empty($user))
+        {
+            if($user->us_lock == "1")
+            {
+                return redirect()->route('login')->with("error","Tài khoản của bạn đang bị khóa");
+            }
+            else
+            {
+                $this->updatedAccFB($user,$info,$social);
+                return redirect()->route('user.dashboard');
+            }
+        }
+        else
+        {
+            $userSocial = new User();
+            $this->createdAccFB($userSocial,$info,$social);
+            return redirect()->route('user.dashboard');
+        }
+    }
+    public function updatedAccFB($user,$info,$social)
+    {
+        //updated
+        $socialUpdated =  $social;
+        $user->us_email = $info->getEmail();
+        $user->us_fullName = $info->getName();
+        $user->provider_user_id = $info->getId();
+        $user->provider = $socialUpdated;                
+        if($info->avatar_original != null)
+        {
+            File::delete(public_path($user->us_image));
+            // $extension = pathinfo($info->avatar_original, PATHINFO_EXTENSION);
+            $extension = 'jpg';
+            $picName = time().'.'.$extension;
+            $file = file_get_contents($info->avatar_original);
+            $save = file_put_contents('uploadUsers/'.$user->us_code.'/'.$picName, $file);
+            if($save)
+            {
+                $user->us_image='uploadUsers/'.$user->us_code.'/'.$picName;
+            }
+        }
+        $user->save();
+        Auth::login($user);
+    }
+    public function createdAccFB($userSocial,$info,$social)
+    {
+        // created
+        $socialCreated =  $social;
+        $userSocial->us_email = $info->getEmail();
+        $userSocial->us_password = Hash::make($socialCreated);
+        $userSocial->us_fullName = $info->getName();
+        $userSocial->provider_user_id = $info->getId();
+        $userSocial->provider = $socialCreated;
+        $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $userSocial->us_code = substr(str_shuffle($permitted_chars), 0, 20); 
+        $path = public_path().'/uploadUsers/' . $userSocial->us_code;
+        File::makeDirectory( $path,0777,true);
+        if($info->avatar_original != null)
+        {
+            // $extension = pathinfo($info->avatar_original, PATHINFO_EXTENSION);
+            $extension = 'jpg';
+            $picName = time().'.'.$extension;
+            $file = file_get_contents($info->avatar_original);
+            $save = file_put_contents('uploadUsers/'.$userSocial->us_code.'/'.$picName, $file);
+            if($save)
+            {
+                $userSocial->us_image='uploadUsers/'.$userSocial->us_code.'/'.$picName;
+            }
+        }
+        $userSocial->save();
+        Auth::login($userSocial);
+    }       
+
     public function langVN(Request $req)
     {
         \Session::put('website_language', 'vi');

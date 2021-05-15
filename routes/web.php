@@ -18,6 +18,10 @@ Route::group(
 		Route::get("/","UserController@login")->name("login");
 	}
 );
+Route::get("test","UserController@test");
+//fb
+Route::get("/getInfo-facebook/{social}","UserController@getInfor")->name("getInforFB");
+Route::get("/checkInfo-facebook/{social}","UserController@checkInfor")->name("checkInfor");
 //change language
 Route::post("langVN","UserController@langVN")->name("user.langVN");
 Route::post("langEN","UserController@langEN")->name("user.langEN");
