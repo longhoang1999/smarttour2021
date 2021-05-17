@@ -44,7 +44,7 @@
                         </div>
                     </li>
                     @else
-                    <li class="nav-item mx-0 mx-lg-1">
+                    <li class="nav-item mx-0 mx-lg-1" id="li_more">
                         <a style="color: #497689;" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="{{route('about')}}" id="header_about">{{ trans('messages.About') }}</a>
                     </li>
                     @endif
@@ -63,7 +63,7 @@
                         </div>
                     </li>
                     @else
-                    <li class="nav-item mx-0 mx-lg-1">
+                    <li class="nav-item mx-0 mx-lg-1" id="li_person">
                         <a style="color: #497689;" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#" id="openModalLogin">{{ trans('messages.Login') }}</a>
                     </li>
                     @endif

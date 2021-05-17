@@ -68,15 +68,27 @@
                     <h3 class="font-weight-bold font-italic">{{$route->to_name}}</h3>
                     <hr>
                     <div id="div_btn">
-                        <button class="btn btn-warning" 
-                        @if(Auth::check())
-                            onclick="crollFunction()"
-                        @else
-                            data-toggle="modal"
-                            data-target="#modalLogin"
-                        @endif
-                        >{{ trans('newlang.Rating') }}</button>
-                        <a href="{{route('share.viewSharetour',[$route->to_id,$share->sh_id])}}" class="btn btn-info">{{ trans('newlang.viewTour') }}</a>
+                        <ul>
+                            <li>
+                                <span class="like_tour"><i class="fas fa-heart"></i> Like (10)</span>
+                            </li>
+                            <li>
+                                <span class="rating_tour" 
+                                @if(Auth::check())
+                                    onclick="crollFunction()"
+                                @else
+                                    data-toggle="modal"
+                                    data-target="#modalLogin"
+                                @endif>
+                                    <i class="fas fa-flag-checkered"></i> {{ trans('newlang.Rating') }} ({{$share->numberReviews}})
+                                </span>
+                            </li>
+                            <li>
+                                <a href="{{route('share.viewSharetour',[$route->to_id,$share->sh_id])}}" class="view_tour">
+                                    <i class="fas fa-map-marked"></i> View tour
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                     @if(Auth::check())
                         <?php $findVotes =  Uservotes::where("sh_id",$share->sh_id)->where("us_id",Auth::user()->us_id)->first(); ?>
@@ -200,24 +212,45 @@
             @if(Auth::check())
             <div class="enter_login_rating">
                 <div class="info_userlogin_commnet">
-                    <div class="block_avatar">
-                        @if(Auth::user()->us_image != "")
-                            <img src="{{asset(Auth::user()->us_image)}}" alt="">
-                        @else
-                            <img src="{{asset('assets/img/avataaars.svg')}}" alt="">
-                        @endif
+                    <div class="info_uslogin_left">
+                        <div class="block_avatar">
+                            @if(Auth::user()->us_image != "")
+                                <img src="{{asset(Auth::user()->us_image)}}" alt="">
+                            @else
+                                <img src="{{asset('assets/img/avataaars.svg')}}" alt="">
+                            @endif
+                        </div>
+                        <?php 
+                            $countShare = DB::table('tour')->where('to_id_user',Auth::user()->us_id)
+                                ->rightJoin('sharetour', 'sharetour.sh_to_id', '=', 'tour.to_id')
+                                ->count();
+                         ?>
+                        <div class="block_info_user">
+                            <span>{{Auth::user()->us_fullName}}</span>
+                            @if($countShare > 0)
+                                <small>Đã chia sẻ {{$countShare}} toues</small>
+                            @endif
+                        </div>
                     </div>
-                    <?php 
-                        $countShare = DB::table('tour')->where('to_id_user',Auth::user()->us_id)
-                            ->rightJoin('sharetour', 'sharetour.sh_to_id', '=', 'tour.to_id')
-                            ->count();
-                     ?>
-                    <div class="block_info_user">
-                        <span>{{Auth::user()->us_fullName}}</span>
-                        @if($countShare > 0)
-                            <small>Đã chia sẻ {{$countShare}} toues</small>
-                        @endif
-                    </div>
+                    <div class="info_uslogin_right">
+                        <form method="post" action="{{route('user.choseComment')}}" id="form_chose_comment">
+                            @csrf
+                            <input type="hidden" value="{{$shareId}}" name="share_tour_id">
+                            <select class="form-control" id="chose_comment" name="chose_comment">
+                                <option hidden="">---Lọc comment</option>
+                                <option value="1"
+                                @if($typeComment == "all")
+                                    selected="" 
+                                @endif
+                                >Tất cả</option>
+                                <option value="2"
+                                @if($typeComment == "user_login")
+                                    selected="" 
+                                @endif
+                                >Đánh giá của bạn</option>
+                            </select>
+                        </form>
+                    </div>              
                 </div>
                 <form id="form_add_comment" method="post" action="{{route('user.addcomment',$share->sh_id)}}"> 
                    @csrf
@@ -228,17 +261,16 @@
                        <i class="fas fa-star star_4" data-value="4"></i>
                        <i class="fas fa-star star_5" data-value="5"></i>
                    </div>
-                   <input type="hidden" name="numberStar" id="numberStar" value="0">
-                   <textarea class="form-control" placeholder="Nhập đánh giá của bạn" name="content_rating"></textarea> 
+                   <input type="hidden" name="numberStar" id="numberStar" required="">
+                   <textarea class="form-control" placeholder="Nhập bình luận của bạn (nếu có)" name="content_rating"></textarea> 
                    <input type="submit" class="btn btn-sm btn-primary" value="Đánh giá" id="btn_rating">
                 </form>
             </div>
             @endif
             <!-- detail comment -->
-            @foreach($userVotes as $usVotes)
-            <?php $findComment = Comment::where("id_user_votes",$usVotes->id)->orderBy('co_date_created', 'DESC')->get(); ?>
-                @foreach($findComment as $Comment)
+            @foreach($findComment as $Comment)
                 <?php 
+                    $usVotes = Uservotes::where("id",$Comment->id_user_votes)->first();
                     $findUser = User::where("us_id",$usVotes->us_id)->first();
                     $countShareUser = DB::table('tour')->where('to_id_user',$findUser->us_id)
                                 ->rightJoin('sharetour', 'sharetour.sh_to_id', '=', 'tour.to_id')
@@ -246,16 +278,34 @@
                  ?>
                 <div class="comment_content">
                     <div class="comment_content-title">
-                        <div class="block_avatar">
-                            @if($findUser->us_image != "")
-                                <img src="{{asset($findUser->us_image)}}" alt="">
-                            @else
-                                <img src="{{asset('assets/img/avataaars.svg')}}" alt="">
-                            @endif
+                        <div class="comment_content-title-left">
+                            <div class="block_avatar">
+                                @if($findUser->us_image != "")
+                                    <img src="{{asset($findUser->us_image)}}" alt="">
+                                @else
+                                    <img src="{{asset('assets/img/avataaars.svg')}}" alt="">
+                                @endif
+                            </div>
+                            <div class="block_info_user">
+                                <span>{{$findUser->us_fullName}}</span>
+                                <small>Đã chia sẻ {{$countShareUser}} toues</small>
+                            </div>
                         </div>
-                        <div class="block_info_user">
-                            <span>{{$findUser->us_fullName}}</span>
-                            <small>Đã chia sẻ {{$countShareUser}} toues</small>
+                        <div class="comment_content-title-right">
+                            @if(Auth::check())
+                                @if($usVotes->us_id == Auth::user()->us_id)
+                                <span class="menu_icon">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </span>
+                                <div class="menu_more">
+                                    <ul>
+                                        <li>
+                                            <a href="#" data-id="{{$Comment->co_id}}" data-toggle="modal" data-target="#warningDelete">Xóa</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                @endif
+                            @endif
                         </div>
                     </div>
                     <div class="comment_content-starvotes">
@@ -288,9 +338,31 @@
                         Đã viết vào: <span>{{date("d/m/Y", strtotime($Comment->co_date_created))}}</span>
                     </div>
                 </div>
-                @endforeach
             @endforeach
+            <div class="paginate">
+                {{ $findComment->links() }}
+            </div>
         </div>
+    </div>
+    <!-- warning delete -->
+    <div class="modal fade" id="warningDelete" tabindex="-1" role="dialog" aria-labelledby="warningDeleteLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="warningDeleteLabel">Chú ý!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Bạn có muốn xóa bình luận này không!!
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn btn-danger">Có</a>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- Model -->
     <div class="modal fade" id="modalDetailPlace" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -356,6 +428,36 @@
 @stop
 @section('footer-js')  
     <script type="text/javascript">
+        $('#form_add_comment').one('submit', function(e) {
+            e.preventDefault();
+            if($("#numberStar").val() == "")
+            {
+                alert("Bạn hãy nhập số sao đánh giá!");
+            }
+            else
+                $(this).submit();
+        });
+        $('#warningDelete').on('show.bs.modal', function (event) {
+          let button = $(event.relatedTarget);
+          let recipient = button.data('id');
+          let route = '{!! url('/') !!}'+"/deleteComment/"+recipient;
+          var modal = $(this);
+          modal.find('.modal-footer a').attr('href',route);
+        })
+        $(".menu_icon").click(function(){
+            $(this).parent().find(".menu_more").toggle(200);
+        });
+        $(document).click(function (e)
+        {
+            var container = $(".comment_content-title-right");
+            if (!container.is(e.target) && container.has(e.target).length === 0)
+            {
+                $(".menu_more").hide();
+            }
+        });
+        $("#chose_comment").change(function(){
+            $("#form_chose_comment").submit();
+        });
         @if(!empty($findVotes))
             @if($findVotes->vote_number == "1")
                 $(".star_1").css("color","#ff9700");
@@ -376,6 +478,7 @@
                     $(".star_{{$i}}").css("color","#ff9700");
                 @endfor
             @endif
+            $("#numberStar").val("{{$findVotes->vote_number}}");
         @endif
         function crollFunction(){
             $("textarea[name=content_rating]").focus();

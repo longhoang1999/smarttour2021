@@ -272,7 +272,7 @@
 				</button>
 			</div>
 			<div class="modal-body">
-				<p class="text">{{ trans('messages.OverTime') }}</p>
+				<p id="alert-text" class="text"></p>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-primary" id="del-time-click">{{ trans('messages.Autodeletelocations') }}</button>
@@ -355,6 +355,9 @@
 			$("#noPublic").click(function(){
 				$(".inforForShare").hide();
 			});
+			$('#notification').on('hidden.bs.modal', function (e) {
+				$("#modalLogin").modal("show");
+			})
 			$("#saveTour").click(function(){
 				let _token = $('meta[name="csrf-token"]').attr('content');	
 				//loginForm
@@ -387,17 +390,20 @@
 			               else
 			               {
 			               		$("#modalLogin").modal("hide");
-			               		$(".li_menu_acc").empty();
+			               		$("#li_more").empty();
+			               		$("#li_more").append('<a style="color: #497689;" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#">{{ trans("messages.More") }} <i class="fas fa-sort-down"></i></a><div id="div_more"><a style="color: #497689;" class="nav-link py-3 px-0 px-lg-3 js-scroll-trigger" href="{{route('about')}}" id="header_about">{{trans("messages.About") }}</a><a style="color: #497689;" class="nav-link py-3 px-0 px-lg-3 js-scroll-trigger" href="{{route('feedback')}}" id="header_feedback">{{ trans("messages.sendFeedback") }}</a></div>');
+			               		$("#li_person").empty();
 			               		if(data[0] == "admin")
-			               			$(".li_menu_acc").append('<p class="menu_title_acc text-uppercase" id="your_account">{{ trans("messages.Youraccount") }} <i class="fas fa-sort-down"></i></p><div class="menu_content"><p id="comback_admin">{{ trans("messages.adminPage") }}</p><p id="personalInfo">{{ trans("messages.Aboutyou") }}</p><p id="p_logout">{{ trans("messages.Logout") }}</p></div>');
+			               			$("#li_person").append('<a style="color: #497689;" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#">'+data[2]+' <i class="fas fa-sort-down"></i></a><div id="div_person"><p id="comback_admin">{{ trans('messages.adminPage') }}</p><p id="personalInfo">{{ trans('messages.Aboutyou') }}</p><p id="p_logout">{{ trans('messages.Logout') }}</p></div>');
 			               		else if(data[0] == "user")
-			               			$(".li_menu_acc").append('<p class="menu_title_acc text-uppercase" id="your_account">{{ trans("messages.Youraccount") }} <i class="fas fa-sort-down"></i></p><div class="menu_content"><p id="personalInfo">{{ trans("messages.Aboutyou") }}</p><p id="p_logout">{{ trans("messages.Logout") }}</p></div>');
+			               			$("#li_person").append('<a style="color: #497689;" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#">'+data[2]+' <i class="fas fa-sort-down"></i></a><div id="div_person"><p id="personalInfo">{{ trans('messages.Aboutyou') }}</p><p id="p_logout">{{ trans('messages.Logout') }}</p></div>');
 			               		$("#enterNameTour").modal("show");
 			               		$( "#saveTour").unbind( "click" );
 			               		$("#saveTour").click(function(){
 									$("#enterNameTour").modal("show");
 									$("#modalLogin").modal("hide");
 								});
+								animationHeader();
 			               }
 			           }
 			        });
@@ -2422,6 +2428,7 @@ function initMap(){
 		function timecheck(){
 			if(dur > choosendur){
 				$("#timeAlert").modal("show");
+				$('#alert-text').text('The travel time has exceeded the selected time. Click close to delete some locations or choose the another end time. Click "Auto delete locations" we will delete some locations and Optimized the routes automaticaly.')
 				$("#del-time-click").click(()=>{
 					$("#timeAlert").modal("hide");
 					isAuDel = 1;
@@ -2431,6 +2438,7 @@ function initMap(){
 				$("#timeAlert-close").click(()=>{
 					$("#timeAlert").modal("hide");
 					$('#get-route').show()
+					$('#saveTour').hide();
 				});
 				return;
 			} else {
@@ -2450,6 +2458,7 @@ function initMap(){
 		function costcheck(){
 			if(cost > choosenCost){
 				$("#timeAlert").modal("show");
+				$('#alert-text').text('The travel cost has exceeded the selected time. Click close to delete some locations or choose the another cost. Click "Auto delete locations" we will delete some locations and Optimized the routes automaticaly.')
 				$("#del-time-click").click(()=>{
 					$("#timeAlert").modal("hide");
 					isAuDel = 1;
@@ -2459,6 +2468,7 @@ function initMap(){
 				$("#timeAlert-close").click(()=>{
 					$("#timeAlert").modal("hide");
 					$('#get-route').show()
+					$('#saveTour').hide();
 				});
 				return;
 			} else {
@@ -2497,9 +2507,7 @@ function initMap(){
 			if(cost > choosenCost && dur <= choosendur){
 				costcheck();
 				return
-			}
-
-			$("#timeAlert").modal("show");
+			}$("#timeAlert").modal("show");
 				$("#del-time-click").click(()=>{
 					$("#timeAlert").modal("hide");
 					isAuDel = 1;
@@ -2516,7 +2524,6 @@ function initMap(){
 		idToData(null,'LatLngArr');
 		drawRoutes();
 	}
-
 	// function clearAndReAddMarker(){
 		
 	// }

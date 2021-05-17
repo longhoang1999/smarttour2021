@@ -10,6 +10,13 @@ p{margin: 0}
 }
 .rating_comment-right{
 	flex: 3;
+    position: relative;
+}
+.paginate{
+    position: absolute;
+    bottom: -4rem;
+    left: 50%;
+    transform: translateX(-50%);
 }
 .line_1 {
 	margin-top: 1em;
@@ -24,9 +31,41 @@ p{margin: 0}
 .detail_votes{
 	margin-left: 1em;
 }
-.comment_content-title,.info_userlogin_commnet{
+.comment_content-title-left{
 	display: flex;
 	align-items: center;
+}
+.comment_content-title-right{
+    position: relative;
+}
+.menu_more{
+    position: absolute;
+    left: -200%;
+    display: none;
+}
+.menu_more ul{
+    margin: 0;padding: 0;
+}
+.menu_more ul li a{
+    display: block;
+    background: #efefef;
+    padding: .1em .9em;
+    text-decoration: none;
+    border-radius: 5px;
+}
+.menu_more ul li a:hover{
+    opacity: 0.6;
+}
+.menu_icon{
+    cursor: pointer;
+}
+.info_userlogin_commnet,.comment_content-title{
+    display: flex;
+    justify-content: space-between;
+}
+.info_uslogin_left{
+    display: flex;
+    align-items: center;
 }
 .block_avatar img{
 	width: 100%;
@@ -176,4 +215,40 @@ ul.slick-dots li button {
 }
 .slick-active > button{
     background: #f0fdec !important;
+}
+#div_btn ul{
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+#div_btn ul li{
+}
+#div_btn ul li span,#div_btn ul li a{
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: .2em .5em;
+    text-decoration: none;
+    color: black;
+}
+.like_tour:hover{
+    color: #fb0000 !important;
+}
+.rating_tour:hover{
+    color: #ffc107 !important;
+}
+.view_tour:hover{
+    color: #1abc9c !important;
+}
+.color_green{
+    color: #1abc9c;
+}
+.color_yellow{
+    color: #ffc107;
+}
+.color_red{
+    color: #fb0000;
 }

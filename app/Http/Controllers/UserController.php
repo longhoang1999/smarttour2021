@@ -204,11 +204,11 @@ class UserController extends Controller
                         $user = Auth::user();
                         if($user->us_type == "0")
                         {
-                            return [$position = "user",$user->us_id];
+                            return [$position = "user",$user->us_id,$user->us_fullName];
                         }
                         else
                         {
-                            return [$position = "admin",$user->us_id];
+                            return [$position = "admin",$user->us_id,$user->us_fullName];
                         }
                     }
                     else

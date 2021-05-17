@@ -63,6 +63,8 @@ Route::group(
 		    return view('recommend_tour');
 		})->name("user.maps");
 		Route::get("viewtour/{id}","ShareTourController@viewtour")->name('viewtour');
+		Route::get("viewtourUserComment/{id}","ShareTourController@viewtourUserComment")->name('
+			viewtourUserComment');
 		Route::post("takeInforPlace","ShareTourController@takeInforPlace")->name('takeInforPlace');
 		//Route::get("loadmore/{type}","ShareTourController@loadmore")->name('share.loadmore');
 		Route::get("viewSharetour/{routeid}/{shareId}","ShareTourController@viewSharetour")->name('share.viewSharetour');
@@ -110,6 +112,8 @@ Route::group(
 		// check tour duplicate
 		Route::post("duplicate","UserController@duplicate")->name("user.duplicate");
 		Route::post("addcomment/{idShare}","ShareTourController@addcomment")->name("user.addcomment");
+		Route::post("choseComment","ShareTourController@choseComment")->name("user.choseComment");
+		Route::get("deleteComment/{idComment}","ShareTourController@deleteComment")->name("user.deleteComment");
 	}
 );
 Route::group(

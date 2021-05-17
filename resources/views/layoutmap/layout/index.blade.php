@@ -95,10 +95,12 @@
 
             $(".up_btn").click(function(){
                 $(".nav_more").slideUp("fast");
+                $("#wrap").css("margin-top","5em");
                 $(".show_btn").show();
             });
             $(".show_btn").click(function(){
                 $(".nav_more").slideDown("fast");
+                $("#wrap").css("margin-top","8em");
                 $(this).hide();
             });
             $("#searchPlace").keyup(function(){
@@ -358,14 +360,11 @@
                 });
             });
         </script>
-        @if(Auth::check())
         <script type="text/javascript">
             $(document).ready(function(){
-                @if(Auth::check())
-                    $("#comback_admin").click(function(){
-                        location.replace("{{route('admin.generalInfor')}}");
-                    });
-                @endif
+                $("#comback_admin").click(function(){
+                    location.replace("{{route('admin.generalInfor')}}");
+                });
                 $("#personalInfo").click(function(){
                     $("#personal").modal("show");
                 });
@@ -442,10 +441,40 @@
                     $("#file_name").css("display","block");
                     $("#file_name").html($("#input_File").val().split('\\').pop());
                 });
-
-                
             });
         </script>
-        @endif
+        <script type="text/javascript">
+            function animationHeader(){
+                $("#li_more").on("click",'a',function(){
+                    if ($('#div_more').is(':visible'))
+                    {
+                        $("#div_more").slideUp("fast");
+                    }
+                    else
+                    {
+                        $("#div_more").slideDown("fast");
+                    }
+                });
+                $("#li_person").on("click",'a',function(){ 
+                    if ($('#div_person').is(':visible'))
+                    {
+                        $("#div_person").slideUp("fast");
+                    }
+                    else
+                    {
+                        $("#div_person").slideDown("fast");
+                    }
+                });
+                $("#comback_admin").click(function(){
+                    location.replace("{{route('admin.generalInfor')}}");
+                });
+                $("#personalInfo").click(function(){
+                    $("#personal").modal("show");
+                });
+                $("#p_logout").click(function(){
+                    location.replace("{{route('logout')}}");
+                });
+            }
+        </script>
         @yield('footer-js')
     </body>

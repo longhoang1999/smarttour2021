@@ -31,37 +31,42 @@ class ShareTourController extends Controller
 {
     public function addcomment($idShare,Request $req)
     {
-        $findUserVotes = Uservotes::where("sh_id",$idShare)->where("us_id",Auth::user()->us_id)->first();
-        if($findUserVotes)
+        if($req->numberStar != "")
         {
-            $findUserVotes->vote_number = $req->numberStar;
-            $findUserVotes->save();
-            $userVotesId = $findUserVotes->id;
+            $findUserVotes = Uservotes::where("sh_id",$idShare)->where("us_id",Auth::user()->us_id)->first();
+            if($findUserVotes)
+            {
+                $findUserVotes->vote_number = $req->numberStar;
+                $findUserVotes->save();
+                $userVotesId = $findUserVotes->id;
+            }
+            else
+            {
+                $userVotes = new Uservotes();
+                $userVotes->sh_id = $idShare;
+                $userVotes->us_id = Auth::user()->us_id;
+                $userVotes->vote_number = $req->numberStar;
+                $userVotes->save();
+                $userVotesId = $userVotes->id;
+            }
+            $allVote = Uservotes::where("sh_id",$idShare)->get();
+            $all_user_votes = $allVote->count();
+            $allStart = "0";
+            foreach ($allVote as $value) {
+                $allStart += floatval($value->vote_number);
+            }
+            $sharetour = ShareTour::where("sh_id",$idShare)->first();
+            $sharetour->number_star = floatval($allStart/$all_user_votes);
+            $sharetour->numberReviews = $all_user_votes;
+            $sharetour->save();
+            if($req->content_rating != "")
+            {
+                $addComment = new Comment();
+                $addComment->id_user_votes = $userVotesId;
+                $addComment->co_content = $req->content_rating;
+                $addComment->save();
+            }
         }
-        else
-        {
-            $userVotes = new Uservotes();
-            $userVotes->sh_id = $idShare;
-            $userVotes->us_id = Auth::user()->us_id;
-            $userVotes->vote_number = $req->numberStar;
-            $userVotes->save();
-            $userVotesId = $userVotes->id;
-        }
-        $allVote = Uservotes::where("sh_id",$idShare)->get();
-        $all_user_votes = $allVote->count();
-        $allStart = "0";
-        foreach ($allVote as $value) {
-            $allStart += floatval($value->vote_number);
-        }
-        $sharetour = ShareTour::where("sh_id",$idShare)->first();
-        $sharetour->number_star = floatval($allStart/$all_user_votes);
-        $sharetour->numberReviews = $all_user_votes;
-        $sharetour->save();
-
-        $addComment = new Comment();
-        $addComment->id_user_votes = $userVotesId;
-        $addComment->co_content = $req->content_rating;
-        $addComment->save();
         return back();
     }
     public function viewtour($shareId)
@@ -72,6 +77,11 @@ class ShareTourController extends Controller
         $creatorName = User::select('us_fullName')->where("us_id",$tour->to_id_user)->first();
 
         $userVotes = Uservotes::where('sh_id',$share->sh_id)->orderBy('dateCreated', 'DESC')->get();
+        $array = array();
+        foreach ($userVotes as $value) {
+            array_push($array, $value->id);
+        }
+        $findComment = Comment::whereIn("id_user_votes",$array)->orderBy('co_date_created', 'DESC')->paginate(10);
         $fiveStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","5")->count();
         $fourStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","4")->count();
         $threeStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","3")->count();
@@ -84,7 +94,58 @@ class ShareTourController extends Controller
             'totalVotes' => $userVotes->count(),
             'fiveStar' => $fiveStar,'fourStar' => $fourStar,'threeStar' => $threeStar,'towStar' => $towStar,'oneStar' => $oneStar,
             'userVotes' => $userVotes,
+            'findComment' => $findComment,
+            'shareId' => $shareId,
+            'typeComment' => 'all',
         ]);
+    }
+    public function choseComment(Request $req)
+    {
+        $shareId = $req->share_tour_id;
+        if($req->chose_comment == "1")
+        {
+            return redirect()->route('viewtour',$shareId);
+        }
+        else if($req->chose_comment == "2")
+        {
+            return redirect()->route('viewtourUserComment',$shareId);
+        }
+    }
+    public function viewtourUserComment($shareId)
+    {
+        // viewtour again
+        $shareTour = ShareTour::where('sh_id','<>',$shareId)->orderBy('numberReviews', 'DESC')->limit(10)->get();
+        $share = ShareTour::where("sh_id",$shareId)->first();
+        $tour = Route::where("to_id",$share->sh_to_id)->first();
+        $creatorName = User::select('us_fullName')->where("us_id",$tour->to_id_user)->first();
+        $userVotes = Uservotes::where('us_id',Auth::user()->us_id)->where('sh_id',$share->sh_id)->orderBy('dateCreated', 'DESC')->get();
+        $array = array();
+        foreach ($userVotes as $value) {
+            array_push($array, $value->id);
+        }
+        $findComment = Comment::whereIn("id_user_votes",$array)->orderBy('co_date_created', 'DESC')->paginate(10);
+        $fiveStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","5")->count();
+        $fourStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","4")->count();
+        $threeStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","3")->count();
+        $towStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","2")->count();
+        $oneStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","1")->count();
+        return view('sharetour.sharetour',[
+            'share'=>$share,
+            'shareTour'=>$shareTour,
+            'creatorName'=>$creatorName->us_fullName,
+            'totalVotes' => $userVotes->count(),
+            'fiveStar' => $fiveStar,'fourStar' => $fourStar,'threeStar' => $threeStar,'towStar' => $towStar,'oneStar' => $oneStar,
+            'userVotes' => $userVotes,
+            'findComment' => $findComment,
+            'shareId' => $shareId,
+            'typeComment' => 'user_login',
+        ]);
+    }
+    public function deleteComment($idComment)
+    {
+        $findComment = Comment::where("co_id",$idComment)->first();
+        $findComment->delete();
+        return back()->with("success","Xóa thành công!");
     }
     public function rating(Request $req)
     {
