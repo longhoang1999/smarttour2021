@@ -22,6 +22,9 @@ Route::get("test","UserController@test");
 //fb
 Route::get("/getInfo-facebook/{social}","UserController@getInfor")->name("getInforFB");
 Route::get("/checkInfo-facebook/{social}","UserController@checkInfor")->name("checkInfor");
+//google
+Route::get("/getInfo-google/{social}","UserController@getInfor")->name("getInforGG");
+Route::get("/checkInfo-google/{social}","UserController@checkInfor")->name("checkInforGG");
 //change language
 Route::post("langVN","UserController@langVN")->name("user.langVN");
 Route::post("langEN","UserController@langEN")->name("user.langEN");
@@ -106,6 +109,7 @@ Route::group(
 		Route::post("voteUser","ShareTourController@voteUser")->name('share.voteUser');
 		// check tour duplicate
 		Route::post("duplicate","UserController@duplicate")->name("user.duplicate");
+		Route::post("addcomment/{idShare}","ShareTourController@addcomment")->name("user.addcomment");
 	}
 );
 Route::group(

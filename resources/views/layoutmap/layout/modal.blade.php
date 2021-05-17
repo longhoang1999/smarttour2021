@@ -216,10 +216,16 @@
                                     <input type="submit" value="{{ trans('messages.Login') }}"> 
                                     <input type="button" id="btn_register" data-toggle="modal" data-target="#modalRegis" value="{{ trans('messages.Registration') }}">
                                 </div>
-                                <div class="btn-loginFB">
-                                    <a href="#" id="link_login">
+                                <div class="btn-loginFB mt-4">
+                                    <a target="_blank" href="{{url('/getInfo-facebook/facebook')}}" id="link_login" class="link_login_FB">
                                         <i class="fab fa-facebook-square"></i>
                                         Login with Facebook
+                                    </a>
+                                </div>
+                                <div class="btn-loginGoogle mt-2">
+                                    <a target="_blank" href="{{url('/getInfo-google/google')}}" id="link_login" class="link_login_google">
+                                        <i class="fab fa-google"></i>
+                                        Login with Google
                                     </a>
                                 </div>
                                 <div class="pass">

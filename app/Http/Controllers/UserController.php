@@ -25,17 +25,17 @@ use Socialite;
 
 class UserController extends Controller
 {
-    //fb
+    //fb + google
     public function getInfor($social)
     {
         return Socialite::driver($social)->redirect();
     }
-    // login by FB
+    // login by FB + google
     public function checkInfor($social)
     {
         $info = Socialite::driver($social)->user();
         $user = User::where('provider',$social)->where('provider_user_id',$info->getId())->first();
-        if(!empty($user))
+        if($user)
         {
             if($user->us_lock == "1")
             {
@@ -105,7 +105,7 @@ class UserController extends Controller
         }
         $userSocial->save();
         Auth::login($userSocial);
-    }       
+    }   
 
     public function langVN(Request $req)
     {
@@ -760,7 +760,7 @@ class UserController extends Controller
     }
     public function checkForgot(Request $req)
     {
-        $user = User::where("us_email",$req->input)->first();
+        $user = User::where("us_email",$req->input)->where('provider_user_id', null)->first();
         if(!empty($user))
         {
             return "true";

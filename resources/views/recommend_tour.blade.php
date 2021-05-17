@@ -117,7 +117,7 @@
 					  <input type="checkbox" id="is-back" >
 					  <label><b>Quay lại điểm bắt đầu?<b></label>
 					</div>
-					<!-- <div class="ui form">
+					<div class="ui form">
 						<label><b>Bạn ưu tiên gì hơn?</b></label>
 					  <div class="inline fields">
 					    <div class="field">
@@ -128,18 +128,18 @@
 					    </div>
 					    <div class="field">
 					      <div class="ui radio checkbox">
-					        <input type="radio" name="frequency">
+					        <input type="radio" value="time" name="frequency">
 					        <label>Thời gian</label>
 					      </div>
 					    </div>
 					    <div class="field">
 					      <div class="ui radio checkbox">
-					        <input type="radio" name="frequency">
+					        <input type="radio" value="cost" name="frequency">
 					        <label>Chi phí</label>
 					      </div>
 					    </div>
 					  </div>
-					</div> -->
+					</div>
 					<div  class="ui">
 						<button id="get-route" class="ui secondary button">
 						  Chỉ đường
@@ -315,6 +315,7 @@
 	          else
 	          {
 	            $(".show_money").text($(this).val().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") +" "+$(".currency").val());
+	            	choosenCost = parseInt($(this).val()); 
 	            $(".show_yourCost").show();
 	          }
 	        });
@@ -643,21 +644,22 @@ const colorlist = ['#418bca','#00bc8c','#f89a14','#ef6f6c','#5bc0de','#811411'],
 			locationdata = new Map(),
 			markerArray = new Map();
 var newMarkOnClk = {},
+startLocat = {},
 		locationID = [],
-		startLocat = {},
+		allRoutePosible = [],
+		recentLocatID = [],
+		nearMarks = [],
+		nearIW= [],
 		newLocatMark =[],
 		polylines = [],
 		glowPolylines =[],
-		isopt = 1,
 		locats = [],
+		isopt = 1,
 		isAuDel = 0,
+		choosenCost = 0,
 		disresponse,
-		allRoutePosible = [],
-		recentLocatID = [],
 		recentStart,
-		newStartIndex,
-		nearMarks = [],
-		nearIW= [];
+		newStartIndex;
 
 function initMap(){
 //==================Main progress========================
@@ -773,19 +775,20 @@ function initMap(){
 				$('#time-cost-picker').hide();
 				// e.currentTarget.className.replace("loading", "");
 				// e.currentTarget.className += ' loading';
-				if((Object.entries(startLocat).length && locationID.length == 1) || (!Object.entries(startLocat).length && locationID.length ==2)){
+				if((Object.entries(startLocat).length && locationID.length == 1) || (!Object.entries(startLocat).length && locationID.length ==2) || isopt == 0 ){
 					drawRoutes();
 				}
-				else
+				else{
+					setOption();
 					processanddrawrouteclient();
+				}
 			}
 		})
 		$('#time-close').click(()=>{
 			document.querySelector("#startDate")._flatpickr.clear();
 		})
 		$('#is-back').click(updateRoute);
-		// $('#is-opt').click(updateRoute);
-		// $('.dur-dis').click(updateRoute);
+		$(".radio input").click(updateRoute);
 		$('#startDate').change(updateRoute);
 		$('#time-end').change(updateRoute);
 		// format money
@@ -817,7 +820,6 @@ function initMap(){
           	$(".amount-text").text($("#amount").val().toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")+" "+$(this).val());
           }
         });
-		// Test brancg git
 		$('#clear_mark').click(()=>{
 			 if(nearMarks.length){
 			 	nearMarks.forEach(ele=>ele.setMap(null));
@@ -831,6 +833,11 @@ function initMap(){
 		resetAllHTML();
 	}
 	
+
+	function isEmptyObj(obj){
+		if(Object.entries(obj).length) return false;
+		return true;
+	} 
 
 	function resetAllHTML(){
 		$("#reset_opt").click(()=>{
@@ -865,7 +872,7 @@ function initMap(){
 				});
 			}
 
-			if(Object.entries(newMarkOnClk.size).length){
+			if(Object.entries(newMarkOnClk).length){
 				newMarkOnClk.marker.setMap(null);
 			}
 
@@ -912,7 +919,6 @@ function initMap(){
 	}
 
 	function drawRoutes(){
-		// document.getElementById('get-route').className.replace('loading',' ');
 		let waypts =[];
 		for(var i=1; i<locats.length; i++)
 	      waypts.push({
@@ -927,7 +933,11 @@ function initMap(){
 				travelMode: 'DRIVING',
 		},customDirectionsRenderer);
 	}
-
+	function setOption(){
+		if($(".radio input:checked").attr('value')=== 'cost'){
+			isopt = 2;
+		} else isopt =1;
+	}
 	function customDirectionsRenderer(response, status) {
 		var bounds = new google.maps.LatLngBounds();
 		var legs = response.routes[0].legs;
@@ -1298,26 +1308,25 @@ function initMap(){
 			// console.log(locationdata.get($("#time-cost-picker").attr('value')))
 			updateRoute()
 		})
+		let money =0;
 		$('#location-dur-cost').text(Object(locationdata.get(id)).de_name);
-		if($(".currency").val() == "VNĐ")
-		{
+
+		if($(".currency").val() == "VNĐ"){
 			$('#amount').val(Object(locationdata.get(id)).de_cost);
-			let money =idToData(id,'cost');
-			$('.amount-text').text(money.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + " "+$(".currency").val());
-		}
-		else if($(".currency").val() == "USD")
-		{
+			money =idToData(id,'cost');
+		} else if($(".currency").val() == "USD"){
 			let new_money = parseFloat(Object(locationdata.get(id)).de_cost)/23000;
 			$("#amount").val(parseFloat(new_money.toFixed(2)));
-			let money =$("#amount").val();
-			$('.amount-text').text(money.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + " "+$(".currency").val());
+			money =$("#amount").val();
 		}
+		$('.amount-text').text(money.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + " "+$(".currency").val());
+
 	}
 
 	function processAddToList(){
 		updateRoute();
 		$('#add-waypoints').hide();	
-		let length = markerArray.size +1;
+		let length = $(".list-item").length +1;
 		let id = $("#search-input").find(":selected").val();
 		let text = $("#search-input").find(":selected").text();
 
@@ -1349,7 +1358,6 @@ function initMap(){
 				addMarkers(id,colorlist[(length-1)%5]);
 			}
 			return;
-
 		}
 		if(length >= 6) return;
 		locationID.push(id)
@@ -1358,7 +1366,6 @@ function initMap(){
 			deleteMarker(newMarkOnClk.id);
 			newMarkOnClk ={};
 		}
-		
 		addToList(id,colorlist[(length-1)%5],length,text);
 		addMarkers(id,colorlist[(length-1)%5]);
 
@@ -1812,8 +1819,7 @@ function initMap(){
 				Object(markerArray.get(id)).setLabel(label);
 			} else {
 				addMarkers(id,color);
-			}
-						
+			}			
 		})
 		
 	}
@@ -1903,249 +1909,629 @@ function initMap(){
 		if(newStartIndex != undefined) startIndex = newStartIndex;
 		if(response != undefined) disresponse = response;
 		let routeOptimized = {
-			route: [],
-			value: 0
+			cost: {
+				route: []
+			},
+			duration: {
+				route: []
+			}
 		}
-		let total = 0;
+		let totalCost = 0;
+		let totalDur = 0;
 		let tmp = [];
 		let tmpArr = [];
 		if(recentLocatID.length) 
 			tmpArr = recentLocatID;
 		else 
 			tmpArr = locationID;
-		// Optimize by duration with the start location
-		if(!isAuDel && isopt == 1 && Object.entries(startLocat).length){
+
+		// Optimize by (duration or cost) with the start location
+		if(!isAuDel &&  Object.entries(startLocat).length){
 		// Loop all route posible to calculate the best way
 			for(var i = 0 ;i<allRoutePosible.length; i++){
 				var A = allRoutePosible[i];
-				
-					// total += disresponse.rows[A[0]].elements[A[1]].duration.value;
-					for(var j = 0 ;j<A.length; j++){
-						if(j==0){
-							total += disresponse.rows[startIndex].elements[A[0]].duration.value;
-						} else {
-							 total += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
-						}
-							total+= Object(locationdata.get(locationID[A[j]-1])).de_duration;  
-					}
-					if($('#is-back').is(':checked')) 
-						total += disresponse.rows[A[A.length-1]].elements[0].duration.value;
-
-					if (routeOptimized.value == 0){ 
-						routeOptimized.route = A;
-						routeOptimized.value = total;
-					}
-					if(total < routeOptimized.value){
-						routeOptimized.route = A;
-						routeOptimized.value = total;
-					}
-					total = 0;
-				}
-		}
-
-		// Optimize by cost with the start location
-		if(!isAuDel && isopt == 2 && Object.entries(startLocat).length){
-			for(var i = 0 ;i<allRoutePosible.length; i++){// Loop all route posible to calculate the best way
-				var A = allRoutePosible[i];
-				for(var j = 0 ;j<A.length-1; j++){
+				for(var j = 0 ;j<A.length; j++){
 					if(j==0){
-						total += disresponse.rows[startIndex].elements[A[0]].distance.value;
+						totalDur += disresponse.rows[startIndex].elements[A[0]].duration.value;
+						totalCost += taxiCal(disresponse.rows[startIndex].elements[A[0]].distance.value);
+
 					} else {
-						total += disresponse.rows[A[j-1]].elements[A[j]].distance.value;
+						 totalDur += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
+						 totalCost += taxiCal(disresponse.rows[A[j-1]].elements[A[j]].distance.value);
 					}
+						totalDur += Object(locationdata.get(locationID[A[j]-1])).de_duration;  
+						totalCost += Object(locationdata.get(locationID[A[j]-1])).de_cost  
 				}
+				if($('#is-back').is(':checked')){
+					totalDur += disresponse.rows[A[A.length-1]].elements[0].duration.value;
+					totalCost += taxiCal(disresponse.rows[A[A.length-1]].elements[0].distance.value);
+				} 
+					
 
-				if($('#is-back').is(':checked')) 
-					total += disresponse.rows[A[A.length-1]].elements[0].distance.value;
-
-				if (routeOptimized.value == 0){ 
-					routeOptimized.route = A;
-					routeOptimized.value = total;
+				if(routeOptimized.duration.value == undefined || totalDur < routeOptimized.duration.value){
+					routeOptimized.duration.route = A;
+					routeOptimized.duration.value = totalDur;
 				}
-				if(total < routeOptimized.value){
-					routeOptimized.route = A;
-					routeOptimized.value = total;
-
+				if(routeOptimized.cost.value == undefined || totalCost < routeOptimized.cost.value){
+					routeOptimized.cost.route = A;
+					routeOptimized.cost.value = totalCost;
 				}
-				total = 0;
+				totalDur = 0;
+				totalCost = 0;
 			}
 		}
 
-		// if(!isAuDel && isopt == 1 && startlocat == undefined && newPlaceIdArr.length){
-		if(!isAuDel && isopt == 1 && !Object.entries(startLocat).length){
+
+
+		// Optimize by (duration or cost) without the start location
+		if(!isAuDel && !Object.entries(startLocat).length){
 			for(var i = 0 ;i<allRoutePosible.length; i++){
 				var A = allRoutePosible[i];
 				for(var j = 0 ;j<A.length-1; j++){
-					total+= Object(locationdata.get(tmpArr[A[j]])).de_duration;
-					total+= disresponse.rows[A[j]].elements[A[j+1]].duration.value;
-				}
-				total+= Object(locationdata.get(tmpArr[A[A.length-1]])).de_duration;
+					totalDur += Object(locationdata.get(tmpArr[A[j]])).de_duration;
+					totalDur += disresponse.rows[A[j]].elements[A[j+1]].duration.value;
 
-				if($('#is-back').is(':checked')) 
-						total += disresponse.rows[A[A.length-1]].elements[0].duration.value;
+					totalCost += Object(locationdata.get(tmpArr[A[j]])).de_cost;
+					totalCost += taxiCal(disresponse.rows[A[j]].elements[A[j+1]].distance.value);
+				}
+				totalDur += Object(locationdata.get(tmpArr[A[A.length-1]])).de_duration;
+				totalCost += Object(locationdata.get(tmpArr[A[A.length-1]])).de_cost;
 
-				if (routeOptimized.value == 0){ 
-					routeOptimized.route = A;
-					routeOptimized.value = total;
+				if($('#is-back').is(':checked')) {
+					totalDur += disresponse.rows[A[A.length-1]].elements[0].duration.value;
+					totalCost += taxiCal(disresponse.rows[A[A.length-1]].elements[0].distance.value) ;
 				}
-				if(total < routeOptimized.value){
-					routeOptimized.route = A;
-					routeOptimized.value = total;
+
+				if(routeOptimized.duration.value == undefined || totalDur < routeOptimized.duration.value){
+					routeOptimized.duration.route = A;
+					routeOptimized.duration.value = totalDur;
 				}
-				total = 0;
+
+				if(routeOptimized.cost.value == undefined || totalCost < routeOptimized.cost.value){
+					routeOptimized.cost.route = A;
+					routeOptimized.cost.value = totalCost;
+				}
+				totalDur =0;
+				totalCost =0;
 			}
 		}
 
-		// if(!isAuDel && isopt == 2 && startlocat == undefined && newPlaceIdArr.length){
-			if(!isAuDel && isopt == 2 && !Object.entries(startLocat).length){
+		// Auto delete location if exceeded duration or cost with start locat
+		if(isAuDel && isopt != 3 && Object.entries(startLocat).length){
+			let allRouteOptimize ={
+				duration:[],
+				cost:[]
+			};
+			for(var i = 0 ;i<allRoutePosible.length; i++){
+					var A = allRoutePosible[i];
+					let tmpRouteOpt = {
+						cost: {
+							route: []
+						},
+						duration: {
+							route: []
+						}
+					}
+					if(isopt == 1){
+						for(var j =0;j<A.length;j++){
+							if(j==0){
+								totalDur += disresponse.rows[startIndex].elements[A[0]].duration.value;
+							} else {
+								totalDur += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
+							}
+							totalDur += Object(locationdata.get(tmpArr[A[j]])).de_duration;
+							let tmptotalDur = totalDur;
+							if($('#is-back').is(':checked')){
+								totalDur += disresponse.rows[A[j]].elements[0].duration.value;
+							}
+
+							if(totalDur <= choosendur){
+								if (tmpRouteOpt.duration.value == undefined){ 
+									tmpRouteOpt.duration.route.push(A[j]);
+									tmpRouteOpt.duration.value = tmptotalDur;
+								}else {
+									tmpRouteOpt.duration.route.push(A[j]);
+									tmpRouteOpt.duration.value = tmptotalDur;
+								}
+							} else {
+								allRouteOptimize.duration.push(tmpRouteOpt.duration);
+								break;
+							}
+						} 
+					}
+						
+					if(isopt == 2){
+						for(var j =0;j<A.length;j++){
+							if(j==0){
+								totalCost += taxiCal(disresponse.rows[startIndex].elements[A[0]].distance.value);
+							} else {
+								totalCost += taxiCal(disresponse.rows[A[j-1]].elements[A[j]].distance.value);
+							}
+							totalCost += Object(locationdata.get(tmpArr[A[j]])).de_cost;
+							let tmptotalCost = totalCost;
+							if($('#is-back').is(':checked')){
+								totalCost += taxiCal(disresponse.rows[A[j]].elements[0].distance.value);
+							}
+							if($(".currency").val() === 'USD'){
+								totalDur = parseFloat(totalDur.toFixed(2));
+							}
+							if(totalCost <= choosenCost){
+								if (tmpRouteOpt.cost.value == undefined){ 
+									tmpRouteOpt.cost.route.push(A[j]);
+									tmpRouteOpt.cost.value = tmptotalCost;
+								}else {
+									tmpRouteOpt.duration.route.push(A[j]);
+									tmpRouteOpt.duration.value = tmptotalCost;
+								}
+							} else {
+								allRouteOptimize.duration.push(tmpRouteOpt.cost);
+								break;
+							}
+						} 
+					}
+					totalDur = 0;
+					totalCost = 0;
+			}
+			let minDur = allRouteOptimize.duration[0];
+			let minCost = allRouteOptimize.cost[0];
+
+			for(let k = 1; k < allRouteOptimize.duration.length; k++){
+				if(allRouteOptimize.duration[k].route.length >= minDur.route.length){
+					if(allRouteOptimize.duration[k].route.length > minDur.route.length){
+						minDur = allRouteOptimize.duration[k];
+					}else if(allRouteOptimize.duration[k].value <= minDur.value){
+						minDur = allRouteOptimize.duration[k]
+					}
+				}
+			}
+
+			for(let k = 1; k < allRouteOptimize.cost.length; k++){
+				if(allRouteOptimize.cost[k].route.length >= minCost.route.length){
+					if(allRouteOptimize.cost[k].route.length > minCost.route.length){
+						minCost = allRouteOptimize[k];
+					}else if(allRouteOptimize.cost[k].value <= minCost.value){
+						minCost = allRouteOptimize.cost[k];                                          
+					}
+				}
+			}
+
+			routeOptimized.duration = minDur;
+			routeOptimized.cost = minCost;
+			isAuDel = 0;
+		}
+		// Auto delete location if exceeded duration or cost without start locat
+		if(isAuDel && isopt != 3 && !Object.entries(startLocat).length){
+			let allRouteOptimize = {
+				cost: [],
+				duration: []
+			};
+			for(var i = 0 ;i<allRoutePosible.length; i++){
+					var A = allRoutePosible[i];
+					let tmpRouteOpt = {
+						cost: {
+							route: []
+						},
+						duration: {
+							route: []
+						}
+					}
+					if(isopt == 1){
+							for(var j =0;j<A.length;j++){
+							if(j!=0){
+								 totalDur += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
+							}
+							totalDur += Object(locationdata.get(tmpArr[A[j]])).de_duration;
+							let tmptotalDur = totalDur;
+							if($('#is-back').is(':checked')){
+								totalDur+= disresponse.rows[A[j]].elements[0].duration.value;
+							}
+							if(totalDur<=choosendur){
+								if (tmpRouteOpt.duration.value == 0){ 
+									tmpRouteOpt.duration.route.push(A[j]);
+									tmpRouteOpt.duration.value = tmptotalDur;
+								}else {
+									tmpRouteOpt.duration.route.push(A[j]);
+									tmpRouteOpt.duration.value = tmptotalDur;
+								}
+							} else {
+								allRouteOptimize.duration.push(tmpRouteOpt.duration);
+								break;
+							}
+						} 
+					}
+
+					if(isopt == 2){
+							for(var j =0;j<A.length;j++){
+							if(j!=0){
+								 totalCost += taxiCal(disresponse.rows[A[j-1]].elements[A[j]].distance.value);
+							}
+							totalCost += Object(locationdata.get(tmpArr[A[j]])).de_cost;
+							let tmptotalCost = totalCost;
+							if($('#is-back').is(':checked')){
+								totalCost += taxiCal(disresponse.rows[A[j]].elements[0].distance.value);
+							}
+							if($(".currency").val() === 'USD'){
+								totalDur = parseFloat(totalDur.toFixed(2));
+							}
+							if(totalCost <= choosenCost){
+								if (tmpRouteOpt.cost.value == 0){ 
+									tmpRouteOpt.cost.route.push(A[j]);
+									tmpRouteOpt.cost.value = tmptotalCost;
+								}else {
+									tmpRouteOpt.cost.route.push(A[j]);
+									tmpRouteOpt.cost.value = tmptotalCost;
+								}
+							} else {
+								allRouteOptimize.cost.push(tmpRouteOpt.cost);
+								break;
+							}
+						} 
+					}
+					
+					totalDur = 0;
+					totalCost = 0;
+			}
+			if(isopt == 1){
+				let minDur = allRouteOptimize.duration[0];
+				for(let k = 1; k < allRouteOptimize.duration.length; k++){
+					if(allRouteOptimize.duration[k].route.length >= minDur.route.length){
+						if(allRouteOptimize.duration[k].route.length > minDur.route.length){
+							minDur = allRouteOptimize.duration[k];
+						}else if(allRouteOptimize.duration[k].value <= minDur.value){
+							minDur = allRouteOptimize.duration[k]
+						}
+					}
+				}
+				routeOptimized.duration = minDur;
+			}
+			
+			if(isopt == 2){
+				let minCost = allRouteOptimize.cost[0];
+				for(let k = 1; k < allRouteOptimize.cost.length; k++){
+					if(allRouteOptimize.cost[k].route.length >= minCost.route.length){
+						if(allRouteOptimize.cost[k].route.length > minCost.route.length){
+							minCost = allRouteOptimize.cost[k];
+						}else if(allRouteOptimize.cost[k].value <= minCost.value){
+							minCost = allRouteOptimize.cost[k]
+						}
+					}
+				}
+				routeOptimized.cost = minCost;
+			}
+			isAuDel = 0;
+		}
+
+		// Auto delete location if exceeded duration and cost with start locat
+		if(isAuDel && isopt == 3 && Object.entries(startLocat).length){
+			let allRouteOptimize ={
+				duration:[],
+				cost:[]
+			};
 			for(var i = 0 ;i<allRoutePosible.length; i++){
 				var A = allRoutePosible[i];
-				for(var j = 0 ;j<A.length-1; j++)
-					total+= disresponse.rows[A[j]-1].elements[A[j+1]-1].distance.value;
-
-				if($('#is-back').is(':checked')) 
-						total += disresponse.rows[A[A.length-1]-1].elements[0].distance.value;
-
-				if (routeOptimized.value == 0){ 
-					routeOptimized.route = A;
-					routeOptimized.value = total;
+				let tmpRouteOpt = {
+					cost: {
+						route: []
+					},
+					duration: {
+						route: []
+					}
 				}
-				if(total < routeOptimized.value){
-					routeOptimized.route = A;
-					routeOptimized.value = total;
-				}
-				total = 0;
+				
+				for(var j =0;j<A.length;j++){
+					if(j==0){
+						totalDur += disresponse.rows[startIndex].elements[A[0]].duration.value;
+						totalCost += taxiCal(disresponse.rows[startIndex].elements[A[0]].distance.value);
+					} else {
+						totalDur += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
+						totalCost += taxiCal(disresponse.rows[A[j-1]].elements[A[j]].distance.value);
+					}
+					totalDur += Object(locationdata.get(tmpArr[A[j]])).de_duration;
+					totalCost += Object(locationdata.get(tmpArr[A[j]])).de_cost;
+					let tmptotalDur = totalDur;
+					let tmptotalCost = totalCost;
+					if($('#is-back').is(':checked')){
+						totalDur += disresponse.rows[A[j]].elements[0].duration.value;
+						totalCost +=	taxiCal(disresponse.rows[A[j]].elements[0].distance.value);
+					}
+					if($(".currency").val() === 'USD'){
+								totalDur = parseFloat(totalDur.toFixed(2));
+							}
+					if(totalDur <= choosendur && totalCost <= choosenCost){
+						if (tmpRouteOpt.duration.value == undefined){ 
+							tmpRouteOpt.duration.route.push(A[j]);
+							tmpRouteOpt.duration.value = tmptotalDur;
+						}else {
+							tmpRouteOpt.duration.route.push(A[j]);
+							tmpRouteOpt.duration.value = tmptotalDur;
+						}
+						if (tmpRouteOpt.cost.value == undefined){ 
+							tmpRouteOpt.cost.route.push(A[j]);
+							tmpRouteOpt.cost.value = tmptotalCost;
+						}else {
+							tmpRouteOpt.cost.route.push(A[j]);
+							tmpRouteOpt.cost.value = tmptotalCost;
+						}
+					} else {
+						allRouteOptimize.duration.push(tmpRouteOpt.duration);
+						allRouteOptimize.cost.push(tmpRouteOpt.cost);
+						break;
+					}
+				} 
+				totalDur = 0;
+				totalCost = 0;
 			}
+			let minDur = allRouteOptimize.duration[0];
+			let minCost = allRouteOptimize.cost[0];
+
+
+			if($('input[value="time"]').is(":checked")){
+				for(let k = 1; k < allRouteOptimize.duration.length; k++){
+					if(allRouteOptimize.duration[k].route.length >= minDur.route.length){
+						if(allRouteOptimize.duration[k].route.length > minDur.route.length){
+							minDur = allRouteOptimize[k];
+						}else if(allRouteOptimize.duration[k].value <= minDur.value){
+							minDur = allRouteOptimize.duration[k];                                          
+						}
+					}
+				}
+			} else {
+				for(let k = 1; k < allRouteOptimize.cost.length; k++){
+					if(allRouteOptimize.cost[k].route.length >= minCost.route.length){
+						if(allRouteOptimize.cost[k].route.length > minCost.route.length){
+							minCost = allRouteOptimize[k];
+						}else if(allRouteOptimize.cost[k].value <= minCost.value){
+							minCost = allRouteOptimize.cost[k];                                          
+						}
+					}
+				}
+			}
+			
+
+			routeOptimized.duration = minDur;
+			routeOptimized.cost = minCost;
+			isAuDel = 0;
 		}
+
+		// Auto delete location if exceeded duration and cost without start locat
+		if(isAuDel && isopt == 3 && !Object.entries(startLocat).length){
+			let allRouteOptimize = {
+				cost: [],
+				duration: []
+			};
+			for(var i = 0 ;i<allRoutePosible.length; i++){
+					var A = allRoutePosible[i];
+					let tmpRouteOpt = {
+						cost: {
+							route: []
+						},
+						duration: {
+							route: []
+						}
+					}
+
+							for(var j =0;j<A.length;j++){
+							if(j!=0){
+								 totalDur += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
+								 totalCost += taxiCal(disresponse.rows[A[j-1]].elements[A[j]].distance.value);
+							}
+							totalDur += Object(locationdata.get(tmpArr[A[j]])).de_duration;
+							totalCost += Object(locationdata.get(tmpArr[A[j]])).de_cost;
+							let tmptotalDur = totalDur;
+							let tmptotalCost = totalCost;
+
+							if($('#is-back').is(':checked')){
+								totalDur+= disresponse.rows[A[j]].elements[0].duration.value;
+								totalCost+= taxiCal(disresponse.rows[A[j]].elements[0].distance.value);
+							}
+
+							if(totalDur<=choosendur && totalCost<=choosenCost){
+								if (tmpRouteOpt.duration.value == 0){ 
+									tmpRouteOpt.duration.route.push(A[j]);
+									tmpRouteOpt.duration.value = tmptotalDur;
+								}else {
+									tmpRouteOpt.duration.route.push(A[j]);
+									tmpRouteOpt.duration.value = tmptotalDur;
+								}
+								if (tmpRouteOpt.cost.value == 0){ 
+									tmpRouteOpt.cost.route.push(A[j]);
+									tmpRouteOpt.cost.value = tmptotalCost;
+								}else {
+									tmpRouteOpt.cost.route.push(A[j]);
+									tmpRouteOpt.cost.value = tmptotalCost;
+								}
+							} else {
+								allRouteOptimize.duration.push(tmpRouteOpt.duration);
+								allRouteOptimize.cost.push(tmpRouteOpt.cost);
+								break;
+							}
+						} 
+					
+					totalDur = 0;
+					totalCost = 0;
+					isAuDel = 0;
+			}
 		
-		if(isAuDel && Object.entries(startLocat).length){
-			let allRouteOptimize =[];
-			for(var i = 0 ;i<allRoutePosible.length; i++){
-					var A = allRoutePosible[i];
-					let tmpRouteOpt = {
-						route: [],
-						value: 0
-					}
-					for(var j =0;j<A.length;j++){
-						if(j==0){
-							total += disresponse.rows[startIndex].elements[A[0]].duration.value;
-						} else {
-							 total += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
+			if($('input[value="time"]').is(":checked")){
+				let minDur = allRouteOptimize.duration[0];
+				for(let k = 1; k < allRouteOptimize.duration.length; k++){
+					if(allRouteOptimize.duration[k].route.length >= minDur.route.length){
+						if(allRouteOptimize.duration[k].route.length > minDur.route.length){
+							minDur = allRouteOptimize.duration[k];
+						}else if(allRouteOptimize.duration[k].value <= minDur.value){
+							minDur = allRouteOptimize.duration[k]
 						}
-						total+= Object(locationdata.get(tmpArr[A[j]])).de_duration;
-						var tmptotal = total;
-						if($('#is-back').is(':checked')){
-							total+= disresponse.rows[A[j]].elements[0].duration.value;
-						}
-						if(total<=choosendur){
-							if (tmpRouteOpt.value == 0){ 
-								tmpRouteOpt.route.push(A[j]);
-								tmpRouteOpt.value = tmptotal;
-							}else {
-								tmpRouteOpt.route.push(A[j]);
-								tmpRouteOpt.value = tmptotal;
-							}
-						} else {
-							allRouteOptimize.push(tmpRouteOpt);
-							break;
-						}
-					} 
-					total = 0;
-			}
-			let min = allRouteOptimize[0];
-			for(let k = 1; k < allRouteOptimize.length; k++){
-				if(allRouteOptimize[k].route.length >= min.route.length){
-					if(allRouteOptimize[k].route.length > min.route.length){
-						min = allRouteOptimize[k];
-					}else if(allRouteOptimize[k].value <= min.value){
-						min = allRouteOptimize[k]
 					}
 				}
-			}
-
-			routeOptimized = min;
-		}
-
-		if(isAuDel && !Object.entries(startLocat).length){
-			let allRouteOptimize =[];
-			for(var i = 0 ;i<allRoutePosible.length; i++){
-					var A = allRoutePosible[i];
-					let tmpRouteOpt = {
-						route: [],
-						value: 0
-					}
-					for(var j =0;j<A.length;j++){
-						if(j!=0){
-							 total += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
+				routeOptimized.duration = minDur;
+			} else {
+				let minCost = allRouteOptimize.cost[0];
+				for(let k = 1; k < allRouteOptimize.cost.length; k++){
+					if(allRouteOptimize.cost[k].route.length >= minCost.route.length){
+						if(allRouteOptimize.cost[k].route.length > minCost.route.length){
+							minCost = allRouteOptimize.cost[k];
+						}else if(allRouteOptimize.cost[k].value <= minCost.value){
+							minCost = allRouteOptimize.cost[k]
 						}
-						total+= Object(locationdata.get(tmpArr[A[j]])).de_duration;
-						var tmptotal = total;
-						if($('#is-back').is(':checked')){
-							total+= disresponse.rows[A[j]].elements[0].duration.value;
-						}
-						if(total<=choosendur){
-							if (tmpRouteOpt.value == 0){ 
-								tmpRouteOpt.route.push(A[j]);
-								tmpRouteOpt.value = tmptotal;
-							}else {
-								tmpRouteOpt.route.push(A[j]);
-								tmpRouteOpt.value = tmptotal;
-							}
-						} else {
-							allRouteOptimize.push(tmpRouteOpt);
-							break;
-						}
-					} 
-					total = 0;
-			}
-			let min = allRouteOptimize[0];
-			for(let k = 1; k < allRouteOptimize.length; k++){
-				if(allRouteOptimize[k].route.length >= min.route.length){
-					if(allRouteOptimize[k].route.length > min.route.length){
-						min = allRouteOptimize[k];
-					}else if(allRouteOptimize[k].value <= min.value){
-						min = allRouteOptimize[k]
 					}
 				}
+				routeOptimized.cost = minCost;
 			}
-
-			routeOptimized = min;
 			
 		}
 
-		for(var i=0;i<routeOptimized.route.length;i++)
-			tmp[i] = (Object.entries(startLocat).length)?tmpArr[routeOptimized.route[i]-1]:tmpArr[routeOptimized.route[i]];
+		let tmpRoute;
+
+		if(isopt == 1){
+			tmpRoute = routeOptimized.duration.route;
+		} else if(isopt == 2){
+			tmpRoute = routeOptimized.cost.route;
+		} else if(isopt ==3){
+			if($('input[value="time"]').is(":checked")) 
+				tmpRoute = routeOptimized.duration.route;
+			else 
+				tmpRoute = routeOptimized.cost.route;
+		}
+
+		for(var i=0;i<tmpRoute.length;i++)
+			tmp[i] = (Object.entries(startLocat).length)?tmpArr[tmpRoute[i]-1]:tmpArr[tmpRoute[i]];
 		locationID = tmp;
-		timeCheck(routeOptimized.value);	
+
+		timeCostCheck((routeOptimized.duration!=undefined)?routeOptimized.duration.value:null,(routeOptimized.cost!=undefined)?routeOptimized.cost.value:null);	
+		
 		
 	}
 
-	function timeCheck(value){
+	function timeCostCheck(dur,cost){
 		let time = document.querySelector("#startDate")._flatpickr.selectedDates
 		let choosendur = 	(time[1]-time[0])/1000;
-		if(isNaN(choosendur)){
-			idToData(null,'LatLngArr');
-			drawRoutes();
+
+		markerArray.forEach((value,key)=>{
+			if(!locationID.includes(key)){
+				value.setMap(null);
+			}
+		});
+		markerArray.forEach((value,key)=>{
+			if(!locationID.includes(key)){
+				markerArray.clear(key);
+			}
+		});
+
+		// Not Optimize
+		
+		function timecheck(){
+			if(dur > choosendur){
+				$("#timeAlert").modal("show");
+				$("#del-time-click").click(()=>{
+					$("#timeAlert").modal("hide");
+					isAuDel = 1;
+					isopt =1;
+					bestWay();
+				});
+				$("#timeAlert-close").click(()=>{
+					$("#timeAlert").modal("hide");
+					$('#get-route').show()
+				});
+				return;
+			} else {
+				idToData(null,'LatLngArr');
+				// undisabled deleted location in select box
+			 	document.querySelectorAll('#search-input option').forEach(ele=>{
+			 		let check;
+			 		let id = ele.getAttribute('value');
+			 		(startLocat.id != undefined)?(check = !locationID.includes(id) ||(startLocat.id == id)):check =!locationID.includes(id);
+
+			 		if(check) ele.disabled = false;
+			 	})
+				drawRoutes();
+			}
+		}
+
+		function costcheck(){
+			if(cost > choosenCost){
+				$("#timeAlert").modal("show");
+				$("#del-time-click").click(()=>{
+					$("#timeAlert").modal("hide");
+					isAuDel = 1;
+					isopt = 2;
+					bestWay();
+				});
+				$("#timeAlert-close").click(()=>{
+					$("#timeAlert").modal("hide");
+					$('#get-route').show()
+				});
+				return;
+			} else {
+				idToData(null,'LatLngArr');
+				// undisabled deleted location in select box
+			 	document.querySelectorAll('#search-input option').forEach(ele=>{
+			 		let check;
+			 		let id = ele.getAttribute('value');
+			 		(startLocat.id != undefined)?(check = !locationID.includes(id) ||(startLocat.id == id)):check =!locationID.includes(id);
+			 		if(check) ele.disabled = false;
+			 	})
+				idToData(null,'LatLngArr');
+				drawRoutes();
+			}
+		}
+		// Optimize by time
+		if(!isNaN(choosendur) && choosenCost == 0){
+			timecheck();
 			return;
 		}
-		if(value > choosendur){
+
+		// Optimize by time
+		if(isNaN(choosendur) && choosenCost != 0){
+			costcheck();
+			return;
+		}
+
+		//Optimize by time && cost
+		if(!isNaN(choosendur) && choosenCost != 0){
+			// cost available time unavailable
+			if(cost <= choosenCost && dur > choosendur){
+				timecheck();
+				return
+			}
+			// time available cost unavailable
+			if(cost > choosenCost && dur <= choosendur){
+				costcheck();
+				return
+			}
+
 			$("#timeAlert").modal("show");
-			$("#del-time-click").click(()=>{
-				$("#timeAlert").modal("hide");
-				isAuDel = 1;
-				bestWay();
-			});
-			$("#timeAlert-close").click(()=>{
-				$("#timeAlert").modal("hide");
-				$('#get-route').show()
-			});
-			return;
-		} else {
-			idToData(null,'LatLngArr');
-			drawRoutes();
+				$("#del-time-click").click(()=>{
+					$("#timeAlert").modal("hide");
+					isAuDel = 1;
+					isopt = 3;
+					bestWay();
+				});
+				$("#timeAlert-close").click(()=>{
+					$("#timeAlert").modal("hide");
+					$('#get-route').show()
+				});
+				return;
+
 		}
-		isopt = 0;
+		idToData(null,'LatLngArr');
+		drawRoutes();
 	}
+
+	// function clearAndReAddMarker(){
+		
+	// }
+
+	function taxiCal(metters){
+		let km = parseFloat((metters/1000).toFixed(1));
+		let money = 6000;
+		if(km > 1 && km <= 30){
+			money = km * 11000;
+		} else if( km>30 ){
+			money = 330000 +(km -30)*9000;
+		}
+		return money;
+	}
+
 	function writeDetailForSave(){
 		$(".content_modal_left").empty();
 		$(".content_modal_left").append('<span class="mb-0">Detail tour</span>');

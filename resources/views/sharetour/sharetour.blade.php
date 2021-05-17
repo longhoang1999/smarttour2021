@@ -4,12 +4,18 @@
 @parent   
 @stop
 @section('header_styles')  
-    <style>
-        p{margin: 0}
-    </style>
+    <link rel="stylesheet" href="{{asset('css/sharetourDetail.css')}}">
 @stop
 @section('content')
-    <?php use App\Models\Destination; use App\Models\Language;use App\Models\Uservotes;use Illuminate\Support\Facades\Auth;?>
+    <?php 
+        use App\Models\Destination;
+        use App\Models\Language;
+        use App\Models\Uservotes;
+        use Illuminate\Support\Facades\Auth;
+        use Illuminate\Support\Facades\DB;
+        use App\Models\User;
+        use App\Models\Comment;
+    ?>
     <section class="page-section portfolio" id="portfolio">
         <div class="container">
             <!-- Portfolio Section Heading-->
@@ -62,10 +68,11 @@
                     <h3 class="font-weight-bold font-italic">{{$route->to_name}}</h3>
                     <hr>
                     <div id="div_btn">
-                        <button class="btn btn-warning" data-toggle="modal"
+                        <button class="btn btn-warning" 
                         @if(Auth::check())
-                            data-target="#exampleModal"
+                            onclick="crollFunction()"
                         @else
+                            data-toggle="modal"
                             data-target="#modalLogin"
                         @endif
                         >{{ trans('newlang.Rating') }}</button>
@@ -75,7 +82,13 @@
                         <?php $findVotes =  Uservotes::where("sh_id",$share->sh_id)->where("us_id",Auth::user()->us_id)->first(); ?>
                         @if(!empty($findVotes))
                             <p><span class="font-weight-bold font-italic">{{ trans('newlang.Yourvotes') }}: </span>
-                            <span>{{$findVotes->vote_number}} <i class="fas fa-star text-warning"></i></span></p>
+                            <span>
+                                <i class="fas fa-star star_1" data-value="1"></i>
+                                <i class="fas fa-star star_2" data-value="2"></i>
+                                <i class="fas fa-star star_3" data-value="3"></i>
+                                <i class="fas fa-star star_4" data-value="4"></i>
+                                <i class="fas fa-star star_5" data-value="5"></i>
+                            </span></p>
                         @else
                             <p><span class="font-weight-bold font-italic">{{ trans('newlang.Yourvotes') }}: </span>
                             <span class="badge badge-success">{{ trans('newlang.notHavereviews') }}</span></p>
@@ -113,13 +126,172 @@
                         $(".total_time").html(durationString);
                     </script>
                     <!-- /endis -->
-
+                    <p><span class="font-weight-bold font-italic">Người tạo: </span>
+                    <span>{{$creatorName}}</span></p>
                     <p><span class="font-weight-bold font-italic">{{ trans('newlang.dateCreated') }}: </span>
                     <span>{{date('d/m/Y', strtotime($route->to_startDay))}}</span></p>
                 </div>
             </div>
         </div>
     </section>
+    <!-- Portfolio Item 4-->
+    <div class="container rating_comment_title">
+        <h3 class="font-weight-bold font-italic">{{ trans('messages.HIGHLIGHTS_TOUR') }}</h3>
+    </div>
+    <div class="container mb-5 slide-show" id="slideshow">
+        <div class="slide-show-tour">
+            @foreach($shareTour as $value)
+            <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
+            <a href="{{route('viewtour',$value->sh_id)}}" class="hightly_div_child">
+                <p class="tourContent">
+                    <span class="nameTour">{{$route->to_name}}</span>
+                    {{$value->number_star}}<i class="fas fa-star text-warning"></i> - {{$value->numberReviews}} votes
+                </p>
+                @if($value->image != "")
+                    <img src="{{asset($value->image)}}" alt="" class="img_open_model{{$value->sh_id}}">
+                @else
+                    <img src="{{asset('imgPlace/empty.png')}}" alt="" title="location with no photo" class="img_open_model{{$value->sh_id}}"/>
+                @endif
+            </a>
+            @endforeach
+        </div>
+    </div>
+
+    <div class="container rating_comment_title">
+        <h3 class="font-weight-bold font-italic">Đánh giá và phản hồi</h3>
+    </div>
+    <div class="container rating_comment">
+        <div class="rating_comment-left">
+            <div class="line_1">
+                <span class="font-weight-bold">{{$share->number_star}}</span>
+                <i class="fas fa-star text-warning"></i>
+                <i class="fas fa-star text-warning"></i>
+                <i class="fas fa-star text-warning"></i>
+                <i class="fas fa-star text-warning"></i>
+                <i class="fas fa-star text-warning"></i>
+                <span> - {{$totalVotes}} votes</span>
+            </div>
+            <div class="line_1">
+                <ul class="line_1_detail">
+                    <li>
+                        <span class="font-weight-bold">5</span><i class="fas fa-star text-warning"></i>: 
+                        <span class="detail_votes">{{$fiveStar}} votes</span>
+                    </li>
+                    <li>
+                        <span class="font-weight-bold">4</span><i class="fas fa-star text-warning"></i>: 
+                        <span class="detail_votes">{{$fourStar}} votes</span>
+                    </li>
+                    <li>
+                        <span class="font-weight-bold">3</span><i class="fas fa-star text-warning"></i>: 
+                        <span class="detail_votes">{{$threeStar}} votes</span>
+                    </li>
+                    <li>
+                        <span class="font-weight-bold">2</span><i class="fas fa-star text-warning"></i>: 
+                        <span class="detail_votes">{{$towStar}} votes</span>
+                    </li>
+                    <li>
+                        <span class="font-weight-bold">1</span><i class="fas fa-star text-warning"></i>: 
+                        <span class="detail_votes">{{$oneStar}} votes</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="rating_comment-right">
+            @if(Auth::check())
+            <div class="enter_login_rating">
+                <div class="info_userlogin_commnet">
+                    <div class="block_avatar">
+                        @if(Auth::user()->us_image != "")
+                            <img src="{{asset(Auth::user()->us_image)}}" alt="">
+                        @else
+                            <img src="{{asset('assets/img/avataaars.svg')}}" alt="">
+                        @endif
+                    </div>
+                    <?php 
+                        $countShare = DB::table('tour')->where('to_id_user',Auth::user()->us_id)
+                            ->rightJoin('sharetour', 'sharetour.sh_to_id', '=', 'tour.to_id')
+                            ->count();
+                     ?>
+                    <div class="block_info_user">
+                        <span>{{Auth::user()->us_fullName}}</span>
+                        @if($countShare > 0)
+                            <small>Đã chia sẻ {{$countShare}} toues</small>
+                        @endif
+                    </div>
+                </div>
+                <form id="form_add_comment" method="post" action="{{route('user.addcomment',$share->sh_id)}}"> 
+                   @csrf
+                   <div class="chose_star" id="div_Starrank_tour">
+                       <i class="fas fa-star star_1" data-value="1"></i>
+                       <i class="fas fa-star star_2" data-value="2"></i>
+                       <i class="fas fa-star star_3" data-value="3"></i>
+                       <i class="fas fa-star star_4" data-value="4"></i>
+                       <i class="fas fa-star star_5" data-value="5"></i>
+                   </div>
+                   <input type="hidden" name="numberStar" id="numberStar" value="0">
+                   <textarea class="form-control" placeholder="Nhập đánh giá của bạn" name="content_rating"></textarea> 
+                   <input type="submit" class="btn btn-sm btn-primary" value="Đánh giá" id="btn_rating">
+                </form>
+            </div>
+            @endif
+            <!-- detail comment -->
+            @foreach($userVotes as $usVotes)
+            <?php $findComment = Comment::where("id_user_votes",$usVotes->id)->orderBy('co_date_created', 'DESC')->get(); ?>
+                @foreach($findComment as $Comment)
+                <?php 
+                    $findUser = User::where("us_id",$usVotes->us_id)->first();
+                    $countShareUser = DB::table('tour')->where('to_id_user',$findUser->us_id)
+                                ->rightJoin('sharetour', 'sharetour.sh_to_id', '=', 'tour.to_id')
+                                ->count();
+                 ?>
+                <div class="comment_content">
+                    <div class="comment_content-title">
+                        <div class="block_avatar">
+                            @if($findUser->us_image != "")
+                                <img src="{{asset($findUser->us_image)}}" alt="">
+                            @else
+                                <img src="{{asset('assets/img/avataaars.svg')}}" alt="">
+                            @endif
+                        </div>
+                        <div class="block_info_user">
+                            <span>{{$findUser->us_fullName}}</span>
+                            <small>Đã chia sẻ {{$countShareUser}} toues</small>
+                        </div>
+                    </div>
+                    <div class="comment_content-starvotes">
+                        @if($usVotes->vote_number == "1")
+                            <i class="fas fa-star text-warning"></i>
+                        @elseif($usVotes->vote_number == "2")
+                            @for($i = 0;$i < 2;$i++ )
+                                <i class="fas fa-star text-warning"></i>
+                            @endfor
+                        @elseif($usVotes->vote_number == "3")
+                            @for($i = 0;$i < 3;$i++ )
+                                <i class="fas fa-star text-warning"></i>
+                            @endfor
+                        @elseif($usVotes->vote_number == "4")
+                            @for($i = 0;$i < 4;$i++ )
+                                <i class="fas fa-star text-warning"></i>
+                            @endfor
+                        @elseif($usVotes->vote_number == "5")
+                            @for($i = 0;$i < 5;$i++ )
+                                <i class="fas fa-star text-warning"></i>
+                            @endfor
+                        @endif
+                    </div>
+                    <div class="comment_content-content">
+                        <span>
+                            {!! $Comment->co_content !!}
+                        </span>
+                    </div>
+                    <div class="comment_content-date">
+                        Đã viết vào: <span>{{date("d/m/Y", strtotime($Comment->co_date_created))}}</span>
+                    </div>
+                </div>
+                @endforeach
+            @endforeach
+        </div>
+    </div>
     <!-- Model -->
     <div class="modal fade" id="modalDetailPlace" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
@@ -181,43 +353,49 @@
       </div>
     </div>
     <!-- /Model -->
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">{{ trans('newlang.Rating') }}</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="container-fuild">
-                <div class="row">
-                  <div class="col-md-12 col-sm-12 col-12">
-                    <p class="font-weight-bold font-italic">{{ trans('newlang.ratingForTour') }}</p>
-                  </div>
-                  <div class="col-md-12 col-sm-12 col-12 mb-3" id="div_Starrank_tour">
-                    <i class="fas fa-star star_1 fa-2x"  data-value="1" style="cursor: pointer;"></i>
-                    <i class="fas fa-star star_2 fa-2x" data-value="2" style="cursor: pointer;"></i>
-                    <i class="fas fa-star star_3 fa-2x" data-value="3" style="cursor: pointer;"></i>
-                    <i class="fas fa-star star_4 fa-2x"  data-value="4" style="cursor: pointer;"></i>
-                    <i class="fas fa-star star_5 fa-2x" data-value="5" style="cursor: pointer;"></i>
-                  </div>
-                  <input type="hidden" id="star_Share" name="numberStar">
-                </div>
-              </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btn_Rating">{{ trans('newlang.Rating') }}</button>
-          </div>
-        </div>
-      </div>
-    </div>
 @stop
 @section('footer-js')  
     <script type="text/javascript">
+        @if(!empty($findVotes))
+            @if($findVotes->vote_number == "1")
+                $(".star_1").css("color","#ff9700");
+            @elseif($findVotes->vote_number == "2")
+                @for($i=1;$i<=2;$i++)
+                    $(".star_{{$i}}").css("color","#ff9700");
+                @endfor
+            @elseif($findVotes->vote_number == "3")
+                @for($i=1;$i<=3;$i++)
+                    $(".star_{{$i}}").css("color","#ff9700");
+                @endfor
+            @elseif($findVotes->vote_number == "4")
+                @for($i=1;$i<=4;$i++)
+                    $(".star_{{$i}}").css("color","#ff9700");
+                @endfor
+            @elseif($findVotes->vote_number == "5")
+                @for($i=1;$i<=5;$i++)
+                    $(".star_{{$i}}").css("color","#ff9700");
+                @endfor
+            @endif
+        @endif
+        function crollFunction(){
+            $("textarea[name=content_rating]").focus();
+            $("html, body").delay(500).animate({
+                scrollTop: $('.rating_comment').offset().top - 150
+            }, 500);
+        }
         $(document).ready(function(){
+            $('.slide-show-tour').slick({
+                slidesToShow: 3,
+                slidesToScroll: 2,
+                autoplay: true,
+                autoplaySpeed: 2500,
+                dots: true,
+                dotClass: 'slick-dots',
+                fade: false,
+                pauseOnHover: false,
+                prevArrow: '<button type="button" class="slick-prev"><i class="fas fa-caret-left"></i></button>',
+                nextArrow: '<button type="button" class="slick-next"><i class="fas fa-caret-right"></i></button>',
+            });
             // votess star
             @for($i = 1; $i<= 5; $i++)
               $("#div_Starrank_tour .star_{{$i}}").click(function(){
@@ -227,8 +405,7 @@
                   @for($j = 1 ; $j <= $i; $j++)
                       $("#div_Starrank_tour .star_{{$j}}").css("color","#ff9700");
                   @endfor
-                  //console.log($(this).attr("data-value"));
-                  $("#star_Share").val($(this).attr("data-value"));
+                  $("#numberStar").val($(this).attr("data-value"));
               });
             @endfor
             @foreach ($array as $value)
@@ -306,86 +483,6 @@
             });
         });
     </script>
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $('#exampleModal').on('show.bs.modal', function (event) {
-              // load start
-              let _token = $('meta[name="csrf-token"]').attr('content');
-              let $url_path = '{!! url('/') !!}';
-              let routeCheckTour = $url_path+"/voteUser";
-              $.ajax({
-                    url:routeCheckTour,
-                    method:"POST",
-                    data:{_token:_token,shareId:{{$share->sh_id}}},
-                    success:function(result){ 
-                      console.log(result);
-                      //reset
-                      $("#star_Share").val('0');
-                      $(".star_1").css("color","#212529");
-                      $(".star_2").css("color","#212529");
-                      $(".star_3").css("color","#212529");
-                      $(".star_4").css("color","#212529");
-                      $(".star_5").css("color","#212529");
-                      if(result[0] == "yes")
-                      {
-                        $("#star_Share").val(result[1]);
-                        if(result[1] == "1")
-                        {
-                          $(".star_1").css("color","#ff9700");
-                        }
-                        else if(result[1] == "2")
-                        {
-                          $(".star_1").css("color","#ff9700");
-                          $(".star_2").css("color","#ff9700");
-                        }
-                        else if(result[1] == "3")
-                        {
-                          $(".star_1").css("color","#ff9700");
-                          $(".star_2").css("color","#ff9700");
-                          $(".star_3").css("color","#ff9700");
-                        }
-                        else if(result[1] == "4")
-                        {
-                          $(".star_1").css("color","#ff9700");
-                          $(".star_2").css("color","#ff9700");
-                          $(".star_3").css("color","#ff9700");
-                          $(".star_4").css("color","#ff9700");
-                        }
-                        else if(result[1] == "5")
-                        {
-                          $(".star_1").css("color","#ff9700");
-                          $(".star_2").css("color","#ff9700");
-                          $(".star_3").css("color","#ff9700");
-                          $(".star_4").css("color","#ff9700");
-                          $(".star_5").css("color","#ff9700");
-                        }
-                      }
-                   }
-              });
-          });
-            $("#input_File").change(function(){
-                $(".btn_upload").css("background","#ff8304");
-                $("#file_name").css("display","block");
-                $("#file_name").html($("#input_File").val().split('\\').pop());
-            });
-            
-            $("#btn_Rating").click(function(){
-                let _token = $('meta[name="csrf-token"]').attr('content');
-                let $url_path = '{!! url('/') !!}';
-                let routeRating=$url_path+"/rating";
-                let numberStar = $("#star_Share").val();
-                $.ajax({
-                      url:routeRating,
-                      method:"POST",
-                      data:{_token:_token,numberStar:numberStar,shareId:{{$share->sh_id}}},
-                      success:function(data){
-                        alert("{{ trans('newlang.ratingSuccess') }}");
-                        location.reload();
-                     }
-                });
-            });
-        });
-    </script>
     <script type="text/javascript">    
         var markers=[];
         function initMap(){
@@ -393,6 +490,7 @@
             var map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 12.5,
                 center: { lat: 21.0226586, lng: 105.8179091 },
+                gestureHandling: 'greedy',
             }),
             directionsService = new google.maps.DirectionsService();
             const geocoder = new google.maps.Geocoder();

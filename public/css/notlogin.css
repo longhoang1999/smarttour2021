@@ -133,10 +133,10 @@ form .txt_field{
     cursor: pointer;
 }
 .inforForShare{display: none;}
-.btn-loginFB {
+.btn-loginFB,.btn-loginGoogle{
     width: 100%;
     text-align: center;
-    margin-top: 1em;
+    
 }
 #link_login {
     font-weight: normal;
@@ -147,9 +147,17 @@ form .txt_field{
     border: none;
     font-size: 18px;
     font-family: auto;
-    background: #304dc6;
     box-sizing: border-box;
     text-decoration: none;
     display: block;
     margin: auto;
+}
+.link_login_FB{
+    background: #304dc6;
+}
+.link_login_google{
+    background: #ff0000;
+}
+#link_login:hover{
+    opacity: 0.5;
 }
