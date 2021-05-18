@@ -74,3 +74,20 @@ td.detaillocat_class {
 td.id_tourname {
     width: 9em;
 }
+#link_detail_tour{
+  color: black;
+}
+#link_detail_tour:hover{
+  color: #1abc9c;
+  text-decoration: none;
+}
+#site_searchtour{
+  position: relative;
+}
+#site_searchtour svg{
+  position: absolute;
+  color: #00ade5;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 110px;
+}

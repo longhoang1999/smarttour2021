@@ -8,6 +8,7 @@ use App\Models\Language;
 use App\Models\Destination;
 use App\Models\TypePlace;
 use App\Models\Langtype;
+use Illuminate\Support\Arr;
 use Session;
 use DB;
 class MapDirectController {
@@ -23,13 +24,14 @@ class MapDirectController {
         {
             $de = Language::where("language","vn")->get();
             foreach ($de as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_cost','de_image')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_cost','de_image','de_tag')->where("de_remove",$value->des_id)->first();
                 $value["de_id"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_link"] = $des->de_link;
                 $value["de_duration"] = $des->de_duration;
                 $value["de_cost"] = $des->de_cost;
+                $value["de_tag"] = $des->de_tag;
                 if($des->de_image != "")
                 	$value["de_image"] = asset($des->de_image);
             }
@@ -38,13 +40,14 @@ class MapDirectController {
         {
             $de = Language::where("language","en")->get();
             foreach ($de as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_cost','de_image')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_link','de_duration','de_cost','de_image','de_tag')->where("de_remove",$value->des_id)->first();
                 $value["de_id"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_link"] = $des->de_link;
                 $value["de_duration"] = $des->de_duration;
                 $value["de_cost"] = $des->de_cost;
+                $value["de_tag"] = $des->de_tag;
                 if($des->de_image != "")
                 	$value["de_image"] = asset($des->de_image);
             }
@@ -52,7 +55,15 @@ class MapDirectController {
 		$destination  = array();
 		foreach ($de as $value) {
 			$latlng = array('lat' => $value->de_lat, 'lng' => $value->de_lng);
-			$tmp  = (object) array('de_name' => $value->de_name,'location' =>$latlng,'de_duration'=>$value->de_duration,'de_link'=>$value->de_link,'de_description'=>$value->de_description,'de_cost'=>$value->de_cost,'de_img'=>$value->de_image,'de_shortdes'=>$value->de_shortdes);
+			$array_detag = array();
+			if($value->de_tag != null)
+			{
+		        $pieces = explode("|", $value->de_tag);
+		        for ($i=0; $i < count($pieces)-1; $i++) {
+		            $array_detag = Arr::add($array_detag, $i ,$pieces[$i]);
+		        }
+			}
+			$tmp  = (object) array('de_name' => $value->de_name,'location' =>$latlng,'de_duration'=>$value->de_duration,'de_link'=>$value->de_link,'de_description'=>$value->de_description,'de_cost'=>$value->de_cost,'de_img'=>$value->de_image,'de_shortdes'=>$value->de_shortdes,'de_tag'=>$array_detag);
 			$des =   [$value->de_id,$tmp];
 			array_push($destination,$des);
 		}

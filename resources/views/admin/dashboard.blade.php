@@ -9,6 +9,7 @@
     .box1 a {
         color: white;
     }
+    td.id_type{text-align: center;}
   </style>
 @stop
 @section('content')
@@ -49,9 +50,9 @@
                       <th>Email</th>
                       <th>{{ trans('admin.FullName') }}</th>
                       <th>{{ trans('admin.Gender') }}</th>
-                      <th>{{ trans('admin.Age') }}</th>
                       <th>{{ trans('admin.Position') }}</th>
                       <th>{{ trans('admin.status') }}</th>
+                      <th>Type</th>
                       <th>{{ trans('admin.Actions') }}</th>
                   </tr>
                   </thead>
@@ -264,15 +265,18 @@
     $(function() {
         var table = $('#Table_AllClass').DataTable({
           "language": {
-          "emptyTable": "{{trans('admin.emptyTable')}}",
-          "sLengthMenu": "{{ trans('admin.showEntries') }}",
-          "search": "{{ trans('admin.search') }}",
-          "info": "{{ trans('admin.showingToOf') }}",
-          "paginate": {
-            "previous": "{{ trans('admin.previous') }}",
-            "next": "{{ trans('admin.next') }}"
-          }
-        },
+            "emptyTable": "{{trans('admin.emptyTable')}}",
+            "sLengthMenu": "{{ trans('admin.showEntries') }}",
+            "search": "{{ trans('admin.search') }}",
+            "info": "{{ trans('admin.showingToOf') }}",
+            "paginate": {
+              "previous": "{{ trans('admin.previous') }}",
+              "next": "{{ trans('admin.next') }}"
+            }
+          },
+          "columnDefs": [
+              { className: "id_type", "targets": [ 6 ] },
+          ],
           "order": [[ 1, 'asc' ]],
             processing: true,
             serverSide: true,
@@ -283,9 +287,9 @@
                 { data: 'us_email', name: 'us_email' },
                 { data: 'us_fullName', name: 'us_fullName' },
                 { data: 'us_gender', name: 'us_gender' },
-                { data: 'us_age', name: 'us_age' },
                 { data: 'position', name: 'position' },
                 { data: 'status', name: 'status' },
+                { data: 'us_type', name: 'us_type' },
                 { data: 'actions', name: 'actions' },
                 ]
             });

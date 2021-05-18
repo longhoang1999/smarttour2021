@@ -56,6 +56,19 @@ class AdminController extends Controller
                     return $position;
                 }
             )
+            
+            ->addColumn(
+                'us_type',
+                function ($allAccount) {
+                    if($allAccount->provider == "facebook")
+                        $us_type = '<i class="fab fa-facebook-square fa-2x text-primary"></i>';
+                    else if($allAccount->provider == "google")
+                        $us_type = '<i class="fab fa-google fa-2x text-danger"></i>';
+                    else
+                        $us_type = '';
+                    return $us_type;
+                }
+            )
             ->addColumn(
                 'status',
                 function ($allAccount) {
@@ -94,7 +107,7 @@ class AdminController extends Controller
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','position','actions','status'])
+            ->rawColumns(['stt','position','actions','status','us_type'])
             ->make(true);
     }
     public function deleteAcc($id)
@@ -245,7 +258,7 @@ class AdminController extends Controller
         $mail->Host = 'smtp.gmail.com';
         $mail->Port = 587;
         $mail->Username = 'longhoanghai8499@gmail.com';
-        $mail->Password = 'shikatori142922188aA';
+        $mail->Password = 'shikatori8499';
         $mail->isHTML(true);
         $mail->setFrom('system@gmail.com', 'Tour Advce System');
         $mail->addAddress($req->emailRecipient, 'User');
@@ -482,6 +495,7 @@ class AdminController extends Controller
         	$destination->de_lat = $req->de_lat;
         	$destination->de_lng = $req->de_lng;
             $destination->de_type = $req->typePlace;
+            $destination->de_tag = $req->content_tag;
             if($req->currency == "VNĐ")
                 $destination->de_cost = $req->de_cost;
             else if($req->currency == "USD")
@@ -1440,7 +1454,7 @@ class AdminController extends Controller
                 $mail->Host = 'smtp.gmail.com';
                 $mail->Port = 587;
                 $mail->Username = 'longhoanghai8499@gmail.com';
-                $mail->Password = 'shikatori142922188aA';
+                $mail->Password = 'shikatori8499';
                 $mail->isHTML(true);
                 $mail->setFrom('system@gmail.com', 'Tour Advce System');
                 $mail->addAddress($user->us_email, 'User');

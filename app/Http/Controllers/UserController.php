@@ -43,68 +43,89 @@ class UserController extends Controller
             }
             else
             {
-                $this->updatedAccFB($user,$info,$social);
-                return redirect()->route('user.dashboard');
+                if($this->updatedAccFB($user,$info,$social) == "ok")
+                    return redirect()->route('user.dashboard');
+                else
+                    return redirect()->route('login')->with("error","Email đã đăng ký, vui lòng chọn tài khoản khác");
             }
         }
         else
         {
-            $userSocial = new User();
-            $this->createdAccFB($userSocial,$info,$social);
-            return redirect()->route('user.dashboard');
+            if($this->createdAccFB($info,$social) == "ok")
+                return redirect()->route('user.dashboard');
+            else
+                return redirect()->route('login')->with("error","Email đã đăng ký, vui lòng chọn tài khoản khác");
         }
     }
     public function updatedAccFB($user,$info,$social)
     {
         //updated
-        $socialUpdated =  $social;
-        $user->us_email = $info->getEmail();
-        $user->us_fullName = $info->getName();
-        $user->provider_user_id = $info->getId();
-        $user->provider = $socialUpdated;                
-        if($info->avatar_original != null)
+        $checkEmail = User::where("us_id","<>",$user->us_id)->where("us_email",$info->getEmail())->first();
+        if(empty($checkEmail))
         {
-            File::delete(public_path($user->us_image));
-            // $extension = pathinfo($info->avatar_original, PATHINFO_EXTENSION);
-            $extension = 'jpg';
-            $picName = time().'.'.$extension;
-            $file = file_get_contents($info->avatar_original);
-            $save = file_put_contents('uploadUsers/'.$user->us_code.'/'.$picName, $file);
-            if($save)
+            $socialUpdated =  $social;
+            $user->us_email = $info->getEmail();
+            $user->us_fullName = $info->getName();
+            $user->provider_user_id = $info->getId();
+            $user->provider = $socialUpdated;                
+            if($info->avatar_original != null)
             {
-                $user->us_image='uploadUsers/'.$user->us_code.'/'.$picName;
+                File::delete(public_path($user->us_image));
+                // $extension = pathinfo($info->avatar_original, PATHINFO_EXTENSION);
+                $extension = 'jpg';
+                $picName = time().'.'.$extension;
+                $file = file_get_contents($info->avatar_original);
+                $save = file_put_contents('uploadUsers/'.$user->us_code.'/'.$picName, $file);
+                if($save)
+                {
+                    $user->us_image='uploadUsers/'.$user->us_code.'/'.$picName;
+                }
             }
+            $user->save();
+            Auth::login($user);
+            return $status = "ok";
         }
-        $user->save();
-        Auth::login($user);
+        else{
+            return $status = "exist";
+        }
     }
-    public function createdAccFB($userSocial,$info,$social)
+    public function createdAccFB($info,$social)
     {
-        // created
-        $socialCreated =  $social;
-        $userSocial->us_email = $info->getEmail();
-        $userSocial->us_password = Hash::make($socialCreated);
-        $userSocial->us_fullName = $info->getName();
-        $userSocial->provider_user_id = $info->getId();
-        $userSocial->provider = $socialCreated;
-        $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $userSocial->us_code = substr(str_shuffle($permitted_chars), 0, 20); 
-        $path = public_path().'/uploadUsers/' . $userSocial->us_code;
-        File::makeDirectory( $path,0777,true);
-        if($info->avatar_original != null)
+        $checkEmail = User::where("us_email",$info->getEmail())->first();
+        if(empty($checkEmail))
         {
-            // $extension = pathinfo($info->avatar_original, PATHINFO_EXTENSION);
-            $extension = 'jpg';
-            $picName = time().'.'.$extension;
-            $file = file_get_contents($info->avatar_original);
-            $save = file_put_contents('uploadUsers/'.$userSocial->us_code.'/'.$picName, $file);
-            if($save)
+            // created
+            $userSocial = new User();
+            $socialCreated =  $social;
+            $userSocial->us_email = $info->getEmail();
+            $userSocial->us_password = Hash::make($socialCreated);
+            $userSocial->us_fullName = $info->getName();
+            $userSocial->provider_user_id = $info->getId();
+            $userSocial->provider = $socialCreated;
+            $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $userSocial->us_code = substr(str_shuffle($permitted_chars), 0, 20); 
+            $path = public_path().'/uploadUsers/' . $userSocial->us_code;
+            File::makeDirectory( $path,0777,true);
+            if($info->avatar_original != null)
             {
-                $userSocial->us_image='uploadUsers/'.$userSocial->us_code.'/'.$picName;
+                // $extension = pathinfo($info->avatar_original, PATHINFO_EXTENSION);
+                $extension = 'jpg';
+                $picName = time().'.'.$extension;
+                $file = file_get_contents($info->avatar_original);
+                $save = file_put_contents('uploadUsers/'.$userSocial->us_code.'/'.$picName, $file);
+                if($save)
+                {
+                    $userSocial->us_image='uploadUsers/'.$userSocial->us_code.'/'.$picName;
+                }
             }
+            $userSocial->save();
+            Auth::login($userSocial);
+            return $status = "ok";
         }
-        $userSocial->save();
-        Auth::login($userSocial);
+        else
+        {
+            return $status = "exist";
+        }
     }   
 
     public function langVN(Request $req)
@@ -202,14 +223,22 @@ class UserController extends Controller
                     if(Auth::attempt(['us_email'=>$req->us_email,'us_password'=>$req->us_password]))
                     {
                         $user = Auth::user();
-                        if($user->us_type == "0")
+                        if($user->provider != null)
                         {
-                            return [$position = "user",$user->us_id,$user->us_fullName];
+                            Auth::logout();
+                            return [$result = "fail login"];
                         }
                         else
                         {
-                            return [$position = "admin",$user->us_id,$user->us_fullName];
-                        }
+                            if($user->us_type == "0")
+                            {
+                                return [$position = "user",$user->us_id,$user->us_fullName];
+                            }
+                            else
+                            {
+                                return [$position = "admin",$user->us_id,$user->us_fullName];
+                            }
+                        } 
                     }
                     else
                     {
@@ -236,14 +265,22 @@ class UserController extends Controller
                     if(Auth::attempt(['us_email'=>$req->us_email,'us_password'=>$req->us_password]))
                     {
                         $user = Auth::user();
-                        if($user->us_type == "0")
+                        if($user->provider != null)
                         {
-                            return redirect()->route('user.dashboard');
+                            Auth::logout();
+                            return back()->with("error","Đăng nhập không thành công");
                         }
                         else
                         {
-                            return redirect()->route('admin.generalInfor');
-                        }
+                            if($user->us_type == "0")
+                            {
+                                return redirect()->route('user.dashboard');
+                            }
+                            else
+                            {
+                                return redirect()->route('admin.generalInfor');
+                            }
+                        } 
                     }
                     else
                     {
@@ -614,7 +651,7 @@ class UserController extends Controller
                         $mail->Host = 'smtp.gmail.com';
                         $mail->Port = 587;
                         $mail->Username = 'longhoanghai8499@gmail.com';
-                        $mail->Password = 'shikatori142922188aA';
+                        $mail->Password = 'shikatori8499';
                         $mail->isHTML(true);
                         $mail->setFrom('system@gmail.com', 'Tour Advce System');
                         $mail->addAddress($user->us_email, 'User');
@@ -701,7 +738,7 @@ class UserController extends Controller
                     $mail->Host = 'smtp.gmail.com';
                     $mail->Port = 587;
                     $mail->Username = 'longhoanghai8499@gmail.com';
-                    $mail->Password = 'shikatori142922188aA';
+                    $mail->Password = 'shikatori8499';
                     $mail->isHTML(true);
                     $mail->setFrom('system@gmail.com', 'Tour Advce System');
                     $mail->addAddress($user->us_email, 'User');
@@ -793,7 +830,7 @@ class UserController extends Controller
             $mail->Host = 'smtp.gmail.com';
             $mail->Port = 587;
             $mail->Username = 'longhoanghai8499@gmail.com';
-            $mail->Password = 'shikatori142922188aA';
+            $mail->Password = 'shikatori8499';
             $mail->isHTML(true);
             $mail->setFrom('system@gmail.com', 'Tour Advce System');
             $mail->addAddress($user->us_email, 'User');

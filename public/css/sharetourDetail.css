@@ -225,7 +225,7 @@ ul.slick-dots li button {
 }
 #div_btn ul li{
 }
-#div_btn ul li span,#div_btn ul li a{
+#div_btn ul li > span,#div_btn ul li > a{
     cursor: pointer;
     display: block;
     width: 100%;

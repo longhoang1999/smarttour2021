@@ -75,7 +75,6 @@ class ShareTourController extends Controller
         $share = ShareTour::where("sh_id",$shareId)->first();
         $tour = Route::where("to_id",$share->sh_to_id)->first();
         $creatorName = User::select('us_fullName')->where("us_id",$tour->to_id_user)->first();
-
         $userVotes = Uservotes::where('sh_id',$share->sh_id)->orderBy('dateCreated', 'DESC')->get();
         $array = array();
         foreach ($userVotes as $value) {
@@ -87,6 +86,12 @@ class ShareTourController extends Controller
         $threeStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","3")->count();
         $towStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","2")->count();
         $oneStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","1")->count();
+        // load like
+        $pieces_2 = explode("|", $tour->user_like);
+        $array_user_like = array();
+        for ($i=0; $i < count($pieces_2)-1; $i++) {
+            $array_user_like = Arr::add($array_user_like, $i ,$pieces_2[$i]);
+        }
         return view('sharetour.sharetour',[
             'share'=>$share,
             'shareTour'=>$shareTour,
@@ -97,6 +102,7 @@ class ShareTourController extends Controller
             'findComment' => $findComment,
             'shareId' => $shareId,
             'typeComment' => 'all',
+            'array_user_like' => $array_user_like
         ]);
     }
     public function choseComment(Request $req)
@@ -129,6 +135,12 @@ class ShareTourController extends Controller
         $threeStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","3")->count();
         $towStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","2")->count();
         $oneStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","1")->count();
+        // load like
+        $pieces_2 = explode("|", $tour->user_like);
+        $array_user_like = array();
+        for ($i=0; $i < count($pieces_2)-1; $i++) {
+            $array_user_like = Arr::add($array_user_like, $i ,$pieces_2[$i]);
+        }
         return view('sharetour.sharetour',[
             'share'=>$share,
             'shareTour'=>$shareTour,
@@ -139,7 +151,39 @@ class ShareTourController extends Controller
             'findComment' => $findComment,
             'shareId' => $shareId,
             'typeComment' => 'user_login',
+            'array_user_like' => $array_user_like
         ]);
+    }
+    public function changeLikeTour(Request $req)
+    {
+        $sharetour = ShareTour::where("sh_id",$req->shareId)->first();
+        $tour = Route::where("to_id",$sharetour->sh_to_id)->first();
+        $pieces_2 = explode("|", $tour->user_like);
+        $array_user_like = array();
+        for ($i=0; $i < count($pieces_2)-1; $i++) {
+            $array_user_like = Arr::add($array_user_like, $i ,$pieces_2[$i]);
+        }
+        $check = 1;
+        // unlike
+        foreach ($array_user_like as $key => $value) {
+            if(Auth::user()->us_id == $value)
+            {
+                $check = 2;
+                unset($array_user_like[$key]);
+            }
+        }
+        // like
+        if($check == 1)
+        {
+            array_push($array_user_like, Auth::user()->us_id);
+        }
+        $user_like = "";
+        foreach ($array_user_like as $value) {
+            $user_like = $user_like.$value."|";
+        }
+        $tour->user_like = $user_like;
+        $tour->save();
+        return [$check,count($array_user_like)];
     }
     public function deleteComment($idComment)
     {
@@ -1624,7 +1668,7 @@ class ShareTourController extends Controller
         }
         else
             $startLocat = '<span class="badge badge-warning">Not available</span>';
-        $link_view_tour = route('share.viewSharetour',[$route->to_id,$sharetour->sh_id]);
+        $link_detail_tour = route('viewtour',$sharetour->sh_id);
         //tour_creator
         $find_tour_creator = User::select('us_fullName')->where("us_id",$route->to_id_user)->first();
         return [$arrayImg,
@@ -1639,7 +1683,7 @@ class ShareTourController extends Controller
             date('d/m/Y h:i a', strtotime($route->to_starttime)),
             date('d/m/Y h:i a', strtotime($route->to_endtime)),
             date('d/m/Y', strtotime($route->to_startDay)),
-            $link_view_tour,
+            $link_detail_tour,
             Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime)),
             $sharetour->sh_id,
             $totalCost,
@@ -1935,6 +1979,10 @@ class ShareTourController extends Controller
     {
         return view('sharetour.tourhistory');
     }
+    public function tourUserLike()
+    {
+        return view('sharetour.touruserlike');
+    }
     public function showtourhistory()
     {
         $route = Route::where("to_id_user",Auth::user()->us_id)->get();
@@ -2024,7 +2072,113 @@ class ShareTourController extends Controller
             ->rawColumns(['stt','startLocat','detailPlace','totalTime','Star'])
             ->make(true);
     }
-    public function takeDetailTour(Request $req)
+    public function showtourlike()
+    {
+        $allRoute = Route::get();
+        $listTour = array();
+        foreach($allRoute as $route)
+        {
+            $pieces_2 = explode("|", $route->user_like);
+            $array_user_like = array();
+            for ($i=0; $i < count($pieces_2)-1; $i++) {
+                $array_user_like = Arr::add($array_user_like, $i ,$pieces_2[$i]);
+            }
+            foreach($array_user_like as $arr)
+            {
+                if($arr == Auth::user()->us_id)
+                {
+                    array_push($listTour, $route->to_id);
+                }
+            }
+        }
+        $route = Route::whereIn("to_id",$listTour)->get();
+        return DataTables::of($route)
+            ->addColumn(
+                'stt',
+                function ($route) {
+                    $stt = "";
+                    return $stt;
+                }
+            )
+            ->addColumn(
+                'startLocat',
+                function ($route) {
+                    if($route->to_startLocat == "")
+                    {
+                        $startLocat = '<span class="badge badge-warning">Not available</span>';
+                    }
+                    else
+                    {
+                        $des = Destination::where("de_remove",$route->to_startLocat)->first();
+                        $startLocat = '<i class="fas fa-street-view" style="color:#e74949;"></i> '.$des->de_name;
+                    }
+                    return $startLocat;
+                }
+            )
+            ->addColumn(
+                'Star',
+                function ($route) {
+                    $findShare = ShareTour::where("sh_to_id",$route->to_id)->first();
+                    if(empty($findShare))
+                    {
+                        return $route->to_star.' <i class="fas fa-star text-warning"></i>';
+                    }
+                    else
+                    {
+                        return $findShare->number_star.' <i class="fas fa-star text-warning"></i>';
+                    }
+                }
+            )
+            ->addColumn(
+                'totalTime',
+                function ($route) {
+                    $start_time = Carbon::parse($route->to_starttime);
+                    $finish_time = Carbon::parse($route->to_endtime);
+                    $totalTime_seconds = $finish_time->diffInSeconds($start_time);
+                    //convert second to H:i:s
+                    $dt = Carbon::now();
+                    $days = $dt->diffInDays($dt->copy()->addSeconds($totalTime_seconds));
+                    $hours = $dt->diffInHours($dt->copy()->addSeconds($totalTime_seconds)->subDays($days));
+                    $minutes = $dt->diffInMinutes($dt->copy()->addSeconds($totalTime_seconds)->subDays($days)->subHours($hours));
+                    return $totalTime = CarbonInterval::days($days)->hours($hours)->minutes($minutes)->forHumans();
+                }
+            )
+            ->addColumn(
+                'detailPlace',
+                function ($route) {
+                    $pieces = explode("|", $route->to_des);
+                    $array = array();
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $Detail = "";
+                    foreach ($array as $value) {
+                        $checkDes = Destination::where("de_remove",$value)->first();
+                        if($checkDes->de_default == "0")
+                        {
+                            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                            {
+                                $desName = Language::select('de_name')->where("language","vn")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                            else
+                            {
+                                $desName = Language::select('de_name')->where("language","en")->where("des_id",$value)->first();
+                                $Detail=$Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$desName->de_name.'<br>';
+                            }
+                        }
+                        else if($checkDes->de_default == "1")
+                        {
+                            $Detail= $Detail.'<i class="fas fa-street-view" style="color:#e74949;"></i>'.$checkDes->de_name.'<br>';
+                        }
+                    }
+                    return $Detail;
+                }
+            )
+            ->rawColumns(['stt','startLocat','detailPlace','totalTime','Star'])
+            ->make(true);
+    }
+    public function takeDetailTour(Request $req,$status)
     {
         $route = Route::where("to_id",$req->idTour)->first();
         // img + label
@@ -2080,7 +2234,13 @@ class ShareTourController extends Controller
         }
         else
             $startLocat = '<span class="badge badge-warning">Not available</span>';
-        $link_view_tour = route('user.editTour',[$route->to_id]);
+        if($req->status == "haveshare")
+        {
+            $findShare = ShareTour::where("sh_to_id",$route->to_id)->first();
+            $link_view_tour = route('viewtour',$findShare->sh_id);
+        }
+        else if($req->status == "noshare")
+            $link_view_tour = route('user.editTour',[$route->to_id]);
 
         return [$arrayImg,
             $arrayLabel,

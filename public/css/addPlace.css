@@ -150,3 +150,97 @@
 #target {
   width: 345px;
 }
+
+/*semantic*/
+.div_drop .ui.tag.label, .div_drop .ui.tag.labels .label {
+    margin-top: .5em;
+    margin-left: 1em;
+    position: relative;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    border-radius: 0 .28571429rem .28571429rem 0;
+    -webkit-transition: none;
+    transition: none;
+}
+.div_drop .ui.label:first-child {
+    margin-left: 0;
+}
+.div_drop a.ui.label {
+    cursor: pointer;
+}
+.div_drop .ui.label,.div_drop .ui.labels .label {
+    font-size: .85714286rem;
+}
+.div_drop .ui.label {
+    display: inline-block;
+    line-height: 1;
+    vertical-align: baseline;
+    margin: 0 .14285714em;
+    background-color: #e8e8e8;
+    background-image: none;
+    padding: .5833em .833em;
+    color: rgba(0,0,0,.6);
+    text-transform: none;
+    font-weight: 700;
+    border: 0 solid transparent;
+    border-radius: .28571429rem;
+    -webkit-transition: background .1s ease;
+    transition: background .1s ease;
+}
+.div_drop a {
+    color: #4183c4;
+    text-decoration: none;
+}
+.div_drop a.ui.label:hover,.div_drop a.ui.labels .label:hover {
+    background-color: #e0e0e0;
+    border-color: #e0e0e0;
+    background-image: none;
+    color: rgba(0,0,0,.8);
+}
+.div_drop .ui.labels a.label:hover:before,.div_drop a.ui.label:hover:before {
+    color: rgba(0,0,0,.8);
+}
+.div_drop .ui.tag.label:before,.div_drop .ui.tag.labels .label:before {
+    position: absolute;
+    -webkit-transform: translateY(-50%) translateX(50%) rotate(
+-45deg
+);
+    transform: translateY(-50%) translateX(50%) rotate(
+-45deg
+);
+    top: 50%;
+    right: 100%;
+    content: '';
+    background-color: inherit;
+    background-image: none;
+    width: 1.56em;
+    height: 1.56em;
+    -webkit-transition: none;
+    transition: none;
+}
+.div_drop .ui.tag.label:after,.div_drop .ui.tag.labels .label:after {
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: -.25em;
+    margin-top: -.25em;
+    background-color: #fff!important;
+    width: .5em;
+    height: .5em;
+    -webkit-box-shadow: 0 -1px 1px 0 rgb(0 0 0 / 30%);
+    box-shadow: 0 -1px 1px 0 rgb(0 0 0 / 30%);
+    border-radius: 500rem;
+}
+/* end sematic*/
+#div1{
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+  padding: .5em 1.2em;
+  min-height: 5em;
+}
+#div2{
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+  padding: .5em 1.2em;
+  min-height: 2em;
+}

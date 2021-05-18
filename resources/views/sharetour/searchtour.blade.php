@@ -17,8 +17,14 @@
     <div id="main-page">
         <div class="left" id="sitebar">
             <ul>
-                <li id="site_history"><a href="#" id="user_tour_history">{{ trans('newlang.tourhistory') }}</a></li>
-                <li id="site_searchtour"><a href="{{route('searchTour')}}">{{ trans('newlang.searchtour') }}</a></li>
+                @if(Auth::check())
+                <li id="site_history"><a href="{{route('user.tourhistory')}}" id="user_tour_history">{{ trans('newlang.tourhistory') }}</a></li>
+                <li id="site_tourlike"><a href="{{route('user.tourUserLike')}}" id="user_tour_like">Tour you like</a></li>
+                @endif
+                <li id="site_searchtour">
+                  <i class="fas fa-caret-right"></i>
+                  <a href="{{route('searchTour')}}">{{ trans('newlang.searchtour') }}</a>
+                </li>
             </ul>
             <span id="site_searchName">--Search for name</span>
             <div id="content_searchName">
@@ -156,14 +162,17 @@
                     <h3 class="font-weight-bold font-italic" id="name_tour"></h3>
                     <hr>
                     <div id="div_btn">
-                        <button class="btn btn-warning" data-toggle="modal"
+                        <!-- <button class="btn btn-warning" data-toggle="modal"
                         @if(Auth::check())
                             data-target="#exampleModal"
                         @else
                             data-target="#modalLogin"
                         @endif
                         >{{ trans('newlang.Rating') }}</button>
-                        <a href="#" id="link_view_tour" class="btn btn-info">{{ trans('newlang.viewTour') }}</a>
+                        <a href="#" id="link_view_tour" class="btn btn-info">{{ trans('newlang.viewTour') }}</a> -->
+                        <a href="#" id="link_detail_tour">
+                          <i class="fas fa-globe-americas"></i> See tour details
+                        </a>
                     </div>
                     <p id="p_votes"><span class="font-weight-bold font-italic">{{ trans('newlang.Yourvotes') }}: </span>
                     <span id="text_votes"></span></p>
@@ -457,13 +466,6 @@
 <script type="text/javascript">
     var listIdSearch = [];
     $(document).ready(function(){
-        $("#user_tour_history").click(function(){
-          @if(Auth::check())
-            $(this).attr("href","{{route('user.tourhistory')}}");
-          @else
-            $("#modalLogin").modal("show");
-          @endif
-        });
         // votess star
         @for($i = 1; $i<= 5; $i++)
           $("#div_Starrank_tour .star_{{$i}}").click(function(){
@@ -826,8 +828,8 @@
                     $("#end_time").append(data[10]);
                     $("#date_created").empty();
                     $("#date_created").append(data[11]);
-                    $("#link_view_tour").attr("href","");
-                    $("#link_view_tour").attr("href",data[12]);
+                    $("#link_detail_tour").attr("href","");
+                    $("#link_detail_tour").attr("href",data[12]);
 
                     $("#total_time").empty();
                     var duration = moment.duration(data[13], 'minutes');

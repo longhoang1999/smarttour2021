@@ -1,29 +1,29 @@
 @extends('sharetour/layout/index')
 @section('title')
-    {{ trans('newlang.tourhistory') }}
+    Tour you like
 @parent   
 @stop
 @section('header_styles')
   <link rel="stylesheet" href="{{asset('css/tourhistory.css')}}">
   <style>
-    #site_history{
+    #site_tourlike{
       position: relative;
     }
-    #site_history svg{
+    #site_tourlike svg{
       position: absolute;
       color: #00ade5;
       top: 50%;
       transform: translateY(-50%);
       font-size: 110px;
     }
-    #site_history a {
+    #site_tourlike a {
         background: lightblue !important;
         color: #117964 !important;
     }
   </style>
 @stop
 @section('content')
-  <h2 id="page_title" lass="page-section-heading text-center text-uppercase text-secondary mb-0">{{ trans('newlang.tourhistory') }}</h2>
+  <h2 id="page_title" lass="page-section-heading text-center text-uppercase text-secondary mb-0">Tour you like</h2>
   <div class="divider-custom">
       <div class="divider-custom-line"></div>
       <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
@@ -32,19 +32,22 @@
   <div id="main-page">
       <div class="left" id="sitebar">
           <ul>
-              <li id="site_tourlike"><a href="{{route('user.tourUserLike')}}" id="user_tour_like">Tour you like</a></li>
-              <li id="site_searchtour"><a href="{{route('searchTour')}}">{{ trans('newlang.searchtour') }}</a></li>
               <li id="site_history">
-                <i class="fas fa-caret-right"></i>
                 <a href="{{route('user.tourhistory')}}">{{ trans('newlang.tourhistory') }}</a>
               </li>
+              <li id="site_searchtour"><a href="{{route('searchTour')}}">{{ trans('newlang.searchtour') }}</a></li>
+              <li id="site_tourlike">
+                <i class="fas fa-caret-right"></i>
+                <a href="{{route('user.tourUserLike')}}" id="user_tour_like">Tour you like</a>
+              </li>
+              
           </ul>
       </div>
 
       <div class="right" id="main">
           <div class="AllClass_Table">
               <div class="AllClass_Table_title">
-                <p class="text-uppercase">{{ trans('newlang.infoYourTour') }}</p>
+                <p class="text-uppercase">Tour information you liked <i class="fas fa-heart text-danger"></i></p>
               </div>
               <div class="AllClass_Table_content">
                   <table class="table table-bordered table-striped" id="Table_AllClass" style="margin-bottom: 10px;">
@@ -75,7 +78,7 @@
                   <div id="div_btn">
                       <a href="#" id="link_view_tour">
                         <i class="fas fa-edit"></i>
-                        Edit tour
+                        Show detail tour
                       </a>
                   </div>
                   <p id="p_votes"><span class="font-weight-bold font-italic">{{ trans('newlang.Yourvotes') }}: </span>
@@ -222,7 +225,7 @@
             ],
             processing: true,
             serverSide: true,
-            ajax: "{!! url('/showtourhistory') !!}",
+            ajax: "{!! route('share.showtourlike') !!}",
             order:[],
             columns: [
               { data: 'stt', name: 'stt' },
@@ -246,7 +249,7 @@
             idTour = $(this).find(".id_class").text();
             let _token = $('meta[name="csrf-token"]').attr('content');
             let $url_path = '{!! url('/') !!}';
-            let routeDetail=$url_path+"/takeDetailTour/noshare";
+            let routeDetail=$url_path+"/takeDetailTour/haveshare";
             $.ajax({
                   url:routeDetail,
                   method:"POST",

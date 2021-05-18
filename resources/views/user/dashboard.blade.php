@@ -70,7 +70,7 @@
                         </div>
                         <div class="start_tour_right">
                             <img src="{{asset('images/tourha.jpg')}}" alt="">
-                            <div id="StarttourNow">{{ trans('messages.Startour') }}</div>
+                            <a href="{{route('user.maps')}}" id="StarttourNow">{{ trans('messages.Startour') }}</a>
                         </div>
                     </div>
                 </div>
@@ -106,8 +106,35 @@
                         </div>
                     </div>
                 </div>
-                
+                @if(Auth::check())
                 <!-- Portfolio Item 3-->
+                <div class="col-md-12 col-lg-12 mb-5 tour_you_like" id="tourYouLike">
+                    <span class="title_start_tour text-uppercase mt-5">Tour you like</span>
+                    <div class="start_tour">
+                        <div class="start_tour_left bg-orange">
+                            <p>Tours you have enjoyed</p>
+                            <div class="icon align-items">
+                                <div class="parent-icon mr-0 mt-4">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <div class="arrow"></div>
+                                <div class="parent-icon mr-0">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <div class="arrow_2"></div>
+                                <div class="parent-icon mr-0 mt-3">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="start_tour_right">
+                            <img src="{{asset('images/heartplace.jpg')}}" alt="">
+                            <a href="{{route('user.tourUserLike')}}" id="StarttourNow">Tour you like</a>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                <!-- Portfolio Item 4-->
                 <div class="col-md-12 col-lg-12 mb-5 search-tour" id="searchtour">
                     <span class="title_start_tour text-uppercase mt-5">{{ trans('messages.SEARCHTOURS') }}</span>
                     <div class="start_tour">
@@ -129,11 +156,11 @@
                         </div>
                         <div class="start_tour_right">
                             <img src="{{asset('images/search.jpg')}}" alt="">
-                            <div id="StarttourNow" class="searchTour">{{ trans('messages.SEARCHTOURS') }}</div>
+                            <a href="{{route('searchTour')}}" id="StarttourNow">{{ trans('messages.SEARCHTOURS') }}</a>
                         </div>
                     </div>
                 </div>  
-                <!-- Portfolio Item 4-->
+                <!-- Portfolio Item 5-->
                 <div class="col-md-12 col-lg-12 mb-5 slide-show" id="slideshow">
                     <span class="title_start_tour text-uppercase mt-5">{{ trans('messages.HIGHLIGHTS_TOUR') }}</span>
                     <div class="slide-show-tour">
@@ -290,10 +317,6 @@
                 prevArrow: '<button type="button" class="slick-prev"><i class="fas fa-caret-left"></i></button>',
                 nextArrow: '<button type="button" class="slick-next"><i class="fas fa-caret-right"></i></button>',
             });
-
-            $(".searchTour").click(function(){
-                location.replace("{{route('searchTour')}}");
-            });
         });
         window.addEventListener("scroll", function() {
           var elementTarget = document.getElementById("search_title");
@@ -304,15 +327,29 @@
           if (window.scrollY > (starttour.offsetTop + 20)) {
               $(".previous-tour").css("transform",'translateX(0)');
           }
-          var previoustour = document.getElementById("previoustour");
-          if (window.scrollY > (previoustour.offsetTop + 20)) {
-              $(".search-tour").css("transform",'translateX(0)');
-          }
-          var searchtour = document.getElementById("searchtour");
-          if (window.scrollY > (searchtour.offsetTop + 20)) {
-              $(".slide-show").css("transform",'translateX(0)');
-          }
-          
+          @if(Auth::check())
+            var previoustour = document.getElementById("previoustour");
+            if (window.scrollY > (previoustour.offsetTop + 20)) {
+                $(".tour_you_like").css("transform",'translateX(0)');
+            }
+            var tourYouLike = document.getElementById("tourYouLike");
+            if (window.scrollY > (tourYouLike.offsetTop + 20)) {
+                $(".search-tour").css("transform",'translateX(0)');
+            }
+            var searchtour = document.getElementById("searchtour");
+            if (window.scrollY > (searchtour.offsetTop + 20)) {
+                $(".slide-show").css("transform",'translateX(0)');
+            }
+          @else
+            var previoustour = document.getElementById("previoustour");
+            if (window.scrollY > (previoustour.offsetTop + 20)) {
+                $(".search-tour").css("transform",'translateX(0)');
+            }
+            var searchtour = document.getElementById("searchtour");
+            if (window.scrollY > (searchtour.offsetTop + 20)) {
+                $(".slide-show").css("transform",'translateX(0)');
+            }
+          @endif
         });
     	$(document).ready(function(){
 			$(".tour").dblclick(function(){

@@ -70,7 +70,9 @@
                     <div id="div_btn">
                         <ul>
                             <li>
-                                <span class="like_tour"><i class="fas fa-heart"></i> Like (10)</span>
+                                <span class="like_tour"><i class="fas fa-heart"></i> Like 
+                                    <span class="total_like">({{count($array_user_like)}})</span>
+                                </span>
                             </li>
                             <li>
                                 <span class="rating_tour" 
@@ -428,6 +430,39 @@
 @stop
 @section('footer-js')  
     <script type="text/javascript">
+        @if(Auth::check())
+            @foreach($array_user_like as $arr)
+                @if(Auth::user()->us_id == $arr)
+                    $("#div_btn .like_tour").css("color","#fb0000");
+                    $("#div_btn .like_tour").css("font-weight","bold");
+                @endif
+            @endforeach
+        @endif
+        $(".like_tour").click(function(){
+            let $url_path = '{!! url('/') !!}';
+            let _token = $('meta[name="csrf-token"]').attr('content');
+            let routeChangeLike = $url_path+"/changeLikeTour";
+            $.ajax({
+                  url:routeChangeLike,
+                  method:"post",
+                  data:{_token:_token,shareId:{{$shareId}}},
+                  success:function(data){ 
+                    console.log(data[0])
+                    if(data[0] == 1)
+                    {
+                        $(".like_tour").css("color","#fb0000");
+                        $(".total_like").text(`(${data[1]})`);
+                        $("#div_btn .like_tour").css("font-weight","bold");
+                    }
+                    if(data[0] == 2)
+                    {
+                        $(".like_tour").css("color","black");
+                        $(".total_like").text(`(${data[1]})`);
+                        $("#div_btn .like_tour").css("font-weight","normal");
+                    }
+                }
+            });
+        })
         $('#form_add_comment').one('submit', function(e) {
             e.preventDefault();
             if($("#numberStar").val() == "")

@@ -110,11 +110,13 @@
     font-weight: bold;
     font-size: 25px;
     cursor: pointer;
+    text-decoration: none;
 }
 #StarttourNow:hover{
     background: #598ca1;
     margin-top: 2px;
     margin-left: 2px;
+    text-decoration: none;
 }
 .title_start_tour {
 	font-family: auto;
@@ -186,10 +188,10 @@
 .align-items{
     align-items: center;
 }
-.previous-tour,.search-tour,.slide-show,.slide-show{
+.previous-tour,.search-tour,.slide-show,.slide-show,.tour_you_like{
     margin-top: 5em;
 }
-#starttour,.previous-tour,.search-tour,.slide-show{
+#starttour,.previous-tour,.search-tour,.slide-show,.tour_you_like{
 	transform: translateX(-100%);
 	transition: all 1s;
 }
@@ -296,4 +298,7 @@ ul.slick-dots li button {
 }
 .slick-active > button{
     background: #9eb9a1 !important;
+}
+.bg-orange{
+    background: #edb949;
 }

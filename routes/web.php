@@ -106,14 +106,20 @@ Route::group(
 		Route::post("getinfor-touredit","ShareTourController@getinforTouredit")->name("user.getinfor-touredit");
 		Route::post("editRoute/{id}","AdminController@editRoute")->name("user.editRoute");
 		Route::get("tourhistory","ShareTourController@tourhistory")->name("user.tourhistory");
-		Route::get("showtourhistory","ShareTourController@showtourhistory")->name('share.showtourhistory');
-		Route::post("takeDetailTour","ShareTourController@takeDetailTour")->name('share.takeDetailTour');
+		Route::get("tourUserLike","ShareTourController@tourUserLike")->name("user.tourUserLike");
+		Route::get("showtourhistory","ShareTourController@showtourhistory")->name('
+			share.showtourhistory');
+		Route::get("showtourlike","ShareTourController@showtourlike")->name('share.showtourlike');
+		Route::post("takeDetailTour/{status}","ShareTourController@takeDetailTour")->name('share.takeDetailTour');
 		Route::post("voteUser","ShareTourController@voteUser")->name('share.voteUser');
 		// check tour duplicate
 		Route::post("duplicate","UserController@duplicate")->name("user.duplicate");
 		Route::post("addcomment/{idShare}","ShareTourController@addcomment")->name("user.addcomment");
 		Route::post("choseComment","ShareTourController@choseComment")->name("user.choseComment");
-		Route::get("deleteComment/{idComment}","ShareTourController@deleteComment")->name("user.deleteComment");
+		Route::get("deleteComment/{idComment}","ShareTourController@deleteComment")->name("
+			user.deleteComment");
+		Route::post("changeLikeTour","ShareTourController@changeLikeTour")->name("user.changeLikeTour");
+		
 	}
 );
 Route::group(

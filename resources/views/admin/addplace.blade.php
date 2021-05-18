@@ -254,10 +254,29 @@
                 <input type="text" class="form-control" id="inputLatitude" placeholder="{{ trans('admin.Latitude') }}" required="" readonly="" name="de_lat">
               </div>
               <div class="form-group">
-                <label for="open_inputFile">{{ trans('admin.Image') }}</label>
+                <label for="open_inputFile">Main Image</label>
                 <div class="open_inputFile">{{ trans('admin.Upload') }}</div>
                 <p class="file_name"></p>
                 <input type="file" class="form-control" id="inputImage" name="de_image" accept=".jpg,.png">
+              </div>
+              <div class="form-group">
+                <label for="div1">Tag</label>
+                <div class="div_drop" id="div1" ondrop="drop(event,this)" ondragover="allowDrop(event)">
+                      <a class="ui tag label" draggable="true" ondragstart="drag(event)" id="drag1">Cổ kính</a>
+                      <a class="ui tag label" draggable="true" ondragstart="drag(event)" id="drag2">Lịch sử</a>
+                      <a class="ui tag label" draggable="true" ondragstart="drag(event)" id="drag3">Hoài cổ</a>
+                      <a class="ui tag label" draggable="true" ondragstart="drag(event)" id="drag4">Món ngon</a>
+                      <a class="ui tag label" draggable="true" ondragstart="drag(event)" id="drag5">Giá rẻ</a>
+                      <a class="ui tag label" draggable="true" ondragstart="drag(event)" id="drag6">Thư dãn</a>
+                      <a class="ui tag label" draggable="true" ondragstart="drag(event)" id="drag7">Thiên nhiên</a>
+                      <a class="ui tag label" draggable="true" ondragstart="drag(event)" id="drag8">Cảnh đẹp</a>
+                      <a class="ui tag label" draggable="true" ondragstart="drag(event)" id="drag9">Kiến thức</a>
+                      <a class="ui tag label" draggable="true" ondragstart="drag(event)" id="drag10">Lãng mạn</a>
+                </div>
+                <label for="div2">Drop tag here</label>
+                <div class="div_drop" id="div2" ondrop="drop(event,this)" ondragover="allowDrop(event)">
+                </div>
+                <input type="hidden" id="content_tag" name="content_tag">
               </div>
               <div class="form-group">
                 <label for="inputDuration">{{ trans('admin.avgTime') }} ({{ trans('admin.hours') }})</label>
@@ -304,6 +323,30 @@
   	<script type="text/javascript" src="{{ asset('datatables/js/dataTables.bootstrap4.js') }}" ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.js"></script>
     <script type="text/javascript">
+      function allowDrop(ev) {
+        ev.preventDefault();
+      }
+      function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+      }
+      var arrayTag = [];
+      function drop(ev,el) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        el.appendChild(document.getElementById(data));
+        // gán value
+        $("#content_tag").val("");
+        arrayTag = [];
+        let lenth = $("#div2 a").length;
+        for (let i = 0; i < lenth; i++) {
+          arrayTag.push($("#div2 a")[i].text)
+        }
+        let content_tag = "";
+        arrayTag.forEach(function(item, index){
+          content_tag = content_tag + item + "|";
+        })
+        $("#content_tag").val(content_tag);
+      }
       $(document).ready(function(){
         // format money
         $("#inputCost").keyup(function(){
