@@ -53,6 +53,7 @@
                       <th>{{ trans('admin.Longitude') }}</th>
                       <th>{{ trans('admin.Latitude') }}</th>
                       <th>{{ trans('admin.Duration') }} ({{ trans('admin.hours') }})</th>
+                      <th>Additional pictures</th>
                       <th>{{ trans('admin.Createdby') }}</th>
                       <th>{{ trans('admin.Actions') }}</th>
                   </tr>
@@ -278,6 +279,7 @@
     </div>
   </div>
 </div>
+
 <!-- Modal Edit -->
 
 @stop
@@ -383,6 +385,7 @@
                   { data: 'de_lng', name: 'de_lng' },
                   { data: 'de_lat', name: 'de_lat' },
                   { data: 'duration', name: 'duration' },
+                  { data: 'uploadImg', name: 'uploadImg' },
                   { data: 'status', name: 'status' },
                   { data: 'actions', name: 'actions' },
                   ]

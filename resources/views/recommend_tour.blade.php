@@ -305,6 +305,7 @@
 		<script type="text/javascript">
 			@if(!isset($to_des))
 				$("#totalCostModal").modal("show");
+				choosenCost = parseInt($("#totalCostModal").val()); 
 			@endif
 			@if(!isset($justview))
 			$("#inputTotalCost").keyup(function(){
@@ -2403,7 +2404,7 @@ function initMap(){
 			tmp[i] = (Object.entries(startLocat).length)?tmpArr[tmpRoute[i]-1]:tmpArr[tmpRoute[i]];
 		locationID = tmp;
 
-		timeCostCheck((routeOptimized.duration!=undefined)?routeOptimized.duration.value:null,(routeOptimized.cost!=undefined)?routeOptimized.cost.value:null);	
+		timeCostCheck((routeOptimized.duration.value!=undefined)?routeOptimized.duration.value:null,(routeOptimized.cost.value!=undefined)?routeOptimized.cost.value:null);	
 		
 		
 	}
@@ -2458,7 +2459,7 @@ function initMap(){
 		function costcheck(){
 			if(cost > choosenCost){
 				$("#timeAlert").modal("show");
-				$('#alert-text').text('The travel cost has exceeded the selected time. Click close to delete some locations or choose the another cost. Click "Auto delete locations" we will delete some locations and Optimized the routes automaticaly.')
+				$('#alert-text').text('The travel cost has exceeded the selected cost. Click close to delete some locations or choose the another cost. Click "Auto delete locations" we will delete some locations and Optimized the routes automaticaly.')
 				$("#del-time-click").click(()=>{
 					$("#timeAlert").modal("hide");
 					isAuDel = 1;
@@ -2497,7 +2498,7 @@ function initMap(){
 		}
 
 		//Optimize by time && cost
-		if(!isNaN(choosendur) && choosenCost != 0){
+		if(!isNaN(choosendur) && choosenCost != 0 && cost != null && dur != null){
 			// cost available time unavailable
 			if(cost <= choosenCost && dur > choosendur){
 				timecheck();
@@ -2507,7 +2508,9 @@ function initMap(){
 			if(cost > choosenCost && dur <= choosendur){
 				costcheck();
 				return
-			}$("#timeAlert").modal("show");
+			}
+				$("#timeAlert").modal("show");
+				$('#alert-text').text('The travel cost and time has exceeded the selected cost and time. Click close to delete some locations or choose the another cost. Click "Auto delete locations" we will delete some locations and Optimized the routes automaticaly.')
 				$("#del-time-click").click(()=>{
 					$("#timeAlert").modal("hide");
 					isAuDel = 1;

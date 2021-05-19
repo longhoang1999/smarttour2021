@@ -114,7 +114,7 @@ class ShareTourController extends Controller
         }
         else if($req->chose_comment == "2")
         {
-            return redirect()->route('viewtourUserComment',$shareId);
+            return redirect()->route('viewtourUserComment',[$shareId]);
         }
     }
     public function viewtourUserComment($shareId)

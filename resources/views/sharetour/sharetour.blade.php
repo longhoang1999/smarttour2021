@@ -438,6 +438,7 @@
                 @endif
             @endforeach
         @endif
+        @if(Auth::check())
         $(".like_tour").click(function(){
             let $url_path = '{!! url('/') !!}';
             let _token = $('meta[name="csrf-token"]').attr('content');
@@ -463,6 +464,11 @@
                 }
             });
         })
+        @else
+        $(".like_tour").click(function(){
+            $("#modalLogin").modal("show");
+        })
+        @endif
         $('#form_add_comment').one('submit', function(e) {
             e.preventDefault();
             if($("#numberStar").val() == "")

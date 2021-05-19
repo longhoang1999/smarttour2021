@@ -12,12 +12,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::group(
-	['middleware' => ['locale'] ],
-	function(){
-		Route::get("/","UserController@login")->name("login");
-	}
-);
 Route::get("test","UserController@test");
 //fb
 Route::get("/getInfo-facebook/{social}","UserController@getInfor")->name("getInforFB");
@@ -42,6 +36,7 @@ Route::get("check","AdminController@check")->name("check");
 Route::group(
 	['middleware' => ['locale'] ],
 	function(){
+		Route::get("/","UserController@login")->name("login");
 		//gronp view
 		Route::get("tour","UserController@tour")->name("tour");
 		Route::get("place","UserController@place")->name("place");
@@ -53,8 +48,6 @@ Route::group(
 		Route::get("listPlaceForType/{idtype}","UserController@listPlaceForType")->name("listPlaceForType");
 		Route::post("loadPlaceInfo","UserController@loadPlaceInfo")->name("loadPlaceInfo");
 		Route::get("viewShareFeedback","UserController@viewShareFeedback")->name("viewShareFeedback");
-		
-
 		Route::get('maps/showmap','MapDirectController@showmap')->name('showmap');
 		Route::get('maps/processroute','MapDirectController@processroute')->name('processroute');
 		Route::get('maps/updpath','MapDirectController@updpath')->name('updpath');
@@ -63,8 +56,7 @@ Route::group(
 		    return view('recommend_tour');
 		})->name("user.maps");
 		Route::get("viewtour/{id}","ShareTourController@viewtour")->name('viewtour');
-		Route::get("viewtourUserComment/{id}","ShareTourController@viewtourUserComment")->name('
-			viewtourUserComment');
+		Route::get("viewtourUserComment/{id}","ShareTourController@viewtourUserComment")->name('viewtourUserComment');
 		Route::post("takeInforPlace","ShareTourController@takeInforPlace")->name('takeInforPlace');
 		//Route::get("loadmore/{type}","ShareTourController@loadmore")->name('share.loadmore');
 		Route::get("viewSharetour/{routeid}/{shareId}","ShareTourController@viewSharetour")->name('share.viewSharetour');

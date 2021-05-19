@@ -1143,6 +1143,13 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'uploadImg',
+                function ($destination) {
+                    $uploadImg = '<a href="#"><i class="fa-2x fas fa-cloud-upload-alt text-primary"></i></a>';
+                    return $uploadImg;
+                }
+            )
+            ->addColumn(
                 'actions',
                 function ($destination) {
                     $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
@@ -1150,7 +1157,7 @@ class AdminController extends Controller
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','duration','actions','status'])
+            ->rawColumns(['stt','duration','actions','status','uploadImg'])
             ->make(true);
     }
     public function showDetailEdit(Request $req,$remove,$lang)

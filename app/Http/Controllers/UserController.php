@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
@@ -21,6 +22,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use PHPMailer;
 use Socialite;
+use Redirect;
+use Cookie;
 
 
 class UserController extends Controller
@@ -138,8 +141,26 @@ class UserController extends Controller
         \Session::put('website_language', 'en');
         return true;
     }
-    public function login()
+    public function login(Request $req)
     {
+        if(!Auth::check())
+        {
+            $cookieEmail = $req->cookie('email');
+            $cookiePassword = $req->cookie('password');
+            if(isset($cookieEmail) && isset($cookiePassword))
+            {
+                $findUser = User::where("us_email",$cookieEmail)->where("provider",null)->first();
+                if(!empty($findUser) && $findUser->us_lock=="0")
+                {
+                    Auth::attempt(['us_email'=>$cookieEmail,'us_password'=>$cookiePassword]);
+                }
+                else
+                {
+                    \Cookie::queue(\Cookie::forget('email'));
+                    \Cookie::queue(\Cookie::forget('password'));
+                }
+            }
+        }
         $shareTour = ShareTour::orderBy('numberReviews', 'DESC')->limit(10)->get();
         if(Auth::check())
         {
@@ -274,11 +295,15 @@ class UserController extends Controller
                         {
                             if($user->us_type == "0")
                             {
-                                return redirect()->route('user.dashboard');
+                                return redirect()->route('user.dashboard')
+                                    ->withCookie(cookie('email', $req->us_email, 20160))
+                                    ->withCookie(cookie('password', $req->us_password, 20160));
                             }
                             else
                             {
-                                return redirect()->route('admin.generalInfor');
+                                return redirect()->route('admin.generalInfor')
+                                    ->withCookie(cookie('email', $req->us_email, 20160))
+                                    ->withCookie(cookie('password', $req->us_password, 20160));
                             }
                         } 
                     }
@@ -419,6 +444,8 @@ class UserController extends Controller
         return $lang; 
     }
     public function logout(){
+        \Cookie::queue(\Cookie::forget('email'));
+        \Cookie::queue(\Cookie::forget('password'));
         Auth::logout();
         session()->flush();
         return redirect()->route('login')->with("success","You have logged out successfully");
