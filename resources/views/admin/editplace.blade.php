@@ -13,6 +13,17 @@
       width: 100%;
       max-height: 20rem !important;
     }
+    td.id_link_image{text-align: center;}
+    td.id_link_image a{position: relative;text-decoration: none;color: #007bff;}
+    #Table_AllClass {text-align: center;}
+    td.id_link_image a span {
+        position: absolute;
+        width: 6em;
+        top: 1em;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    td.id_link_image a:hover{color: #60a7f3}
   </style>
 @stop
 @section('content')
@@ -52,7 +63,7 @@
                       <th>{{ trans('admin.NamePlace') }}</th>
                       <th>{{ trans('admin.Longitude') }}</th>
                       <th>{{ trans('admin.Latitude') }}</th>
-                      <th>{{ trans('admin.Duration') }} ({{ trans('admin.hours') }})</th>
+                      <th>{{ trans('admin.Duration') }} (h)</th>
                       <th>Additional pictures</th>
                       <th>{{ trans('admin.Createdby') }}</th>
                       <th>{{ trans('admin.Actions') }}</th>
@@ -373,6 +384,9 @@
                 "next": "{{ trans('admin.next') }}"
               }
             },
+            "columnDefs": [
+              { className: "id_link_image", "targets": [ 5 ] },
+            ],
             "lengthMenu": [[5, 10, -1], [5, 10,"All"]],
             "order": [[ 1, 'asc' ]],
               processing: true,

@@ -23,7 +23,7 @@
                 <?php $i=1; ?>
                 @foreach($des as $value)
                 <div class="downPlace">
-                    <div class="portfolio-item mx-auto" data-toggle="modal" data-target="#placeModal{{$i}}"
+                    <a class="portfolio-item mx-auto" href="{{route('showDetailPlace',$value->des_id)}}" 
                     style="  
                         @if($value->de_image != "")
                             background:url('{{asset($value->de_image)}}');
@@ -36,7 +36,7 @@
                         @endif
                     ">
                         <p class="lead">{{$value->de_name}}</p>
-                    </div>
+                    </a>
                 </div>
                 <?php $i++; ?>
                 @endforeach

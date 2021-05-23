@@ -149,8 +149,6 @@ header .slider div{width: 100%;min-height:40rem; }
     display: block;
     overflow: hidden;
     border-radius: 15px;
-}
-.hightly_div_child {
     width: 100%;
     margin: auto;
     position: relative;
@@ -258,6 +256,7 @@ h2{line-height: 3.5rem !important;}
     display: none;
 }
 .box-header {
+    text-decoration: none;
     background: white;
     margin: 0 .5rem;
     padding: .5rem .6rem;
@@ -272,6 +271,7 @@ h2{line-height: 3.5rem !important;}
     cursor: pointer;
 }
 .box-header:hover{
+    text-decoration: none;
     background: #497782;
     color: white;
 }

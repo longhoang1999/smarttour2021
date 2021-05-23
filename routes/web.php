@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get("test","UserController@test");
 //fb
 Route::get("/getInfo-facebook/{social}","UserController@getInfor")->name("getInforFB");
 Route::get("/checkInfo-facebook/{social}","UserController@checkInfor")->name("checkInfor");
@@ -31,7 +30,6 @@ Route::post("checkkey","UserController@checkkey")->name('checkkey');
 Route::post("postLogin","UserController@postLogin")->name("postLogin");
 Route::post("register","UserController@register")->name("register");
 Route::get("check","AdminController@check")->name("check");
-
 //Auth::routes();
 Route::group(
 	['middleware' => ['locale'] ],
@@ -99,8 +97,7 @@ Route::group(
 		Route::post("editRoute/{id}","AdminController@editRoute")->name("user.editRoute");
 		Route::get("tourhistory","ShareTourController@tourhistory")->name("user.tourhistory");
 		Route::get("tourUserLike","ShareTourController@tourUserLike")->name("user.tourUserLike");
-		Route::get("showtourhistory","ShareTourController@showtourhistory")->name('
-			share.showtourhistory');
+		Route::get("showtourhistory","ShareTourController@showtourhistory")->name('share.showtourhistory');
 		Route::get("showtourlike","ShareTourController@showtourlike")->name('share.showtourlike');
 		Route::post("takeDetailTour/{status}","ShareTourController@takeDetailTour")->name('share.takeDetailTour');
 		Route::post("voteUser","ShareTourController@voteUser")->name('share.voteUser');
@@ -111,6 +108,11 @@ Route::group(
 		Route::get("deleteComment/{idComment}","ShareTourController@deleteComment")->name("
 			user.deleteComment");
 		Route::post("changeLikeTour","ShareTourController@changeLikeTour")->name("user.changeLikeTour");
+		Route::post("updateRating/{ra_id}","UserController@updateRating")->name("user.updateRating");
+		Route::post("addRating/{idplace}","UserController@addRating")->name("user.addRating");
+		Route::post("temporaryImg","ShareTourController@temporaryImg")->name("user.temporaryImg");
+		Route::post("temporaryDeleteImg","ShareTourController@temporaryDeleteImg")->name("user.temporaryDeleteImg");
+		Route::post("temporaryCopyImg","UserController@temporaryCopyImg")->name("user.temporaryCopyImg");
 		
 	}
 );
@@ -177,6 +179,10 @@ Route::group(
 		Route::post("addtypeplace","AdminController@addtypeplace")->name("admin.addtypeplace");
 		Route::post("deleteTypePlace","AdminController@deleteTypePlace")->name("admin.deleteTypePlace");
 		Route::post("sharefeedback","AdminController@sharefeedback")->name("admin.sharefeedback");
+		Route::get("childImg/{idPlace}","AdminController@childImg")->name("admin.childImg");
+		Route::post("postChildImg/{idPlace}","AdminController@postChildImg")->name("admin.postChildImg");
+		Route::post("reloadChildImg","AdminController@reloadChildImg")->name("admin.reloadChildImg");
+		Route::post("deleteImage","AdminController@deleteImage")->name("admin.deleteImage");
 		
 	}
 );

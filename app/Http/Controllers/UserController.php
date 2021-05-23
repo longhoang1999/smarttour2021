@@ -16,6 +16,7 @@ use App\Models\Language;
 use App\Models\Uservotes;
 use App\Models\TypePlace;
 use App\Models\Langtype;
+use App\Models\RatingPlace;
 use Session;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -28,6 +29,15 @@ use Cookie;
 
 class UserController extends Controller
 {
+    public function cutArrray($string)
+    {
+        $pieces = explode("|", $string);
+        $array = array();
+        for ($i=0; $i < count($pieces)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces[$i]);
+        }
+        return $array;
+    }
     //fb + google
     public function getInfor($social)
     {
@@ -166,8 +176,12 @@ class UserController extends Controller
         {
             $user = Auth::user();
             $route = Route::where('to_id_user',$user->us_id)->orderBy('to_startDay', 'desc')->get();
+            if($user->tour_seen != null)
+                $arrayTourSeen = $this->cutArrray($user->tour_seen);
+            else
+                $arrayTourSeen = array();
             session()->put('route',$route);
-            return view('user.dashboard',['fullName'=>$user->us_fullName,'shareTour'=>$shareTour]);
+            return view('user.dashboard',['fullName'=>$user->us_fullName,'shareTour'=>$shareTour,'arrayTourSeen'=>$arrayTourSeen]);
         }
         else
         {
@@ -206,7 +220,6 @@ class UserController extends Controller
             $value["de_link"] = $des->de_link;
             $value["de_map"] = $des->de_map;
         }
-
         if(Auth::check())
         {
             $user = Auth::user();
@@ -364,10 +377,9 @@ class UserController extends Controller
     public function showDetailPlace($idplace)
     {
         $de = Destination::
-        select('de_lat','de_lng','de_duration','de_link','de_map','de_image','de_type')
+        select('de_lat','de_lng','de_duration','de_link','de_map','de_image','de_type','de_child_img','de_tag')
         ->where('de_remove',$idplace)
         ->first();
-
         if(Session::has('website_language') && Session::get('website_language') == "vi")
         {
             $lang = Language::where("language","vn")->where("des_id",$idplace)->first();
@@ -380,24 +392,148 @@ class UserController extends Controller
             $findType = TypePlace::where("id",$de->de_type)->first();
             $langplace = Langtype::select("nametype")->where("language","en")->where("type_id",$findType->id)->first();
         }
-        
+        $array = array();
+        if($de->de_child_img != null)
+        {
+            $pieces = explode("|", $de->de_child_img);
+            for ($i=0; $i < count($pieces)-1; $i++) {
+                $array = Arr::add($array, $i ,$pieces[$i]);
+            }
+        }
         $lang["de_lat"] = $de->de_lat;
         $lang["de_lng"] = $de->de_lng;
         $lang["de_link"] = $de->de_link;
         $lang["de_image"] = $de->de_image;
         $lang["de_map"] = $de->de_map;
-        $lang["de_duration"] = $de->de_duration;
+        $lang["de_duration"] = $de->de_duration;  
         $lang["nametype"] = $langplace->nametype;
+        //tag
+        if($de->de_tag != null)
+            $arrTag = $this->cutArrray($de->de_tag);
+        // rating place
+        $findRating = RatingPlace::where("ra_des_id",$idplace)->orderBy('ra_date_created', 'DESC')->get();
+        $sumVotes = 0;
+        $oneVote = 0;$twoVote = 0;$threeVote = 0;$fourVote = 0;$fiveVote = 0;
+        foreach ($findRating as $value) {
+            $sumVotes = $sumVotes + $value->ra_votes;
+            if($value->ra_votes == "1")
+                $oneVote = $$oneVote + 1;
+            else if($value->ra_votes == "2")
+                $twoVote = $twoVote + 1;
+            else if($value->ra_votes == "3")
+                $threeVote = $threeVote + 1;
+            else if($value->ra_votes == "4")
+                $fourVote = $fourVote + 1;
+            else if($value->ra_votes == "5")
+                $fiveVote = $fiveVote + 1;
+        }
+        if(count($findRating) != 0)
+            $svgVotes = $sumVotes/count($findRating);
+        else
+            $svgVotes = 0;
         if(Auth::check())
         {
+            // reset temporary photo
             $user = Auth::user();
-            return view('user.showplace',['fullName'=>$user->us_fullName,'lang'=>$lang]);
+            $array_temporary = $this->cutArrray($user->temporary_photo);
+            foreach ($array_temporary as $value) {
+                File::delete(public_path('temporary_Img/'.$value));
+            }
+            $user->temporary_photo = null;
+            $user->save();
+
+            $findRatingUsLogin = RatingPlace::where("ra_us_id",$user->us_id)->where("ra_des_id",$idplace)->first();
+            return view('user.showplace',[
+                'idplace' => $idplace,
+                'fullName'=>$user->us_fullName,
+                'lang'=>$lang,
+                'array'=>$array,
+                'findRating' => $findRating,
+                'findRatingUsLogin' => $findRatingUsLogin,
+                'svgVotes' => $svgVotes,
+                'oneVote' => $oneVote,'twoVote' => $twoVote,'threeVote' => $threeVote,'fourVote' => $fourVote,'fiveVote' => $fiveVote,
+                'arrTag' => $arrTag
+            ]);
         }
         else
         {
-            return view('user.showplace',['lang'=>$lang]);
+            return view('user.showplace',[
+                'idplace' => $idplace,
+                'lang'=>$lang,
+                'array'=>$array,
+                'findRating' => $findRating,
+                'svgVotes' => $svgVotes,
+                'oneVote' => $oneVote,'twoVote' => $twoVote,'threeVote' => $threeVote,'fourVote' => $fourVote,'fiveVote' => $fiveVote,
+                'arrTag' => $arrTag
+            ]);
         }
         
+    }
+    public function temporaryCopyImg(Request $req)
+    {
+        // reset
+        $user = Auth::user();
+        // $files = $req->file('input_file_img');
+        $array = $this->cutArrray($user->temporary_photo);
+        foreach ($array as $value) {
+            File::delete(public_path('temporary_Img/'.$value));
+        }
+        $findRating =  RatingPlace::where("ra_id",$req->ra_id)->first();
+        if($findRating->ra_images != "")
+        {
+            Auth::user()->temporary_photo = $findRating->ra_images;
+            Auth::user()->save();
+            $arrayImg = $this->cutArrray(Auth::user()->temporary_photo);
+            foreach ($arrayImg as $file) {
+                File::copy(public_path('uploadUsers/'.Auth::user()->us_code.'/'.$file),public_path('temporary_Img/'.$file));
+            }
+        }
+    }
+    public function updateRating(Request $req,$ra_id)
+    {
+        $findRating = RatingPlace::where("ra_id",$ra_id)->first();
+        $findRating->ra_votes = $req->numberStar;
+        $findRating->ra_content = $req->content_rating;
+        $findRating->ra_date_created = Carbon::now();
+        if($findRating->ra_images != null)
+        {
+            $arrayOldImg = $this->cutArrray($findRating->ra_images);
+            foreach($arrayOldImg as $ar)
+                File::delete(public_path('uploadUsers/'.Auth::user()->us_code.'/'.$ar));
+        }
+        if(Auth::user()->temporary_photo != "")
+        {
+            $findRating->ra_images = Auth::user()->temporary_photo;
+            $arrayImg = $this->cutArrray(Auth::user()->temporary_photo);
+            foreach ($arrayImg as $file) {
+                File::move(public_path('temporary_Img/'.$file), public_path('uploadUsers/'.Auth::user()->us_code.'/'.$file));
+            }
+            Auth::user()->temporary_photo = null;
+            Auth::user()->save();
+        }
+        $findRating->save();
+        return back()->with("success","Chỉnh sửa đánh giá thành công!");
+    }
+    public function addRating(Request $req,$idplace)
+    {
+        $newRating = new RatingPlace();
+        $newRating->ra_votes = $req->numberStar;
+        $newRating->ra_us_id = Auth::user()->us_id;
+        $newRating->ra_des_id = $idplace;
+        $newRating->ra_content = $req->content_rating;
+        $newRating->ra_date_created = Carbon::now();
+        if(Auth::user()->temporary_photo != "")
+        {
+            $newRating->ra_images = Auth::user()->temporary_photo;
+            $arrayImg = $this->cutArrray(Auth::user()->temporary_photo);
+            foreach ($arrayImg as $file) {
+                File::move(public_path('temporary_Img/'.$file), public_path('uploadUsers/'.Auth::user()->us_code.'/'.$file));
+            }
+            Auth::user()->temporary_photo = null;
+            Auth::user()->save();
+        }
+        $newRating->save();
+        return back()->with("success","Đánh giá thành công!");
     }
     public function listPlaceForType($idtype)
     {

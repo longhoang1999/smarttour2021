@@ -25,10 +25,53 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 
-
-
 class ShareTourController extends Controller
 {
+    public function cutArrray($string)
+    {
+        $pieces = explode("|", $string);
+        $array = array();
+        for ($i=0; $i < count($pieces)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces[$i]);
+        }
+        return $array;
+    }
+    public function temporaryImg(Request $req)
+    {
+        // reset
+        $user = Auth::user();
+        $array = $this->cutArrray($user->temporary_photo);
+        foreach ($array as $value) {
+            File::delete(public_path('temporary_Img/'.$value));
+        }
+        $user->temporary_photo = "";
+        
+        $files = $req->file('input_file_img');
+        $arrNameFile = array();
+        foreach ($files as $file) {
+            $picName = time().rand(10,1000).'.'.$file->getClientOriginalExtension();
+            $file->move(public_path('temporary_Img'), $picName);
+            $user->temporary_photo = $user->temporary_photo.$picName."|";
+            array_push($arrNameFile, $picName);
+        }
+        $user->save();
+        return $arrNameFile;
+    }
+    public function temporaryDeleteImg(Request $req)
+    {
+        $user = Auth::user();
+        $array = $this->cutArrray($user->temporary_photo);
+        $listImg = "";
+        foreach ($array as $value) {
+            if($value == $req->nameImg)
+                File::delete(public_path('temporary_Img/'.$value));
+            else
+                $listImg = $listImg.$value."|";
+        }
+        $user->temporary_photo = $listImg;
+        $user->save();
+        return;
+    }
     public function addcomment($idShare,Request $req)
     {
         if($req->numberStar != "")
@@ -64,6 +107,16 @@ class ShareTourController extends Controller
                 $addComment = new Comment();
                 $addComment->id_user_votes = $userVotesId;
                 $addComment->co_content = $req->content_rating;
+                if(Auth::user()->temporary_photo != "")
+                {
+                    $addComment->co_image = Auth::user()->temporary_photo;
+                    $arrayImg = $this->cutArrray(Auth::user()->temporary_photo);
+                    foreach ($arrayImg as $file) {
+                        File::move(public_path('temporary_Img/'.$file), public_path('uploadUsers/'.Auth::user()->us_code.'/'.$file));
+                    }
+                    Auth::user()->temporary_photo = null;
+                    Auth::user()->save();
+                }
                 $addComment->save();
             }
         }
@@ -71,6 +124,27 @@ class ShareTourController extends Controller
     }
     public function viewtour($shareId)
     {
+        if(Auth()->check())
+        {
+            // reset temporary photo
+            $array_temporary = $this->cutArrray(Auth::user()->temporary_photo);
+            foreach ($array_temporary as $value) {
+                File::delete(public_path('temporary_Img/'.$value));
+            }
+            Auth::user()->temporary_photo = null;
+            Auth::user()->save();
+            // gắn tour đã xem
+            $check = 1;
+            foreach ($this->cutArrray(Auth()->user()->tour_seen) as $value) {
+                if($value ==$shareId)
+                    $check = 2;
+            }
+            if($check == 1)
+            {
+                Auth()->user()->tour_seen = Auth()->user()->tour_seen.$shareId."|";
+                Auth()->user()->save();
+            }
+        }
         $shareTour = ShareTour::where('sh_id','<>',$shareId)->orderBy('numberReviews', 'DESC')->limit(10)->get();
         $share = ShareTour::where("sh_id",$shareId)->first();
         $tour = Route::where("to_id",$share->sh_to_id)->first();
@@ -86,12 +160,6 @@ class ShareTourController extends Controller
         $threeStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","3")->count();
         $towStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","2")->count();
         $oneStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","1")->count();
-        // load like
-        $pieces_2 = explode("|", $tour->user_like);
-        $array_user_like = array();
-        for ($i=0; $i < count($pieces_2)-1; $i++) {
-            $array_user_like = Arr::add($array_user_like, $i ,$pieces_2[$i]);
-        }
         return view('sharetour.sharetour',[
             'share'=>$share,
             'shareTour'=>$shareTour,
@@ -102,7 +170,7 @@ class ShareTourController extends Controller
             'findComment' => $findComment,
             'shareId' => $shareId,
             'typeComment' => 'all',
-            'array_user_like' => $array_user_like
+            'array_user_like' => $this->cutArrray($tour->user_like)
         ]);
     }
     public function choseComment(Request $req)
@@ -135,12 +203,6 @@ class ShareTourController extends Controller
         $threeStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","3")->count();
         $towStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","2")->count();
         $oneStar = Uservotes::where('sh_id',$share->sh_id)->where("vote_number","1")->count();
-        // load like
-        $pieces_2 = explode("|", $tour->user_like);
-        $array_user_like = array();
-        for ($i=0; $i < count($pieces_2)-1; $i++) {
-            $array_user_like = Arr::add($array_user_like, $i ,$pieces_2[$i]);
-        }
         return view('sharetour.sharetour',[
             'share'=>$share,
             'shareTour'=>$shareTour,
@@ -151,18 +213,14 @@ class ShareTourController extends Controller
             'findComment' => $findComment,
             'shareId' => $shareId,
             'typeComment' => 'user_login',
-            'array_user_like' => $array_user_like
+            'array_user_like' => $this->cutArrray($tour->user_like)
         ]);
     }
     public function changeLikeTour(Request $req)
     {
         $sharetour = ShareTour::where("sh_id",$req->shareId)->first();
         $tour = Route::where("to_id",$sharetour->sh_to_id)->first();
-        $pieces_2 = explode("|", $tour->user_like);
-        $array_user_like = array();
-        for ($i=0; $i < count($pieces_2)-1; $i++) {
-            $array_user_like = Arr::add($array_user_like, $i ,$pieces_2[$i]);
-        }
+        $array_user_like = $this->cutArrray($tour->user_like);
         $check = 1;
         // unlike
         foreach ($array_user_like as $key => $value) {
@@ -188,6 +246,15 @@ class ShareTourController extends Controller
     public function deleteComment($idComment)
     {
         $findComment = Comment::where("co_id",$idComment)->first();
+        if($findComment->co_image != null)
+        {
+            $findUserVotes = Uservotes::select("us_id")->where("id",$findComment->id_user_votes)->first();
+            $findUser = User::select("us_code")->where("us_id",$findUserVotes->us_id)->first();
+            $array = $this->cutArrray($findComment->co_image);
+            foreach ($array as $value) {
+                File::delete(public_path('uploadUsers/'.$findUser->us_code.'/'.$value));
+            }
+        }
         $findComment->delete();
         return back()->with("success","Xóa thành công!");
     }
@@ -285,7 +352,8 @@ class ShareTourController extends Controller
 	    {
 	    	$image="";
 	    }
-	    return [$de_lat,$de_lng,$de_name,$image,$short,$description,$checkDes->de_duration,$checkDes->de_map,$checkDes->de_link,$type];
+        $linkDetail = route('showDetailPlace',$req->des_id);
+	    return [$de_lat,$de_lng,$de_name,$image,$short,$description,$checkDes->de_duration,$checkDes->de_map,$checkDes->de_link,$type,$linkDetail];
     }
     // public function loadmore($type)
     // {
@@ -356,11 +424,7 @@ class ShareTourController extends Controller
     {
         $route = Route::where("to_id",$id)->first();
         // treo
-        $pieces_2 = explode("|", $route->to_des);
-        $array = array();
-        for ($i=0; $i < count($pieces_2)-1; $i++) {
-            $array = Arr::add($array, $i ,$pieces_2[$i]);
-        }
+        $array = $this->cutArrray($route->to_des);
         $latlng_new = array();
         $dename_new = array();
         $placeId_new = array();
@@ -532,13 +596,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'evaluate',
                 function ($votes_over) {
-                    $evaluate = '';
-                    for ($i=1; $i <= 5; $i++) { 
-                        if($i <= $votes_over->number_star)
-                        {
-                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-                        }
-                    }
+                    $evaluate = $this->converStar($votes_over->number_star);
                     return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
@@ -561,11 +619,7 @@ class ShareTourController extends Controller
                 'detailPlace',
                 function ($votes_over) {
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -592,6 +646,31 @@ class ShareTourController extends Controller
             )
             ->rawColumns(['stt','tourName','startLocat','detailPlace','evaluate','totalTime'])
             ->make(true);
+    }
+    public function converStar($num)
+    {
+        $num = floatval($num);
+        $roundnum = round(($num+0.5)*2)/2 -0.5;
+        $arr = array();
+        for($i =5; $i>0; $i--){
+            for( $j = 1; $j>=0;$j = $j-0.5){     
+                if(($roundnum - $j)>=0 ){
+                    $roundnum -= $j;
+                    array_push($arr, $j);
+                    break;
+                }
+            }
+        }
+        $starStsing = '';
+        foreach ($arr as $value) {
+            if($value == 1)
+                $starStsing = $starStsing.'<i class="fas fa-star text-warning"></i>';
+            else if($value == 0)
+                $starStsing = $starStsing.'<i class="far fa-star text-warning"></i>';
+            else if($value == 0.5)
+                $starStsing = $starStsing.'<i class="fas fa-star-half-alt text-warning"></i>';
+        }
+        return $starStsing;
     }
     // div_1
     public function searchTourTable()
@@ -632,13 +711,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'evaluate',
                 function ($votes_over) {
-                    $evaluate = '';
-                    for ($i=1; $i <= 5; $i++) { 
-                        if($i <= $votes_over->number_star)
-                        {
-                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-                        }
-                    }
+                    $evaluate = $this->converStar($votes_over->number_star);
                     return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
@@ -661,11 +734,7 @@ class ShareTourController extends Controller
                 'detailPlace',
                 function ($votes_over) {
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -732,13 +801,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'evaluate',
                 function ($votes_over) {
-                    $evaluate = '';
-                    for ($i=1; $i <= 5; $i++) { 
-                        if($i <= $votes_over->number_star)
-                        {
-                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-                        }
-                    }
+                    $evaluate = $this->converStar($votes_over->number_star);
                     return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
@@ -761,11 +824,7 @@ class ShareTourController extends Controller
                 'detailPlace',
                 function ($votes_over) {
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -841,13 +900,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'evaluate',
                 function ($votes_over) {
-                    $evaluate = '';
-                    for ($i=1; $i <= 5; $i++) { 
-                        if($i <= $votes_over->number_star)
-                        {
-                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-                        }
-                    }
+                    $evaluate = $this->converStar($votes_over->number_star);
                     return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
@@ -870,11 +923,7 @@ class ShareTourController extends Controller
                 'detailPlace',
                 function ($votes_over) {
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -946,13 +995,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'evaluate',
                 function ($votes_over) {
-                    $evaluate = '';
-                    for ($i=1; $i <= 5; $i++) { 
-                        if($i <= $votes_over->number_star)
-                        {
-                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-                        }
-                    }
+                    $evaluate = $this->converStar($votes_over->number_star);
                     return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
@@ -975,11 +1018,7 @@ class ShareTourController extends Controller
                 'detailPlace',
                 function ($votes_over) {
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -1051,13 +1090,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'evaluate',
                 function ($votes_over) {
-                    $evaluate = '';
-                    for ($i=1; $i <= 5; $i++) { 
-                        if($i <= $votes_over->number_star)
-                        {
-                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-                        }
-                    }
+                    $evaluate = $this->converStar($votes_over->number_star);
                     return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
@@ -1080,11 +1113,7 @@ class ShareTourController extends Controller
                 'detailPlace',
                 function ($votes_over) {
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -1156,13 +1185,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'evaluate',
                 function ($votes_over) {
-                    $evaluate = '';
-                    for ($i=1; $i <= 5; $i++) { 
-                        if($i <= $votes_over->number_star)
-                        {
-                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-                        }
-                    }
+                    $evaluate = $this->converStar($votes_over->number_star);
                     return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
@@ -1185,11 +1208,7 @@ class ShareTourController extends Controller
                 'detailPlace',
                 function ($votes_over) {
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -1265,13 +1284,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'evaluate',
                 function ($votes_over) {
-                    $evaluate = '';
-                    for ($i=1; $i <= 5; $i++) { 
-                        if($i <= $votes_over->number_star)
-                        {
-                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-                        }
-                    }
+                    $evaluate = $this->converStar($votes_over->number_star);
                     return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
@@ -1294,11 +1307,7 @@ class ShareTourController extends Controller
                 'detailPlace',
                 function ($votes_over) {
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -1373,13 +1382,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'evaluate',
                 function ($votes_over) {
-                    $evaluate = '';
-                    for ($i=1; $i <= 5; $i++) { 
-                        if($i <= $votes_over->number_star)
-                        {
-                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-                        }
-                    }
+                    $evaluate = $this->converStar($votes_over->number_star);
                     return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
@@ -1402,11 +1405,7 @@ class ShareTourController extends Controller
                 'detailPlace',
                 function ($votes_over) {
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -1486,13 +1485,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'evaluate',
                 function ($votes_over) {
-                    $evaluate = '';
-                    for ($i=1; $i <= 5; $i++) { 
-                        if($i <= $votes_over->number_star)
-                        {
-                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-                        }
-                    }
+                    $evaluate = $this->converStar($votes_over->number_star);
                     return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
@@ -1515,11 +1508,7 @@ class ShareTourController extends Controller
                 'detailPlace',
                 function ($votes_over) {
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -1568,11 +1557,7 @@ class ShareTourController extends Controller
             array_push($arrayLabel,array($route->to_name));
         }
         // label
-        $pieces = explode("|", $route->to_des);
-        $array = array();
-        for ($i=0; $i < count($pieces)-1; $i++) {
-            $array = Arr::add($array, $i ,$pieces[$i]);
-        }
+        $array = $this->cutArrray($route->to_des);
         //cost total
         
         if(Session::has('website_language') && Session::get('website_language') == "vi")
@@ -1649,14 +1634,7 @@ class ShareTourController extends Controller
                 $your_votes = '<span class="badge badge-warning">Not available</span>';
         }
         // other
-        $evaluate = "";
-        for ($i=1; $i <= 5; $i++) { 
-            if($i <= $sharetour->number_star)
-            {
-                $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-            }
-        }
-        $evaluate = $evaluate.' <span class="font-italic">-'.$sharetour->numberReviews.' votes</span>';
+        $evaluate = $this->converStar($sharetour->number_star).' -'.$sharetour->numberReviews.' votes</span>';
         // ignore 
         $avgRating = $sharetour->number_star. '<i class="fas fa-star text-warning"></i>';
         $number_rate = $sharetour->numberReviews. ' votes';
@@ -1772,11 +1750,7 @@ class ShareTourController extends Controller
             ->get();
         $saveListId = array();
         foreach ($route as $value) {
-            $pieces = explode("|", $value->to_des);
-            $array = array();
-            for ($i=0; $i < count($pieces)-1; $i++) {
-                $array = Arr::add($array, $i ,$pieces[$i]);
-            }
+            $array = $this->cutArrray($value->to_des);
             if(count(array_intersect($req->listIdSearch, $array)) == count($req->listIdSearch))
             {
                 array_push($saveListId, $value->to_id);
@@ -1914,13 +1888,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'evaluate',
                 function ($votes_over) {
-                    $evaluate = '';
-                    for ($i=1; $i <= 5; $i++) { 
-                        if($i <= $votes_over->number_star)
-                        {
-                            $evaluate = $evaluate.' <i class="fas fa-star text-warning"></i>';
-                        }
-                    }
+                    $evaluate = $this->converStar($votes_over->number_star);
                     return $evaluate.' <br>-'.$votes_over->numberReviews.' votes';
                 }
             )
@@ -1943,11 +1911,7 @@ class ShareTourController extends Controller
                 'detailPlace',
                 function ($votes_over) {
                     $route = Route::where("to_id",$votes_over->sh_to_id)->first();
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -2015,11 +1979,11 @@ class ShareTourController extends Controller
                     $findShare = ShareTour::where("sh_to_id",$route->to_id)->first();
                     if(empty($findShare))
                     {
-                        return $route->to_star.' <i class="fas fa-star text-warning"></i>';
+                        return $this->converStar($route->to_star);
                     }
                     else
                     {
-                        return $findShare->number_star.' <i class="fas fa-star text-warning"></i>';
+                        return $this->converStar($findShare->number_star);
                     }
                 }
             )
@@ -2040,11 +2004,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'detailPlace',
                 function ($route) {
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -2078,11 +2038,7 @@ class ShareTourController extends Controller
         $listTour = array();
         foreach($allRoute as $route)
         {
-            $pieces_2 = explode("|", $route->user_like);
-            $array_user_like = array();
-            for ($i=0; $i < count($pieces_2)-1; $i++) {
-                $array_user_like = Arr::add($array_user_like, $i ,$pieces_2[$i]);
-            }
+            $array_user_like = $this->cutArrray($route->user_like);
             foreach($array_user_like as $arr)
             {
                 if($arr == Auth::user()->us_id)
@@ -2121,11 +2077,11 @@ class ShareTourController extends Controller
                     $findShare = ShareTour::where("sh_to_id",$route->to_id)->first();
                     if(empty($findShare))
                     {
-                        return $route->to_star.' <i class="fas fa-star text-warning"></i>';
+                        return $this->converStar($route->to_star);
                     }
                     else
                     {
-                        return $findShare->number_star.' <i class="fas fa-star text-warning"></i>';
+                        return $this->converStar($findShare->number_star);
                     }
                 }
             )
@@ -2146,11 +2102,7 @@ class ShareTourController extends Controller
             ->addColumn(
                 'detailPlace',
                 function ($route) {
-                    $pieces = explode("|", $route->to_des);
-                    $array = array();
-                    for ($i=0; $i < count($pieces)-1; $i++) {
-                        $array = Arr::add($array, $i ,$pieces[$i]);
-                    }
+                    $array = $this->cutArrray($route->to_des);
                     $Detail = "";
                     foreach ($array as $value) {
                         $checkDes = Destination::where("de_remove",$value)->first();
@@ -2185,11 +2137,7 @@ class ShareTourController extends Controller
         $arrayImg = array();
         $arrayLabel = array();
         // label
-        $pieces = explode("|", $route->to_des);
-        $array = array();
-        for ($i=0; $i < count($pieces)-1; $i++) {
-            $array = Arr::add($array, $i ,$pieces[$i]);
-        }
+        $array = $this->cutArrray($route->to_des);
         foreach ($array as $ar) {
             $findDes = Destination::where("de_remove",$ar)->first();
             if($findDes->de_default=="0")

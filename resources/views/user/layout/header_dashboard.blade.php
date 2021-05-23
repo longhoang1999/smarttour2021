@@ -68,9 +68,9 @@
     </nav>
     <nav class="nav_more">
         <div class="container-fuild child_header">
-            <div class="box-header" id="searchTour">
+            <a class="box-header" id="searchTour" href="{{route('searchTour')}}">
                 <i class="fas fa-search"></i> {{ trans('messages.searchTour') }}
-            </div>
+            </a>
             <?php 
                 use App\Models\TypePlace; 
                 use App\Models\Langtype;
@@ -93,9 +93,9 @@
                 <a href="{{route('listPlaceForType',$value->id)}}"><i class="fas fa-map-marker-alt"></i> {{$value->nametype}}</a>
             </div>
             @endforeach
-            <div class="box-header" id="seeFeedback">
+            <a class="box-header" id="seeFeedback" href="{{route('viewShareFeedback')}}">
                 <i class="fas fa-comments"></i> {{ trans('messages.Feedback') }}
-            </div>
+            </a>
             <div class="Language">
                 <div class="lan_title">
                     <span>{{ trans('messages.lang') }}</span><i class="fas fa-caret-down"></i>

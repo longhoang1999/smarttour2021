@@ -15,7 +15,34 @@
         use Illuminate\Support\Facades\DB;
         use App\Models\User;
         use App\Models\Comment;
+        use Illuminate\Support\Arr;
     ?>
+    <script type="text/javascript">
+        function converStar(num){
+            num = parseFloat(num);
+            var roundnum = Math.round((num+0.5)*2)/2 -0.5;
+            var arr =[];
+            for(var i =5; i>0; i--){
+                for(var j = 1; j>=0;j = j-0.5){     
+                    if((roundnum - j)>=0 ){
+                        roundnum -= j;
+                        arr.push(j)
+                        break
+                    }
+                }
+            }
+            let starStsing = '';
+            arr.forEach(function(item, index){
+                if(item == 1)
+                    starStsing += '<i class="fas fa-star text-warning"></i>';
+                else if(item == 0)
+                    starStsing += '<i class="far fa-star text-warning"></i>';
+                else if(item == 0.5)
+                    starStsing += '<i class="fas fa-star-half-alt text-warning"></i>';
+            })
+            return starStsing;
+        }
+    </script>
     <section class="page-section portfolio" id="portfolio">
         <div class="container">
             <!-- Portfolio Section Heading-->
@@ -96,12 +123,8 @@
                         <?php $findVotes =  Uservotes::where("sh_id",$share->sh_id)->where("us_id",Auth::user()->us_id)->first(); ?>
                         @if(!empty($findVotes))
                             <p><span class="font-weight-bold font-italic">{{ trans('newlang.Yourvotes') }}: </span>
-                            <span>
-                                <i class="fas fa-star star_1" data-value="1"></i>
-                                <i class="fas fa-star star_2" data-value="2"></i>
-                                <i class="fas fa-star star_3" data-value="3"></i>
-                                <i class="fas fa-star star_4" data-value="4"></i>
-                                <i class="fas fa-star star_5" data-value="5"></i>
+                            <span class="your_votes_star">
+                                <!-- append here -->
                             </span></p>
                         @else
                             <p><span class="font-weight-bold font-italic">{{ trans('newlang.Yourvotes') }}: </span>
@@ -111,7 +134,7 @@
                     <p><span class="font-weight-bold font-italic">{{ trans('newlang.Introduce') }}: </span>
                     <span>{{$share->content}}</span></p>
                     <p><span class="font-weight-bold font-italic">{{ trans('newlang.averageRating') }}: </span>
-                    <span>{{$share->number_star}} <i class="fas fa-star text-warning"></i></span></p>
+                    <span class="star_rating"></span></p>
                     <p><span class="font-weight-bold font-italic">{{ trans('newlang.numberofRatings') }}: </span>
                     <span>{{$share->numberReviews}} votes</span></p>
                     @if($route->to_startLocat != "")
@@ -159,8 +182,12 @@
             <a href="{{route('viewtour',$value->sh_id)}}" class="hightly_div_child">
                 <p class="tourContent">
                     <span class="nameTour">{{$route->to_name}}</span>
-                    {{$value->number_star}}<i class="fas fa-star text-warning"></i> - {{$value->numberReviews}} votes
+                    <span id="show_star_{{$value->sh_id}}"></span>
+                    <span>- {{$value->numberReviews}} votes</span>
                 </p>
+                <script type="text/javascript">
+                    $("#show_star_{{$value->sh_id}}").append(converStar("{{number_format((float)$value->number_star, 1, '.', '')}}"));
+                </script>
                 @if($value->image != "")
                     <img src="{{asset($value->image)}}" alt="" class="img_open_model{{$value->sh_id}}">
                 @else
@@ -177,34 +204,30 @@
     <div class="container rating_comment">
         <div class="rating_comment-left">
             <div class="line_1">
-                <span class="font-weight-bold">{{$share->number_star}}</span>
-                <i class="fas fa-star text-warning"></i>
-                <i class="fas fa-star text-warning"></i>
-                <i class="fas fa-star text-warning"></i>
-                <i class="fas fa-star text-warning"></i>
-                <i class="fas fa-star text-warning"></i>
+                <span class="font-weight-bold">{{number_format((float)$share->number_star, 1, '.', '')}}</span>
+                <span class="show_star"></span>
                 <span> - {{$totalVotes}} votes</span>
             </div>
             <div class="line_1">
                 <ul class="line_1_detail">
                     <li>
-                        <span class="font-weight-bold">5</span><i class="fas fa-star text-warning"></i>: 
+                        <span class="font-weight-bold">5</span><i class="fas fa-star color_orange"></i>: 
                         <span class="detail_votes">{{$fiveStar}} votes</span>
                     </li>
                     <li>
-                        <span class="font-weight-bold">4</span><i class="fas fa-star text-warning"></i>: 
+                        <span class="font-weight-bold">4</span><i class="fas fa-star color_orange"></i>: 
                         <span class="detail_votes">{{$fourStar}} votes</span>
                     </li>
                     <li>
-                        <span class="font-weight-bold">3</span><i class="fas fa-star text-warning"></i>: 
+                        <span class="font-weight-bold">3</span><i class="fas fa-star color_orange"></i>: 
                         <span class="detail_votes">{{$threeStar}} votes</span>
                     </li>
                     <li>
-                        <span class="font-weight-bold">2</span><i class="fas fa-star text-warning"></i>: 
+                        <span class="font-weight-bold">2</span><i class="fas fa-star color_orange"></i>: 
                         <span class="detail_votes">{{$towStar}} votes</span>
                     </li>
                     <li>
-                        <span class="font-weight-bold">1</span><i class="fas fa-star text-warning"></i>: 
+                        <span class="font-weight-bold">1</span><i class="fas fa-star color_orange"></i>: 
                         <span class="detail_votes">{{$oneStar}} votes</span>
                     </li>
                 </ul>
@@ -254,7 +277,7 @@
                         </form>
                     </div>              
                 </div>
-                <form id="form_add_comment" method="post" action="{{route('user.addcomment',$share->sh_id)}}"> 
+                <form id="form_add_comment" onsubmit="return validateForm()" method="post" action="{{route('user.addcomment',$share->sh_id)}}" enctype="multipart/form-data"> 
                    @csrf
                    <div class="chose_star" id="div_Starrank_tour">
                        <i class="fas fa-star star_1" data-value="1"></i>
@@ -264,8 +287,17 @@
                        <i class="fas fa-star star_5" data-value="5"></i>
                    </div>
                    <input type="hidden" name="numberStar" id="numberStar" required="">
-                   <textarea class="form-control" placeholder="Nhập bình luận của bạn (nếu có)" name="content_rating"></textarea> 
+                   <div class="block_enter_content">
+                        <textarea class="form-control" placeholder="Nhập bình luận của bạn (nếu có)" name="content_rating"></textarea> 
+                        <i class="fas fa-camera icon_camera"></i>
+                        <div class="temporary_photo">
+                            <!-- append here -->
+                        </div>
+                    </div>
                    <input type="submit" class="btn btn-sm btn-primary" value="Đánh giá" id="btn_rating">
+                </form>
+                <form id="temporaryForm" enctype="multipart/form-data" method="post">
+                    <input type="file" name="input_file_img[]" class="input_file_img" multiple accept="image/*">
                 </form>
             </div>
             @endif
@@ -312,22 +344,22 @@
                     </div>
                     <div class="comment_content-starvotes">
                         @if($usVotes->vote_number == "1")
-                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star color_orange"></i>
                         @elseif($usVotes->vote_number == "2")
                             @for($i = 0;$i < 2;$i++ )
-                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star color_orange"></i>
                             @endfor
                         @elseif($usVotes->vote_number == "3")
                             @for($i = 0;$i < 3;$i++ )
-                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star color_orange"></i>
                             @endfor
                         @elseif($usVotes->vote_number == "4")
                             @for($i = 0;$i < 4;$i++ )
-                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star color_orange"></i>
                             @endfor
                         @elseif($usVotes->vote_number == "5")
                             @for($i = 0;$i < 5;$i++ )
-                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star color_orange"></i>
                             @endfor
                         @endif
                     </div>
@@ -339,6 +371,20 @@
                     <div class="comment_content-date">
                         Đã viết vào: <span>{{date("d/m/Y", strtotime($Comment->co_date_created))}}</span>
                     </div>
+                    @if($Comment->co_image != null)
+                        <?php 
+                            $pieces_2 = explode("|", $Comment->co_image);
+                            $arrayCommentImg = array();
+                            for ($i=0; $i < count($pieces_2)-1; $i++) {
+                                $arrayCommentImg = Arr::add($arrayCommentImg, $i ,$pieces_2[$i]);
+                            }
+                         ?>
+                        <div class="comment_content-image">
+                            @foreach($arrayCommentImg as $arImg)
+                                <a data-fancybox='gallery' href='{{asset("uploadUsers/".$findUser->us_code."/".$arImg)}}'> <img class='img-fluid' src='{{asset("uploadUsers/".$findUser->us_code."/".$arImg)}}' alt=''></a>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             @endforeach
             <div class="paginate">
@@ -380,11 +426,12 @@
             <div class="opSelection">
                 <div class="showImage">{{ trans('newlang.Showimage') }}</div>
                 <div class="showMap">{{ trans('newlang.Showmap') }}</div>
+                <a href="#" class="showLink">Detail Place</a>
             </div>
             <div class="imgPlace mt-4 mb-4">
             </div>
             <div id="map" class="mt-4 mb-4"></div>
-            <div class="container-fuild">
+            <div class="container">
                 <div class="row">
                     <div class="col-md-4 col-sm-6 col-12 mb-4">
                         <p class="font-weight-bold font-italic">{{ trans('newlang.TypeofPlace') }}</p>
@@ -430,6 +477,35 @@
 @stop
 @section('footer-js')  
     <script type="text/javascript">
+        function converStar(num){
+            num = parseFloat(num);
+            var roundnum = Math.round((num+0.5)*2)/2 -0.5;
+            var arr =[];
+            for(var i =5; i>0; i--){
+                for(var j = 1; j>=0;j = j-0.5){     
+                    if((roundnum - j)>=0 ){
+                        roundnum -= j;
+                        arr.push(j)
+                        break
+                    }
+                }
+            }
+            let starStsing = '';
+            arr.forEach(function(item, index){
+                if(item == 1)
+                    starStsing += '<i class="fas fa-star color_orange"></i>';
+                else if(item == 0)
+                    starStsing += '<i class="far fa-star color_orange"></i>';
+                else if(item == 0.5)
+                    starStsing += '<i class="fas fa-star-half-alt color_orange"></i>';
+            })
+            return starStsing;
+        }
+        $(".star_rating").append(converStar("{{$share->number_star}}"));
+        $(".show_star").append(converStar("{{$share->number_star}}"));
+        @if(!empty($findVotes))
+            $(".your_votes_star").append(converStar("{{$findVotes->vote_number}}"));
+        @endif
         @if(Auth::check())
             @foreach($array_user_like as $arr)
                 @if(Auth::user()->us_id == $arr)
@@ -469,15 +545,13 @@
             $("#modalLogin").modal("show");
         })
         @endif
-        $('#form_add_comment').one('submit', function(e) {
-            e.preventDefault();
+        function validateForm(){
             if($("#numberStar").val() == "")
             {
-                alert("Bạn hãy nhập số sao đánh giá!");
+                alert("Bạn hãy nhập số sao đánh giá !!");
+                return false;
             }
-            else
-                $(this).submit();
-        });
+        }
         $('#warningDelete').on('show.bs.modal', function (event) {
           let button = $(event.relatedTarget);
           let recipient = button.data('id');
@@ -528,6 +602,54 @@
             }, 500);
         }
         $(document).ready(function(){
+            @if(Auth::check())
+            $(".icon_camera").click(function(){$(".input_file_img").click();})
+            $(".input_file_img").change(function(){
+                if ($(".input_file_img")[0].files.length > 5) {
+                    alert("Bạn chỉ được upload tối đa 5 file");
+                } else {
+                    let formData = new FormData($("#temporaryForm")[0]);
+                    let $url_path = '{!! url('/') !!}';
+                    let _token = $('meta[name="csrf-token"]').attr('content');
+                    let routeTemporaryImg = $url_path+"/temporaryImg";
+                    $.ajax({
+                          url:routeTemporaryImg,
+                          method:"post",
+                          headers: { "X-CSRF-Token": _token },
+                          data:formData,
+                          processData: false,
+                          contentType: false,
+                          enctype: 'multipart/form-data',
+                          success:function(data){ 
+                            if(data.length != 0)
+                            {
+                                $(".temporary_photo").empty();
+                                data.forEach(function(item, index){
+                                    $(".temporary_photo").append(`<div class="temporary_detail_photo"><img src='${$url_path}/temporary_Img/${item}' alt=''/><div class="temporary_detail_icon" data-name="${item}"><i class="fas fa-times-circle"></i></div></div>`);
+                                })
+                            }
+                        }
+                    });
+                }
+            });
+            
+            $(".temporary_photo").on('click','.temporary_detail_icon',function(){
+                $(this).parent().remove();
+                let $url_path = '{!! url('/') !!}';
+                let _token = $('meta[name="csrf-token"]').attr('content');
+                let nameImg = $(this).data('name');
+                let routeDeleteImg = $url_path+"/temporaryDeleteImg";
+                $.ajax({
+                      url:routeDeleteImg,
+                      method:"post",
+                      headers: { "X-CSRF-Token": _token },
+                      data:{nameImg:nameImg},
+                      success:function(data){ 
+                        //
+                    }
+                });
+            });
+            @endif
             $('.slide-show-tour').slick({
                 slidesToShow: 3,
                 slidesToScroll: 2,
@@ -663,6 +785,7 @@
                                 {
                                     $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='{{ trans('newlang.locationNoPhoto') }}'></a>");
                                 }
+                                $(".showLink").attr("href",data[10]);
                                 $("#typePlace").empty();
                                 $("#typePlace").append(data[9]);
                                 $("#short").empty();

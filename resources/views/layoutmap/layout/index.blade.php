@@ -86,13 +86,6 @@
             });
         </script>
         <script type="text/javascript">
-            $("#searchTour").click(function(){
-                location.replace("{{route('searchTour')}}");
-            });
-            $("#seeFeedback").click(function(){
-                location.replace("{{route('viewShareFeedback')}}");
-            });
-
             $(".up_btn").click(function(){
                 $(".nav_more").slideUp("fast");
                 $("#wrap").css("margin-top","5em");

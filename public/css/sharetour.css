@@ -9,20 +9,26 @@
     text-align: center;
 }
 .opSelection {
+    padding: 0 7em;
     width: 100%;
     display: flex;
     text-align: center;
     margin: auto;
-    justify-content: center;
+    justify-content: space-around;
 }
-.opSelection div {
+.opSelection div,.opSelection .showLink{
+    display: block;
     padding: .6rem 2.4rem;
     border-radius: 2rem;
     color: white;
     font-weight: bold;
     font-size: 17px;
     cursor: pointer;
-    margin-right: 1rem;
+    text-decoration: none;
+}
+.showLink{
+    background: rgb(115,190,0);
+background: linear-gradient(338deg, rgba(115,190,0,1) 0%, rgba(161,255,57,1) 32%, rgba(9,255,108,1) 100%);
 }
 .opSelection .showMap{
     background: rgb(87,164,210);
@@ -32,13 +38,12 @@
     background: rgb(255,197,19);
     background: linear-gradient(90deg, rgba(255,197,19,1) 0%, rgba(252,185,70,1) 26%, rgba(232,186,84,1) 66%, rgba(218,219,14,1) 100%);
 }
-.opSelection .showMap:hover{
-    background: rgb(69,130,167);
-    background: linear-gradient(90deg, rgba(69,130,167,1) 0%, rgba(54,78,182,1) 26%, rgba(60,126,166,1) 66%, rgba(8,142,173,1) 100%);
+.opSelection .showMap:hover,.showLink:hover{
+    text-decoration: none;
+    opacity: .8;
 }
 .opSelection .showImage:hover{
-    background: rgb(161,167,69);
-    background: linear-gradient(90deg, rgba(161,167,69,1) 0%, rgba(182,157,54,1) 26%, rgba(166,142,60,1) 66%, rgba(173,163,8,1) 100%);
+    opacity: .8;
 }
 #map {width: 90% !important;margin: auto;height: 25rem !important}
 #detail_location span,#startLocation{cursor: pointer;}

@@ -18,7 +18,34 @@
         use App\Models\Destination;
         use App\Models\Language;
         use App\Models\ShareTour;
+        use Illuminate\Support\Arr;
     ?> 
+    <script type="text/javascript">
+        function converStar(num){
+            num = parseFloat(num);
+            var roundnum = Math.round((num+0.5)*2)/2 -0.5;
+            var arr =[];
+            for(var i =5; i>0; i--){
+                for(var j = 1; j>=0;j = j-0.5){     
+                    if((roundnum - j)>=0 ){
+                        roundnum -= j;
+                        arr.push(j)
+                        break
+                    }
+                }
+            }
+            let starStsing = '';
+            arr.forEach(function(item, index){
+                if(item == 1)
+                    starStsing += '<i class="fas fa-star text-warning"></i>';
+                else if(item == 0)
+                    starStsing += '<i class="far fa-star text-warning"></i>';
+                else if(item == 0.5)
+                    starStsing += '<i class="fas fa-star-half-alt text-warning"></i>';
+            })
+            return starStsing;
+        }
+    </script>
 	<section class="page-section portfolio" id="portfolio" style="margin-bottom: 10rem;">
         <div class="container">
             <!-- Portfolio Grid Items-->
@@ -44,6 +71,52 @@
                     </div>
                 </div>
                 <!-- Portfolio Item 1-->
+                @if(Auth::check())
+                @if(count($arrayTourSeen) > 0)
+                <div class="col-md-12 col-lg-12 mb-5 slide-show" id="slideshow_seen">
+                    <span class="title_start_tour text-uppercase mt-5">Tours you have seen</span>
+                    <div class="slide-show-tour_seen">
+                        @foreach($arrayTourSeen as $arr )
+                        <?php   $findShare = ShareTour::where("sh_id",$arr)->first();
+                                $findRoute = Route::select('to_name','user_like')->where("to_id",$findShare->sh_to_id)->first();
+                                $pieces = explode("|", $findRoute->user_like);
+                                $array = array();
+                                for ($i=0; $i < count($pieces)-1; $i++) {
+                                    $array = Arr::add($array, $i ,$pieces[$i]);
+                                }
+                         ?>
+                        <a href="{{route('viewtour',$arr)}}" class="hightly_div_child">
+                            <div class="like_tour" data-id="{{$arr}}">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            @foreach($array as $ar)
+                                @if(Auth::user()->us_id == $ar)
+                                    <style>
+                                        .like_tour[data-id="{{$arr}}"]{background: rgba(255,255,255,0.9);}
+                                        .like_tour[data-id="{{$arr}}"] svg{color: #ff0a0a;}
+                                    </style>
+                                @endif
+                            @endforeach
+                            <p class="tourContent">
+                                <span class="nameTour">{{$findRoute->to_name}}</span>
+                                <span id="show_starSeen_{{$arr}}"></span>
+                                <span>- {{$findShare->numberReviews}} votes</span>
+                            </p>
+                            <script type="text/javascript">
+                                $("#show_starSeen_{{$arr}}").append(converStar("{{number_format((float)$findShare->number_star, 1, '.', '')}}"));
+                            </script>
+                            @if($findShare->image != "")
+                                <img src="{{asset($findShare->image)}}" alt="" class="img_open_model{{$findShare->sh_id}}">
+                            @else
+                                <img src="{{asset('imgPlace/empty.png')}}" alt="" title="location with no photo" class="img_open_model{{$findShare->sh_id}}"/>
+                            @endif
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+                @endif
+                <!-- Portfolio Item 2-->
                 <div class="col-md-12 col-lg-12 mb-5" id="starttour">
                     <span class="title_start_tour text-uppercase">{{ trans('messages.createTourTitle') }}</span>
                     <div class="start_tour">
@@ -74,7 +147,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- Portfolio Item 2-->
+                <!-- Portfolio Item 3-->
                 <div class="col-md-12 col-lg-12 mb-5 previous-tour" id="previoustour">
                     <span class="title_start_tour text-uppercase mt-5">{{ trans('messages.PREVIOUSTOURS') }}</span>
                     <div class="start_tour">
@@ -107,7 +180,7 @@
                     </div>
                 </div>
                 @if(Auth::check())
-                <!-- Portfolio Item 3-->
+                <!-- Portfolio Item 4-->
                 <div class="col-md-12 col-lg-12 mb-5 tour_you_like" id="tourYouLike">
                     <span class="title_start_tour text-uppercase mt-5">Tour you like</span>
                     <div class="start_tour">
@@ -134,7 +207,7 @@
                     </div>
                 </div>
                 @endif
-                <!-- Portfolio Item 4-->
+                <!-- Portfolio Item 5-->
                 <div class="col-md-12 col-lg-12 mb-5 search-tour" id="searchtour">
                     <span class="title_start_tour text-uppercase mt-5">{{ trans('messages.SEARCHTOURS') }}</span>
                     <div class="start_tour">
@@ -160,7 +233,7 @@
                         </div>
                     </div>
                 </div>  
-                <!-- Portfolio Item 5-->
+                <!-- Portfolio Item 6-->
                 <div class="col-md-12 col-lg-12 mb-5 slide-show" id="slideshow">
                     <span class="title_start_tour text-uppercase mt-5">{{ trans('messages.HIGHLIGHTS_TOUR') }}</span>
                     <div class="slide-show-tour">
@@ -169,8 +242,12 @@
                         <a href="{{route('viewtour',$value->sh_id)}}" class="hightly_div_child">
                             <p class="tourContent">
                                 <span class="nameTour">{{$route->to_name}}</span>
-                                {{$value->number_star}}<i class="fas fa-star text-warning"></i> - {{$value->numberReviews}} votes
+                                <span id="show_star_{{$value->sh_id}}"></span>
+                                <span>- {{$value->numberReviews}} votes</span>
                             </p>
+                            <script type="text/javascript">
+                                $("#show_star_{{$value->sh_id}}").append(converStar("{{number_format((float)$value->number_star, 1, '.', '')}}"));
+                            </script>
                             @if($value->image != "")
                                 <img src="{{asset($value->image)}}" alt="" class="img_open_model{{$value->sh_id}}">
                             @else
@@ -305,6 +382,31 @@
 	<!-- map -->
     <script type="text/javascript">
         $(document).ready(function(){
+            $(".like_tour").click(function(e){
+                e.preventDefault();
+                let $url_path = '{!! url('/') !!}';
+                let _token = $('meta[name="csrf-token"]').attr('content');
+                let routeChangeLike = $url_path+"/changeLikeTour";
+                let shareId = $(this).data('id');
+                $.ajax({
+                      url:routeChangeLike,
+                      method:"post",
+                      data:{_token:_token,shareId:shareId},
+                      success:function(data){ 
+                        console.log(data[0])
+                        if(data[0] == 1)
+                        {
+                            $(`.like_tour[data-id="${shareId}"]`).find('svg').css("color","#ff0a0a");
+                            $(`.like_tour[data-id="${shareId}"]`).css("background-color","rgba(255,255,255,0.9)");
+                        }
+                        if(data[0] == 2)
+                        {
+                            $(`.like_tour[data-id="${shareId}"]`).find('svg').css("color","white");
+                            $(`.like_tour[data-id="${shareId}"]`).css("background-color","rgba(0,0,0,0.6)");
+                        }
+                    }
+                });
+            })
             $('.slide-show-tour').slick({
                 slidesToShow: 3,
                 slidesToScroll: 2,
@@ -317,39 +419,42 @@
                 prevArrow: '<button type="button" class="slick-prev"><i class="fas fa-caret-left"></i></button>',
                 nextArrow: '<button type="button" class="slick-next"><i class="fas fa-caret-right"></i></button>',
             });
+            $('.slide-show-tour_seen').slick({
+                slidesToShow: 3,
+                slidesToScroll: 2,
+                autoplay: true,
+                fade: false,
+                pauseOnHover: false,
+                prevArrow: '<button type="button" class="slick-prev slide-seem"><i class="fas fa-caret-left"></i></button>',
+                nextArrow: '<button type="button" class="slick-next slide-seem"><i class="fas fa-caret-right"></i></button>',
+            });
+            
         });
         window.addEventListener("scroll", function() {
-          var elementTarget = document.getElementById("search_title");
-          if (window.scrollY > (elementTarget.offsetTop + 20)) {
-              $("#starttour").css("transform",'translateX(0)');
-          }
-          var starttour = document.getElementById("starttour");
-          if (window.scrollY > (starttour.offsetTop + 20)) {
-              $(".previous-tour").css("transform",'translateX(0)');
-          }
-          @if(Auth::check())
-            var previoustour = document.getElementById("previoustour");
-            if (window.scrollY > (previoustour.offsetTop + 20)) {
-                $(".tour_you_like").css("transform",'translateX(0)');
-            }
-            var tourYouLike = document.getElementById("tourYouLike");
-            if (window.scrollY > (tourYouLike.offsetTop + 20)) {
-                $(".search-tour").css("transform",'translateX(0)');
-            }
-            var searchtour = document.getElementById("searchtour");
-            if (window.scrollY > (searchtour.offsetTop + 20)) {
-                $(".slide-show").css("transform",'translateX(0)');
-            }
-          @else
-            var previoustour = document.getElementById("previoustour");
-            if (window.scrollY > (previoustour.offsetTop + 20)) {
-                $(".search-tour").css("transform",'translateX(0)');
-            }
-            var searchtour = document.getElementById("searchtour");
-            if (window.scrollY > (searchtour.offsetTop + 20)) {
-                $(".slide-show").css("transform",'translateX(0)');
-            }
-          @endif
+            // var elementTarget = document.getElementById("search_title");
+            // if (window.scrollY > (elementTarget.offsetTop + 20)) {
+            //     $("#slideshow_seen").css("transform",'translateX(0)');
+            // }
+            // var slideshow_seen = document.getElementById("slideshow_seen");
+            // if (window.scrollY > (starttour.offsetTop + 20)) {
+            //     $("#starttour").css("transform",'translateX(0)');
+            // }
+            // var starttour = document.getElementById("starttour");
+            // if (window.scrollY > (starttour.offsetTop + 20)) {
+            //     $(".previous-tour").css("transform",'translateX(0)');
+            // }
+            // var previoustour = document.getElementById("previoustour");
+            // if (window.scrollY > (previoustour.offsetTop + 20)) {
+            //     $(".tour_you_like").css("transform",'translateX(0)');
+            // }
+            // var tourYouLike = document.getElementById("tourYouLike");
+            // if (window.scrollY > (tourYouLike.offsetTop + 20)) {
+            //     $(".search-tour").css("transform",'translateX(0)');
+            // }
+            // var searchtour = document.getElementById("searchtour");
+            // if (window.scrollY > (searchtour.offsetTop + 20)) {
+            //     $(".slide-show").css("transform",'translateX(0)');
+            // }
         });
     	$(document).ready(function(){
 			$(".tour").dblclick(function(){

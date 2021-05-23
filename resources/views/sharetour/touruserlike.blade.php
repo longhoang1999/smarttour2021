@@ -56,8 +56,8 @@
                             <th>{{ trans("admin.Order") }}</th>
                             <th>ID</th>
                             <th>{{ trans('newlang.Tourname') }}</th>
-                            <th>{{ trans('newlang.startLocation') }}</th>
-                            <th>{{ trans('newlang.detailPlaces') }}</th>
+                            <!-- <th>{{ trans('newlang.startLocation') }}</th>
+                            <th>{{ trans('newlang.detailPlaces') }}</th> -->
                             <th>{{ trans('newlang.Star') }}</th>
                             <th>{{ trans('newlang.totalTime') }}</th>
                         </tr>
@@ -116,11 +116,12 @@
           <div class="opSelection">
               <div class="showImage">{{ trans('newlang.Showimage') }}</div>
               <div class="showMap">{{ trans('newlang.Showmap') }}</div>
+              <a href="#" class="showLink">Detail Place</a>
           </div>
           <div class="imgPlace mt-4 mb-4">
           </div>
           <div id="map" class="mt-4 mb-4"></div>
-          <div class="container-fuild">
+          <div class="container">
               <div class="row">
                   <div class="col-md-4 col-sm-6 col-12 mb-4">
                       <p class="font-weight-bold font-italic">{{ trans('newlang.TypeofPlace') }}</p>
@@ -231,8 +232,8 @@
               { data: 'stt', name: 'stt' },
               { data: 'to_id', name: 'to_id' }, 
                 { data: 'to_name', name: 'to_name' },
-                { data: 'startLocat', name: 'startLocat' },
-                { data: 'detailPlace', name: 'detailPlace' },
+                // { data: 'startLocat', name: 'startLocat' },
+                // { data: 'detailPlace', name: 'detailPlace' },
                 { data: 'Star', name: 'Star' },
                 { data: 'totalTime', name: 'totalTime' },
                 ]
@@ -338,6 +339,7 @@
                     {
                         $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='{{ trans('newlang.locationNoPhoto') }}'></a>");
                     }
+                    $(".showLink").attr("href",data[10]);
                     $("#typePlace").empty();
                     $("#typePlace").append(data[9]);
                     $("#short").empty();

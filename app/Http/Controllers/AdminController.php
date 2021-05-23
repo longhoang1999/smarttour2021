@@ -408,13 +408,14 @@ class AdminController extends Controller
     {
         $destination = Language::where("language","vn")->get();
             foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type','de_default')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type','de_default','de_child_img')->where("de_remove",$value->des_id)->first();
                 $value["de_remove"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_duration"] = $des->de_duration;
                 $value["de_type"] = $des->de_type;
                 $value["de_default"] = $des->de_default;
+                $value["de_child_img"] = $des->de_child_img;
             }
         return DataTables::of($destination)
             ->addColumn(
@@ -442,6 +443,18 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'uploadImg',
+                function ($destination) {
+                    $array = array();
+                    $pieces = explode("|", $destination->de_child_img);
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $uploadImg = '<a href="'.route('admin.childImg',$destination->de_remove).'"><i class="fas fa-cloud-upload-alt"> ('.count($array).')</i><span>Upload Img</span></a>';
+                    return $uploadImg;
+                }
+            )
+            ->addColumn(
                 'actions',
                 function ($destination) {
                     $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
@@ -449,7 +462,7 @@ class AdminController extends Controller
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','duration','actions','status'])
+            ->rawColumns(['stt','duration','actions','status','uploadImg'])
             ->make(true);
         
     }
@@ -697,7 +710,8 @@ class AdminController extends Controller
                 'actions',
                 function ($destination) {
                     $actions = '<button class="btn btn-block btn-info btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDetail">'.trans("admin.Detail").'</button>';
-                    $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
+                    // tạm ẩn
+                    // $actions = $actions.'<button class="btn btn-block btn-danger btn-sm" data-remove="'.$destination->de_remove.'" data-toggle="modal" data-target="#modalDelete">'.trans("admin.Remove").'</button>';
                     return $actions;
                 }
             )
@@ -1006,13 +1020,14 @@ class AdminController extends Controller
                 $destination = Language::whereIn("des_id",$array)->where("language","vn")->get();
             }
             foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type','de_default')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type','de_default','de_child_img')->where("de_remove",$value->des_id)->first();
                 $value["de_remove"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_duration"] = $des->de_duration;
                 $value["de_type"] = $des->de_type;
                 $value["de_default"] = $des->de_default;
+                $value["de_child_img"] = $des->de_child_img;
             }
         }
         else
@@ -1035,6 +1050,18 @@ class AdminController extends Controller
                 }
             )
             ->addColumn(
+                'uploadImg',
+                function ($destination) {
+                    $array = array();
+                    $pieces = explode("|", $destination->de_child_img);
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $uploadImg = '<a href="'.route('admin.childImg',$destination->de_remove).'"><i class="fas fa-cloud-upload-alt"> ('.count($array).')</i><span>Upload Img</span></a>';
+                    return $uploadImg;
+                }
+            )
+            ->addColumn(
                 'status',
                 function ($destination) {
                     $findType = TypePlace::where("id",$destination->de_type)->first();
@@ -1044,6 +1071,7 @@ class AdminController extends Controller
                         return '<span class="badge badge-warning">User</span>';
                 }
             )
+
             ->addColumn(
                 'actions',
                 function ($destination) {
@@ -1052,7 +1080,7 @@ class AdminController extends Controller
                     return $actions;
                 }
             )
-            ->rawColumns(['stt','duration','actions','status'])
+            ->rawColumns(['stt','duration','actions','status','uploadImg'])
             ->make(true);
     }
     public function placeDelete($remove)
@@ -1109,13 +1137,14 @@ class AdminController extends Controller
     {
         $destination = Language::where("language","en")->get();
             foreach ($destination as $value) {
-                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type','de_default')->where("de_remove",$value->des_id)->first();
+                $des = Destination::select('de_remove','de_lat','de_lng','de_duration','de_type','de_default','de_child_img')->where("de_remove",$value->des_id)->first();
                 $value["de_remove"] = $des->de_remove;
                 $value["de_lat"] = $des->de_lat;
                 $value["de_lng"] = $des->de_lng;
                 $value["de_duration"] = $des->de_duration;
                 $value["de_type"] = $des->de_type;
                 $value["de_default"] = $des->de_default;
+                $value["de_child_img"] = $des->de_child_img;
             }
         return DataTables::of($destination)
         	->addColumn(
@@ -1145,7 +1174,12 @@ class AdminController extends Controller
             ->addColumn(
                 'uploadImg',
                 function ($destination) {
-                    $uploadImg = '<a href="#"><i class="fa-2x fas fa-cloud-upload-alt text-primary"></i></a>';
+                    $array = array();
+                    $pieces = explode("|", $destination->de_child_img);
+                    for ($i=0; $i < count($pieces)-1; $i++) {
+                        $array = Arr::add($array, $i ,$pieces[$i]);
+                    }
+                    $uploadImg = '<a href="'.route('admin.childImg',$destination->de_remove).'"><i class="fas fa-cloud-upload-alt"> ('.count($array).')</i><span>Upload Img</span></a>';
                     return $uploadImg;
                 }
             )
@@ -2316,5 +2350,75 @@ class AdminController extends Controller
             $findFeedback->fb_share = "0";
         $findFeedback->save();
         return $status = "success";
+    }
+    public function childImg($idPlace)
+    {
+        $user = Auth::user();
+        $findDes = Destination::where("de_remove",$idPlace)->first();
+        $array = array();
+        $pieces = explode("|", $findDes->de_child_img);
+        for ($i=0; $i < count($pieces)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces[$i]);
+        }
+        if($findDes->de_default == 0)
+        {
+            if(Session::has('website_language') && Session::get('website_language') == "vi")
+                $namePlace = Language::select("de_name")->where("des_id",$idPlace)->where("language","vn")->first()->de_name;
+            else
+                $namePlace = Language::select("de_name")->where("des_id",$idPlace)->where("language","en")->first()->de_name;
+        }
+        else
+            $namePlace = $findDes->de_image;
+
+        return view('admin.childimg',['us_fullName'=>$user->us_fullName,'idPlace'=>$idPlace,'array'=>$array,'namePlace'=>$namePlace]);
+    }
+    public function postChildImg(Request $req,$idPlace)
+    {
+        $this->validate($req,[
+            'file'=>'required|mimes:jpeg,png,jpg'
+        ]);
+        $findDes = Destination::where("de_remove",$idPlace)->first();
+        if(!empty($findDes))
+        {
+            $file_temp = $req->file('file');
+            $extension = $file_temp->getClientOriginalExtension();
+            $noExtension = time().'_'.rand(10,10000);
+            $picName = $noExtension.'.'.$extension;
+            $findDes->de_child_img = $findDes->de_child_img.$picName."|";
+            $findDes->save();
+            $file_temp->move(public_path('child_img_place'), $picName);
+        }
+    }
+    public function reloadChildImg(Request $req)
+    {
+        $idPlace = $req->idPlace;
+        $findDes = Destination::where("de_remove",$idPlace)->first();
+        $array = array();
+        $pieces = explode("|", $findDes->de_child_img);
+        for ($i=0; $i < count($pieces)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces[$i]);
+        }
+        return $array;
+    }
+    public function deleteImage(Request $req)
+    {
+        $findDes = Destination::where("de_remove",$req->idPlace)->first();
+        $array = array();
+        $pieces = explode("|", $findDes->de_child_img);
+        for ($i=0; $i < count($pieces)-1; $i++) {
+            $array = Arr::add($array, $i ,$pieces[$i]);
+        }
+        $reloadImg = '';
+        $nameImg = '';
+        foreach ($array as $arr) {
+            if($arr == $req->nameImg)
+                $nameImg = $arr;
+            else
+                $reloadImg = $reloadImg.$arr."|";
+        }
+        $findDes->de_child_img = $reloadImg;
+        $findDes->save();
+        File::delete(public_path('/child_img_place/'.$nameImg));
+        return;
     }
 }

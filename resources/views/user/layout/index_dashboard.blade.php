@@ -86,13 +86,6 @@
             $(document).ready(function(){
                 $("section").show(500);
             });
-            $("#searchTour").click(function(){
-                location.replace("{{route('searchTour')}}");
-            });
-            $("#seeFeedback").click(function(){
-                location.replace("{{route('viewShareFeedback')}}");
-            });
-
             $(".up_btn").click(function(){
                 $(".nav_more").slideUp("fast");
                 $(".show_btn").show();

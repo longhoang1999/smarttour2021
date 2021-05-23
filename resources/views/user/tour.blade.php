@@ -15,7 +15,33 @@
 	</style>
 @stop
 @section('content')
-	<?php use App\Models\Destination; use App\Models\Language;?>   
+	<?php use App\Models\Destination; use App\Models\Language;?>  
+    <script type="text/javascript">
+        function converStar(num){
+            num = parseFloat(num);
+            var roundnum = Math.round((num+0.5)*2)/2 -0.5;
+            var arr =[];
+            for(var i =5; i>0; i--){
+                for(var j = 1; j>=0;j = j-0.5){     
+                    if((roundnum - j)>=0 ){
+                        roundnum -= j;
+                        arr.push(j)
+                        break
+                    }
+                }
+            }
+            let starStsing = '';
+            arr.forEach(function(item, index){
+                if(item == 1)
+                    starStsing += '<i class="fas fa-star text-warning"></i>';
+                else if(item == 0)
+                    starStsing += '<i class="far fa-star text-warning"></i>';
+                else if(item == 0.5)
+                    starStsing += '<i class="fas fa-star-half-alt text-warning"></i>';
+            })
+            return starStsing;
+        }
+    </script> 
 	<section class="page-section portfolio" id="introduce">
         <div class="container">
             <!-- About Section Heading-->
@@ -155,7 +181,7 @@
                             <script type="text/javascript">
                                 duration = moment.duration({{$total}}, 'minutes');
                                 durationString = duration.days() + 'd ' + duration.hours() + 'h ' + duration.minutes() + 'm';
-                                console.log(durationString);
+                                //console.log(durationString);
                                 $("#modal_{{$value->sh_id}} .total_time").html(durationString);
                             </script>
                             <!-- /endis -->
@@ -188,7 +214,7 @@
                                 <p class="font-weight-bold font-italic">{{ trans('messages.avgStar') }}</p>
                             </div>
                             <div class="col-md-8 col-sm-6 col-12">
-                                <p>{{$value->number_star}} <i class="fas fa-star text-warning"></i></p>
+                                <p id="show_star_{{$value->sh_id}}"></p>
                             </div>
                             <div class="col-md-4 col-sm-6 col-12">
                                 <p class="font-weight-bold font-italic">{{ trans('messages.numRating') }}</p>
@@ -199,11 +225,17 @@
                             <div class="col-md-4 col-sm-6 col-12">
                                 <p class="font-weight-bold font-italic">{{ trans('messages.Yourvote') }}: </p>
                             </div>
+                            <script type="text/javascript">
+                                $("#show_star_{{$value->sh_id}}").append(converStar("{{number_format((float)$value->number_star, 1, '.', '')}}"));
+                            </script>
                             <?php $findVotes =  Uservotes::where("sh_id",$value->sh_id)->where("us_id",Auth::user()->us_id)->first(); ?>
                             @if(!empty($findVotes))
                                 <div class="col-md-8 col-sm-6 col-12">
-                                    <p>{{$findVotes->vote_number}} <i class="fas fa-star text-warning"></i></p>
+                                    <p id="findVotes_{{$value->sh_id}}"></p>
                                 </div>
+                                <script type="text/javascript">
+                                    $("#findVotes_{{$value->sh_id}}").append(converStar("{{number_format((float)$findVotes->vote_number, 1, '.', '')}}"));
+                                </script>
                             @else
                                 <div class="col-md-8 col-sm-6 col-12">
                                     <span class="badge badge-success">{{ trans('messages.dontHavereviews') }}</span>

@@ -8,6 +8,7 @@ use App\Models\Language;
 use App\Models\Destination;
 use App\Models\TypePlace;
 use App\Models\Langtype;
+use App\Models\RatingPlace;
 use Illuminate\Support\Arr;
 use Session;
 use DB;
@@ -63,7 +64,24 @@ class MapDirectController {
 		            $array_detag = Arr::add($array_detag, $i ,$pieces[$i]);
 		        }
 			}
-			$tmp  = (object) array('de_name' => $value->de_name,'location' =>$latlng,'de_duration'=>$value->de_duration,'de_link'=>$value->de_link,'de_description'=>$value->de_description,'de_cost'=>$value->de_cost,'de_img'=>$value->de_image,'de_shortdes'=>$value->de_shortdes,'de_tag'=>$array_detag);
+			// ratingplace
+			$array_ratez_votes = array();
+			$findRatingPlace = RatingPlace::where("ra_des_id",$value->des_id)->get();
+			$sumStar = 0;
+			foreach ($findRatingPlace as $RatingPlace) {
+				$sumStar = $sumStar + $RatingPlace->ra_votes;
+			}
+			if($findRatingPlace->count() > 0)
+			{
+				$avg = $sumStar / $findRatingPlace->count();
+				array_push($array_ratez_votes, number_format((float)$avg, 1, '.', ''), $findRatingPlace->count());
+			}
+			else
+			{
+				array_push($array_ratez_votes, 0 ,$findRatingPlace->count());
+			}
+			//
+			$tmp  = (object) array('de_name' => $value->de_name,'location' =>$latlng,'de_duration'=>$value->de_duration,'de_link'=>$value->de_link,'de_description'=>$value->de_description,'de_cost'=>$value->de_cost,'de_img'=>$value->de_image,'de_shortdes'=>$value->de_shortdes,'de_tag'=>$array_detag,'rate_votes'=>$array_ratez_votes);
 			$des =   [$value->de_id,$tmp];
 			array_push($destination,$des);
 		}
