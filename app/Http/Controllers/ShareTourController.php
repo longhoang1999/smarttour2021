@@ -315,6 +315,7 @@ class ShareTourController extends Controller
 	        	$short = $lang->de_shortdes;
 	        	$description = $lang->de_description;
                 $type = $langType->nametype;
+                $de_default = $des->de_default;
 	        }
 	        else
 	        {
@@ -328,6 +329,7 @@ class ShareTourController extends Controller
 	        	$short = $lang->de_shortdes;
 	        	$description = $lang->de_description;
                 $type = $langType->nametype;
+                $de_default = $des->de_default;
 	        }
 	    }
 	    else
@@ -343,6 +345,7 @@ class ShareTourController extends Controller
         	$short = $checkDes->de_shortdes;
         	$description = $checkDes->de_description;
             $type = $langType->nametype;
+            $de_default = $checkDes->de_default;
 	    }
 	    if($checkDes->de_image != "")
 	    {
@@ -353,7 +356,7 @@ class ShareTourController extends Controller
 	    	$image="";
 	    }
         $linkDetail = route('showDetailPlace',$req->des_id);
-	    return [$de_lat,$de_lng,$de_name,$image,$short,$description,$checkDes->de_duration,$checkDes->de_map,$checkDes->de_link,$type,$linkDetail];
+	    return [$de_lat,$de_lng,$de_name,$image,$short,$description,$checkDes->de_duration,$checkDes->de_map,$checkDes->de_link,$type,$linkDetail,$de_default];
     }
     // public function loadmore($type)
     // {
@@ -2174,6 +2177,30 @@ class ShareTourController extends Controller
                 }
             }
         }
+        // total cost
+        if(Session::has('website_language') && Session::get('website_language') == "vi")
+        {
+            $pieces_cost = explode("|", $route->to_cost);
+            $totalCost = 0;
+            for ($i=0; $i < count($pieces_cost)-1; $i++) {
+                $totalCost = $totalCost + intval($pieces_cost[$i]);
+            }
+            if($route->to_currency == "2")
+                $totalCost = $totalCost*23000;
+            $totalCost = $totalCost." VNĐ";
+        }
+        else
+        {
+            $pieces_cost = explode("|", $route->to_cost);
+            $totalCost = 0;
+            for ($i=0; $i < count($pieces_cost)-1; $i++) {
+                $totalCost = $totalCost + intval($pieces_cost[$i]);
+            }
+            if($route->to_currency == "1")
+                $totalCost = round($totalCost/23000, 2);
+            $totalCost = $totalCost." USD";
+        }
+        
         // start locat
         if($route->to_startLocat != "")
         {
@@ -2189,7 +2216,8 @@ class ShareTourController extends Controller
         }
         else if($req->status == "noshare")
             $link_view_tour = route('user.editTour',[$route->to_id]);
-
+        //tour_creator
+        $find_tour_creator = User::select('us_fullName')->where("us_id",$route->to_id_user)->first();
         return [$arrayImg,
             $arrayLabel,
             $route->to_name,
@@ -2199,7 +2227,9 @@ class ShareTourController extends Controller
             date('d/m/Y h:i a', strtotime($route->to_endtime)),
             date('d/m/Y', strtotime($route->to_startDay)),
             $link_view_tour,
-            Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime))
+            Carbon::parse($route->to_endtime)->diffInMinutes(Carbon::parse($route->to_starttime)),
+            $totalCost,
+            $find_tour_creator->us_fullName,
         ];
     }
     public function getinforTouredit(Request $req)

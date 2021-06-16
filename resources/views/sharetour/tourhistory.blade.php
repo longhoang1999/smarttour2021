@@ -92,6 +92,10 @@
                   <span id="end_time"></span></p>
                   <p><span class="font-weight-bold font-italic">{{ trans('newlang.totalTourTime') }}: </span>
                   <span id="total_time"></span></p>
+                  <p><span class="font-weight-bold font-italic">{{ trans('newlang.TotalCost') }}: </span>
+                  <span id="total_cost"></span></p>
+                  <p><span class="font-weight-bold font-italic">Tour creator: </span>
+                  <span id="tour_creator"></span></p>
                   <p><span class="font-weight-bold font-italic">{{ trans('newlang.dateCreated') }}: </span>
                   <span id="date_created"></span></p>
               </div>
@@ -259,11 +263,19 @@
                     // set up slide show
                     $('.autoplay').slick('unslick');
                     $(".tour_infor_left").empty();
-                    let i = 0;
-                    data[0].forEach(myFunction);
-                    function myFunction(item, index) {
-                       $(".tour_infor_left").append('<div class="div_parents"><p>'+data[1][i]+'</p><a data-fancybox="gallery" href='+item+'><img class="img-fluid" src='+item+' alt="" style="width: 100%"></a></div>');
-                       i++;
+
+                    if(data[0].length > 0)
+                    {
+                      let i = 0;
+                      data[0].forEach(myFunction);
+                      function myFunction(item, index) {
+                         $(".tour_infor_left").append('<div class="div_parents"><p>'+data[1][i]+'</p><a data-fancybox="gallery" href='+item+'><img class="img-fluid" src='+item+' alt="" style="width: 100%"></a></div>');
+                         i++;
+                      }
+                    }
+                    else
+                    {
+                      $(".tour_infor_left").append('<div class="div_empty_img"><span>TOUR ADVICE</span><div>')
                     }
                     //start slide show
                     $('.autoplay').slick(getSliderSettings());
@@ -292,6 +304,9 @@
                     var duration = moment.duration(data[9], 'minutes');
                     var durationString = duration.days() + 'd ' + duration.hours() + 'h ' + duration.minutes() + 'm';
                     $("#total_time").append(durationString);
+                    $("#total_cost").text(data[10].toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                    $("#tour_creator").empty();
+                    $("#tour_creator").append(data[11]);
                  }
             });
           });
@@ -316,7 +331,6 @@
               });
             });
             function showdetail(data_id){
-              $("#modalDetailPlace").modal("show");
               let $url_path = '{!! url('/') !!}';
               let _token = $('meta[name="csrf-token"]').attr('content');
               let routeGetCooor = $url_path+"/takeInforPlace";
@@ -326,6 +340,13 @@
                   method:"post",
                   data:{_token:_token,des_id:des_id},
                   success:function(data){ 
+                    if(data[11] == 0)
+                    {
+                        $(".showLink").show();
+                        $(".showLink").attr("href",data[10]);
+                    }
+                    else if(data[11] == 1)
+                        $(".showLink").hide();
                     $("#exampleModalLabel").html(data[2]);
                     $(".imgPlace").empty();
                     if(data[3] != "")
@@ -336,7 +357,6 @@
                     {
                         $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='{{ trans('newlang.locationNoPhoto') }}'></a>");
                     }
-                    $(".showLink").attr("href",data[10]);
                     $("#typePlace").empty();
                     $("#typePlace").append(data[9]);
                     $("#short").empty();
@@ -368,6 +388,7 @@
                     geocodeAddress(geocoder,map,data[2],add);
                   }
                 });
+                $("#modalDetailPlace").modal("show");
             }
             function deleteMarker()
             {

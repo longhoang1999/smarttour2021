@@ -164,9 +164,7 @@
 							Thành cổ Sơn Tây
 						</a>
 						<div class="star-votes">
-							<span id="star">
-								<!-- none: far  -->
-								<!-- has value: fas -->
+							<span id="detail-star-votes">
 								<i class="fas fa-star text-warning"></i>
 								<i class="fas fa-star text-warning"></i>
 								<i class="fas fa-star text-warning"></i>
@@ -177,7 +175,7 @@
 								2.290 votes
 							</span>
 						</div>
-						<div>
+						<div id='location-tag'>
 							<a class="ui tag label">Cổ kính</a>
 							<a class="ui red tag label">Lịch sử</a>
 							<a class="ui teal tag label">Hoài cổ</a>
@@ -219,7 +217,7 @@
 				    <div class="timeline__list__content ">
 				    	<div class="timeline__list__content__title" ><a href="#" >Hoof hoanf kieemsHoof hoanf kieemsHoof hoanf kieems</a></div>
 				    	<div class="star-votes">
-								<span id="star">
+								<span>
 								
 									<i class="fas fa-star text-warning"></i>
 									<i class="fas fa-star text-warning"></i>
@@ -720,8 +718,6 @@ function initMap(){
 	function setEvent(){
 		let todayDate = new Date();
 		todayDate.setHours(7,0,0);
-		let da = new Date();
-		da.setHours(19,0,0);
 		flatpickr('#startDate', {
 		  enableTime: true,
 			minDate: "today",
@@ -734,11 +730,12 @@ function initMap(){
 		  dateFormat: "d/m/Y h:iK",
 		  "plugins": [new rangePlugin({ input: "#endDate"})]
 		});
+
 		// Event click on map to choose location
 		map.addListener('click',(evt) => {
 			$('#add-waypoints').show();
 			//reset existing marker on map
-			if(Object.entries(newMarkOnClk).length){
+			if(!isEmptyObj(newMarkOnClk)){
 				newMarkOnClk.marker.setMap(null);
 				deleteMarker(newMarkOnClk.id);
 				newMarkOnClk = {};
@@ -771,8 +768,9 @@ function initMap(){
 			$('#start-locat').attr('data-start',1);
 			closeStart();
 		});	
+
 		$('#get-route').click((e)=>{
-			if((Object.entries(startLocat).length && locationID.length == 0) || (!Object.entries(startLocat).length && locationID.length<=1)){
+			if((!isEmptyObj(startLocat) && locationID.length == 0) || (isEmptyObj(startLocat).length && locationID.length<=1)){
 				alert("Please choose at least 2 locations");
 				return;
 			} else {
@@ -782,8 +780,30 @@ function initMap(){
 				$('#time-cost-picker').hide();
 				// e.currentTarget.className.replace("loading", "");
 				// e.currentTarget.className += ' loading';
-				if((Object.entries(startLocat).length && locationID.length == 1) || (!Object.entries(startLocat).length && locationID.length ==2) || isopt == 0 ){
-					drawRoutes();
+				if( (!isEmptyObj(startLocat) && locationID.length == 1) || 
+					(isEmptyObj(startLocat) && locationID.length ==2) ){
+					 // || isopt == 0 ){
+					let totalTime = 0;
+					let totalCost = 0;
+
+					if(!isEmptyObj(startLocat) && locationID.length == 1){
+						totalTime += locationdata.get(startlocat.id).de_duration
+						totalTime += locationdata.get(locationID[0]).de_duration
+
+						totalCost += locationdata.get(startlocat.id).de_cost
+						totalCost += locationdata.get(locationID[0]).de_cost
+					}
+
+					if(isEmptyObj(startLocat) && locationID.length ==2){
+						totalTime += locationdata.get(locationID[0]).de_duration
+						totalTime += locationdata.get(locationID[1]).de_duration
+
+						totalCost += locationdata.get(locationID[0]).de_cost
+						totalCost += locationdata.get(locationID[1]).de_cost
+					}
+
+					timeCostCheck(totalTime,totalCost,'notOptimize')
+
 				}
 				else{
 					setOption();
@@ -827,6 +847,7 @@ function initMap(){
           	$(".amount-text").text($("#amount").val().toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")+" "+$(this).val());
           }
         });
+
 		$('#clear_mark').click(()=>{
 			 if(nearMarks.length){
 			 	nearMarks.forEach(ele=>ele.setMap(null));
@@ -837,6 +858,7 @@ function initMap(){
 			 $('.map-marker-label[value="nearByPlace"]').remove();
 
 		})
+
 		resetAllHTML();
 	}
 	
@@ -879,11 +901,11 @@ function initMap(){
 				});
 			}
 
-			if(Object.entries(newMarkOnClk).length){
+			if(!isEmptyObj(newMarkOnClk)){
 				newMarkOnClk.marker.setMap(null);
 			}
 
-			if(Object.entries(startLocat).length){
+			if(!isEmptyObj(startLocat)){
 				startLocat.marker.setMap(null);
 			}
 
@@ -955,8 +977,8 @@ function initMap(){
 		polylines = [];
 		glowPolylines = [];
 		for (i = 0; i < legs.length; i++) {
-			(i>=5&&i%5 == 0)?index = 4:((Object.entries(startLocat).length)?index = (i%5)-1:index = (i%5));
-			if(Object.entries(startLocat).length && i==0) index = 5;
+			(i>=5&&i%5 == 0)?index = 4:((!isEmptyObj(startLocat))?index = (i%5)-1:index = (i%5));
+			if(!isEmptyObj(startLocat) && i==0) index = 5;
 			 let polyline = new google.maps.Polyline({
 				map:map, 
 				path:[], 
@@ -996,12 +1018,12 @@ function initMap(){
 	    timeline.push(tmp);
 	    tmpTimeLine.push(tmp);
 	    tmp = converttime(tmp);
-	    if(Object.entries(startLocat).length){
+	    if(!isEmptyObj(startLocat)){
 	    	tmp += idToData(startLocat.id,'duration');
 	       timeline.push(converttime(tmp));
 	    }
 	     for(var i = 0; i < response.length-1 ; i++){
-	      if(!Object.entries(startLocat).length){
+	      if(isEmptyObj(startLocat)){
 	        tmp += idToData(locationID[i],'duration');
 	        timeline.push(converttime(tmp));
 	      } else if(i >=1){
@@ -1033,11 +1055,11 @@ function initMap(){
 			let content = 
 			'<p>- Total time: '+converttime(null,'duration_second')+'</p>'+
 			'<p>- Total distance: '+totaldistance+'</p>';
-			let timelineLeg = (Object.entries(startLocat).length)?i:i+1;
+			let timelineLeg = (!isEmptyObj(startLocat))?i:i+1;
 			// timeline__list--type
 			polylines[i].addListener('mouseover', (e)=>{
 				let latlng;
-				if(Object.entries(e).length){
+				if(!isEmptyObj(e)){
 					latlng = e.latLng
 				} else {
 					latlng = polylines[i].getPath().Nb[parseInt(polylines[i].getPath().Nb.length/2)]
@@ -1070,7 +1092,7 @@ function initMap(){
 
   	$(".timeline").children().remove();
 
-  	if(Object.entries(startLocat).length)
+  	if(!isEmptyObj(startLocat))
   		tmpLocationID.unshift(startLocat.id);
   	if($('#is-back').is(':checked'))
   		tmpLocationID.push(tmpLocationID[0])
@@ -1091,10 +1113,35 @@ function initMap(){
 			imglink = "{{asset('imgs/image.jpg')}}"
 		}
 
-  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s "><div class="timeline__list-after"></div><div class="timeline__list-before "></div><div class="timeline__picture"><a data-fancybox="gallery" href="${imglink}"><img class="img_timeline" src="${imglink}" alt=""></a><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${Object(locationdata.get(tmpLocationID[i])).de_name }</a></div><div class="star-votes"><span id="star"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star-half-alt text-warning"></i></span><span id="votes">2.290 votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${Object(locationdata.get(tmpLocationID[i])).de_name }" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon" value="${tmpLocationID[i]}"><div class="parent-icon"><i class="fas fa-hotel"></i><span>Hotel</span></div><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
+  		$(".timeline").append(`<div class="timeline__list  animated fadeInUp delay-1s "><div class="timeline__list-after"></div><div class="timeline__list-before "></div><div class="timeline__picture"><a data-fancybox="gallery" href="${imglink}"><img class="img_timeline" src="${imglink}" alt=""></a><span>${tl[i]}</span></div><div class="timeline__list__content "><div class="timeline__list__content__title" ><a href="#">${locationdata.get(tmpLocationID[i]).de_name}</a></div><div class="star-votes"><span id="star">${addStart(locationdata.get(tmpLocationID[i]).rate_votes[0])}</span><span id="votes">${locationdata.get(tmpLocationID[i]).rate_votes[1]} votes</span></div><div class="link-vr"><p class="text-justify"><span class="font-weight-bold">Link on VR: </span><a href="${locationdata.get(tmpLocationID[i]).de_name}" class="font-italic link-here" target="_blank">Link here</a></p></div><div class="icon" value="${tmpLocationID[i]}"><div class="parent-icon"><i class="fas fa-hotel"></i><span>Hotel</span></div><div class="parent-icon"><i class="fas fa-utensils"></i><span>Restaurant</span></div><div class="parent-icon"><i class="fas fa-store"></i><span>Store</span></div><div class="parent-icon"><i class="fas fa-coffee"></i><span>Coffee</span></div></div></div></div> `+
   			`<div class="timeline__traveltime animated fadeInLeft delay-2s" ><span>${tral_duration}</span></div>`);
 
     }
+		function addStart(num){
+			let roundnum = Math.round((num+0.5)*2)/2 -0.5;
+			let string ='';
+	    for(var i = 5; i>0; i--){
+	    	for(var j = 1; j>=0;j = j-0.5){		
+					if((roundnum - j)>=0 ){
+						roundnum -= j;
+						renderStar(j)
+						break;
+					}
+				}
+	    }
+	    function renderStar(num){
+	    	if(num == 1){
+	    		string +=`<i class="fas fa-star text-warning"></i>`;
+	    	} 
+	    	if(num == 0.5) {
+	    		string += `<i class="fas fa-star-half-alt text-warning"></i>`;
+	    	}
+	    	if(num == 0) {
+	    		string += `<i class="far fa-star text-warning"></i>`;
+	    	}
+	    }
+	    return string;
+		}
     // <div><i class="fas fa-route"></i></div>
     $('.chip').css('display','inline-block');
     $('.timeline__list').last().addClass('timeline__list-lastelement');
@@ -1107,8 +1154,8 @@ function initMap(){
   			after = Array.from(document.querySelectorAll('.timeline__list-after')),
   			title = Array.from(document.querySelectorAll('.timeline__list__content__title > a'));
   	for(let i = 0; i < tl.length; i++ ){
-  		(i>=5&&i%5 == 0)?index = 4:((Object.entries(startLocat).length)?index = (i%5)-1:index = (i%5));
-			if(Object.entries(startLocat).length && i==0) index = 5;
+  		(i>=5&&i%5 == 0)?index = 4:((!isEmptyObj(startLocat))?index = (i%5)-1:index = (i%5));
+			if(!isEmptyObj(startLocat) && i==0) index = 5;
 			before[i].style.backgroundColor = colorlist[index]
 			after[i].style.backgroundColor = colorlist[index]
 			title[i].style.color = colorlist[index]
@@ -1312,7 +1359,6 @@ function initMap(){
 		$('#duration-picker').trigger('change');
 		$('#duration-picker').change(()=>{
 			idToData($("#time-cost-picker").attr('value'),'setDur',$('#duration-picker').val())
-			// console.log(locationdata.get($("#time-cost-picker").attr('value')))
 			updateRoute()
 		})
 		let money =0;
@@ -1357,7 +1403,7 @@ function initMap(){
 			startLocat.marker = newMarkOnClk.marker;
 			newMarkOnClk = {}
 			if(Object(locationdata.get(id)).de_default == undefined){
-				if(Object.entries(newMarkOnClk).length){
+				if(!isEmptyObj(newMarkOnClk)){
 					newMarkOnClk.marker.setMap(null);
 					deleteMarker(newMarkOnClk.id);
 					newMarkOnClk ={};
@@ -1368,7 +1414,7 @@ function initMap(){
 		}
 		if(length >= 6) return;
 		locationID.push(id)
-		if(Object.entries(newMarkOnClk).length){
+		if(!isEmptyObj(newMarkOnClk)){
 			newMarkOnClk.marker.setMap(null);
 			deleteMarker(newMarkOnClk.id);
 			newMarkOnClk ={};
@@ -1382,8 +1428,8 @@ function initMap(){
 		let marker,icon,label;
 		if(id == startLocat.id){
 			startLocat.marker =  	new google.maps.Marker({
-					position: Object(locationdata.get(id)).location,
-					label: Object(locationdata.get(id)).de_name,
+					position: locationdata.get(id).location,
+					label: locationdata.get(id).de_name,
 					map: map
 				});
 			customLabel(startLocat.marker,id);
@@ -1398,7 +1444,7 @@ function initMap(){
 				scale: 1.4,
 			};
 			label = {
-				text: Object(locationdata.get(id)).de_name,
+				text: locationdata.get(id).de_name,
 				color: color,
 				fontWeight: 'bold',
 				fontSize: '20px' 
@@ -1407,7 +1453,7 @@ function initMap(){
 				
 			marker = 	new google.maps.Marker({
 										map: map,
-										position: Object(locationdata.get(id)).location,
+										position: locationdata.get(id).location,
 										// label: label,
 										icon: icon
 								});
@@ -1415,15 +1461,15 @@ function initMap(){
 			markerArray.set(id,marker);
 		}
 
-			let content = '<p><h4>'+Object(locationdata.get(id)).de_name+'</h4></p>'+ 
-					'<p><a href="'+Object(locationdata.get(id)).de_link+'"target="_blank">Click to view tour</a></p>',
+			let content = '<p><h4>'+locationdata.get(id).de_name+'</h4></p>'+ 
+					'<p><a href="'+locationdata.get(id).de_link+'"target="_blank">Click to view tour</a></p>',
 					infowindow = new google.maps.InfoWindow({
 						content: content,
 					});
 
 			marker.addListener('click',()=>{
 				let imglink;
-				if(Object(locationdata.get(id)).de_img != undefined){
+				if(locationdata.get(id).de_img != undefined){
 					imglink = "{{asset('imgs/icon.jpg')}}"
 				} else {
 					imglink = "{{asset('imgs/icon.jpg')}}"
@@ -1464,14 +1510,14 @@ function initMap(){
 				bounds.extend(value.getPosition());
     })
 
-    if(Object.entries(startLocat).length){ bounds.extend(startLocat.marker.getPosition()); }
+    if(!isEmptyObj(startLocat)){ bounds.extend(startLocat.marker.getPosition()); }
 	 	map.fitBounds(bounds);
 	}
 
 	//add location to list
 	function addToList(id,color,index,text){
 		$("#list-container").append(
-			`<div data-target="#time-cost-picker" class="list-item" value="${id}" title="${text}">`+
+			`<div class="list-item" value="${id}" title="${text}">`+
 				`<div class="item-content" value="${id}" style="background-color: ${color};">`+
 					`<div class="order">${index}</div>`+
 					`<div class="item-content-text">${text}</div>`+
@@ -1510,9 +1556,9 @@ function initMap(){
 		if(type == 'LatLngArr'){
 			locats = [];
 			locationID.forEach(ele=>{
-				locats.push(Object(locationdata.get(ele)).location);
+				locats.push(locationdata.get(ele).location);
 			})
-			if(Object.entries(startLocat).length)  locats.unshift(idToData(startLocat.id,'LatLng'));
+			if(!isEmptyObj(startLocat))  locats.unshift(idToData(startLocat.id,'LatLng'));
 			if($('#is-back').is(':checked')) locats.push(locats[0]);
 		}
 
@@ -1548,7 +1594,6 @@ function initMap(){
 				case 'cost':
 					return Object(locationdata.get(id)).de_cost;
 					break;
-
 				default: break;
 			}
 	}
@@ -1556,19 +1601,58 @@ function initMap(){
 	function showDetail(){
 		$('.list-item').click((e)=>{
 			let id = e.currentTarget.getAttribute('value');
-			let name = Object(locationdata.get(id)).de_name;
-			let descript = Object(locationdata.get(id)).de_description;
-			let link = Object(locationdata.get(id)).de_link;
+			let name = locationdata.get(id).de_name;
+			let descript = locationdata.get(id).de_description;
+			let link = locationdata.get(id).de_link;
+			let votes = locationdata.get(id).rate_votes[1];
+			let rates = locationdata.get(id).rate_votes[0];
+			let tags = locationdata.get(id).de_tag;
+			//Add location description
 			$("#link-img").attr("href",'{!! url('/') !!}'+'/showDetailPlace/'+id);
+			$('.link-here').attr('href',link);
 			$('.name-place').text(name);
 			$('#description').text(descript);
-			$('.link-here').attr('href',link);
-			if(Object(locationdata.get(id)).de_description != undefined){
-				$(".parents-img > img").attr('src',Object(locationdata.get(id)).de_img);
+			$('#votes').text(`${votes} votes`)
+			$('#location-tag').empty();
+			tags.forEach(ele=>{
+				$('#location-tag').append(`<a class="ui teal tag label">${ele}</a>`)
+			})
+			$('#detail-star-votes').empty();
+			addStart(rates);
+
+			function addStart(num){
+				console.log(num)
+				let roundnum = Math.round((num+0.5)*2)/2 -0.5;
+		    for(var i = 5; i>0; i--){
+		    	for(var j = 1; j>=0;j = j-0.5){		
+						if((roundnum - j)>=0 ){
+							roundnum -= j;
+							console.log(j)
+							renderStar(j)
+							break;
+						}
+					}
+		    }
+		    function renderStar(num){
+		    	console.log(num == 1)
+		    	if(num == 1){
+		    		$('#detail-star-votes').append(`<i class="fas fa-star text-warning"></i>`)
+		    	} 
+		    	if(num == 0.5) {
+		    		$('#detail-star-votes').append(`<i class="fas fa-star-half-alt text-warning"></i>`)
+		    	}
+		    	if(num == 0) {
+		    		$('#detail-star-votes').append(`<i class="far fa-star text-warning"></i>`)
+		    	}
+		    }
+			}
+
+			if(locationdata.get(id).de_description != undefined){
+				$(".parents-img > img").attr('src',locationdata.get(id).de_img);
 			} else {
 				$(".parents-img > img").attr('src',"{{ asset('imgs/image.jpg') }}");
 			}
-			$('#short_des').text(Object(locationdata.get(id)).de_shortdes);
+			$('#short_des').text(locationdata.get(id).de_shortdes);
 			$("#location-detail").show();
 			let height = $('#control-content').height()-$("#location-detail").height();
 			$('#bottom-height').height(height);
@@ -1599,7 +1683,7 @@ function initMap(){
 			}
 			if(!markerArray.has(id)) return;
 			//Remove marker
-			Object(markerArray.get(id)).setMap(null);
+			markerArray.get(id).setMap(null);
 		  markerArray.delete(id);
 			fitBoundsMarkers();
 			id = $('.list-item').last().attr('value');
@@ -1817,13 +1901,13 @@ function initMap(){
 					scale: 1.4,
 				},
 				label = {
-					text: Object(locationdata.get(id)).de_name,
+					text: locationdata.get(id).de_name,
 					color: color,
 					fontWeight: 'bold',
 					fontSize: '20px' 
 				}; 
-				Object(markerArray.get(id)).setIcon(icon);
-				Object(markerArray.get(id)).setLabel(label);
+				markerArray.get(id).setIcon(icon);
+				markerArray.get(id).setLabel(label);
 			} else {
 				addMarkers(id,color);
 			}			
@@ -1837,14 +1921,14 @@ function initMap(){
 			//Check if recent results can reuse (Don't have to call api agian)
 			if(!recentLocatID.length){
 				recentLocatID = locationID.splice();
-				if(Object.entries(startLocat).length) 
+				if(!isEmptyObj(startLocat)) 
 					recentStart = startLocat.id 
 				else 
 					recentStart = undefined;
 	 		} else {
 	 			// check nếu mảng mới kể cả điểm bắt đầu có ở mảng cũ chưa
 	 			let tmpLocationID = locationID.slice();
-	 			if(Object.entries(startLocat).length) tmpLocationID.unshift(startLocat.id);
+	 			if(!isEmptyObj(startLocat)) tmpLocationID.unshift(startLocat.id);
 	 			let tmprecentLocatID = recentLocatID.slice();
 	 			if(recentStart != undefined) tmprecentLocatID.unshift(recentStart); 
 				// if(locationID.every(e=>recentLocatID.includes(e))||(locationID.every(e=>recentLocatID.includes(e))&&(recentStart == startLocat.id || locationID.indexOf(recentStart)>=0))){
@@ -1867,14 +1951,14 @@ function initMap(){
 				}
 			}
 
-			if(Object.entries(startLocat).length) 
+			if(!isEmptyObj(startLocat)) 
 				recentStart = startLocat.id 
 			else 
 				recentStart = undefined;
 			recentLocatID = locationID.slice();
 			//init array [1,2,3,4,...n] with n is number of locations
 			for(var i = 0;i < locationID.length;i++)
-				Arr[i] = (Object.entries(startLocat).length)?(i+1):i;  
+				Arr[i] = (!isEmptyObj(startLocat))?(i+1):i;  
 			/*swaps the positions of the elements 
 				in the array to create all possible paths*/
 			arrPermutations(Arr.length,Arr); 
@@ -1933,7 +2017,7 @@ function initMap(){
 			tmpArr = locationID;
 
 		// Optimize by (duration or cost) with the start location
-		if(!isAuDel &&  Object.entries(startLocat).length){
+		if(!isAuDel &&  !isEmptyObj(startLocat)){
 		// Loop all route posible to calculate the best way
 			for(var i = 0 ;i<allRoutePosible.length; i++){
 				var A = allRoutePosible[i];
@@ -1971,18 +2055,18 @@ function initMap(){
 
 
 		// Optimize by (duration or cost) without the start location
-		if(!isAuDel && !Object.entries(startLocat).length){
+		if(!isAuDel && isEmptyObj(startLocat)){
 			for(var i = 0 ;i<allRoutePosible.length; i++){
 				var A = allRoutePosible[i];
 				for(var j = 0 ;j<A.length-1; j++){
-					totalDur += Object(locationdata.get(tmpArr[A[j]])).de_duration;
+					totalDur += locationdata.get(tmpArr[A[j]]).de_duration;
 					totalDur += disresponse.rows[A[j]].elements[A[j+1]].duration.value;
 
-					totalCost += Object(locationdata.get(tmpArr[A[j]])).de_cost;
+					totalCost += locationdata.get(tmpArr[A[j]]).de_cost;
 					totalCost += taxiCal(disresponse.rows[A[j]].elements[A[j+1]].distance.value);
 				}
-				totalDur += Object(locationdata.get(tmpArr[A[A.length-1]])).de_duration;
-				totalCost += Object(locationdata.get(tmpArr[A[A.length-1]])).de_cost;
+				totalDur += locationdata.get(tmpArr[A[A.length-1]]).de_duration;
+				totalCost += locationdata.get(tmpArr[A[A.length-1]]).de_cost;
 
 				if($('#is-back').is(':checked')) {
 					totalDur += disresponse.rows[A[A.length-1]].elements[0].duration.value;
@@ -2004,7 +2088,7 @@ function initMap(){
 		}
 
 		// Auto delete location if exceeded duration or cost with start locat
-		if(isAuDel && isopt != 3 && Object.entries(startLocat).length){
+		if(isAuDel && isopt != 3 && !isEmptyObj(startLocat)){
 			let allRouteOptimize ={
 				duration:[],
 				cost:[]
@@ -2026,7 +2110,7 @@ function initMap(){
 							} else {
 								totalDur += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
 							}
-							totalDur += Object(locationdata.get(tmpArr[A[j]])).de_duration;
+							totalDur += locationdata.get(tmpArr[A[j]]).de_duration;
 							let tmptotalDur = totalDur;
 							if($('#is-back').is(':checked')){
 								totalDur += disresponse.rows[A[j]].elements[0].duration.value;
@@ -2054,7 +2138,7 @@ function initMap(){
 							} else {
 								totalCost += taxiCal(disresponse.rows[A[j-1]].elements[A[j]].distance.value);
 							}
-							totalCost += Object(locationdata.get(tmpArr[A[j]])).de_cost;
+							totalCost += locationdata.get(tmpArr[A[j]]).de_cost;
 							let tmptotalCost = totalCost;
 							if($('#is-back').is(':checked')){
 								totalCost += taxiCal(disresponse.rows[A[j]].elements[0].distance.value);
@@ -2107,7 +2191,7 @@ function initMap(){
 			isAuDel = 0;
 		}
 		// Auto delete location if exceeded duration or cost without start locat
-		if(isAuDel && isopt != 3 && !Object.entries(startLocat).length){
+		if(isAuDel && isopt != 3 && isEmptyObj(startLocat)){
 			let allRouteOptimize = {
 				cost: [],
 				duration: []
@@ -2127,7 +2211,7 @@ function initMap(){
 							if(j!=0){
 								 totalDur += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
 							}
-							totalDur += Object(locationdata.get(tmpArr[A[j]])).de_duration;
+							totalDur += locationdata.get(tmpArr[A[j]]).de_duration;
 							let tmptotalDur = totalDur;
 							if($('#is-back').is(':checked')){
 								totalDur+= disresponse.rows[A[j]].elements[0].duration.value;
@@ -2152,7 +2236,7 @@ function initMap(){
 							if(j!=0){
 								 totalCost += taxiCal(disresponse.rows[A[j-1]].elements[A[j]].distance.value);
 							}
-							totalCost += Object(locationdata.get(tmpArr[A[j]])).de_cost;
+							totalCost += locationdata.get(tmpArr[A[j]]).de_cost;
 							let tmptotalCost = totalCost;
 							if($('#is-back').is(':checked')){
 								totalCost += taxiCal(disresponse.rows[A[j]].elements[0].distance.value);
@@ -2209,7 +2293,7 @@ function initMap(){
 		}
 
 		// Auto delete location if exceeded duration and cost with start locat
-		if(isAuDel && isopt == 3 && Object.entries(startLocat).length){
+		if(isAuDel && isopt == 3 && !isEmptyObj(startLocat)){
 			let allRouteOptimize ={
 				duration:[],
 				cost:[]
@@ -2233,8 +2317,8 @@ function initMap(){
 						totalDur += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
 						totalCost += taxiCal(disresponse.rows[A[j-1]].elements[A[j]].distance.value);
 					}
-					totalDur += Object(locationdata.get(tmpArr[A[j]])).de_duration;
-					totalCost += Object(locationdata.get(tmpArr[A[j]])).de_cost;
+					totalDur += locationdata.get(tmpArr[A[j]]).de_duration;
+					totalCost += locationdata.get(tmpArr[A[j]]).de_cost;
 					let tmptotalDur = totalDur;
 					let tmptotalCost = totalCost;
 					if($('#is-back').is(':checked')){
@@ -2301,7 +2385,7 @@ function initMap(){
 		}
 
 		// Auto delete location if exceeded duration and cost without start locat
-		if(isAuDel && isopt == 3 && !Object.entries(startLocat).length){
+		if(isAuDel && isopt == 3 && isEmptyObj(startLocat)){
 			let allRouteOptimize = {
 				cost: [],
 				duration: []
@@ -2322,8 +2406,8 @@ function initMap(){
 								 totalDur += disresponse.rows[A[j-1]].elements[A[j]].duration.value;
 								 totalCost += taxiCal(disresponse.rows[A[j-1]].elements[A[j]].distance.value);
 							}
-							totalDur += Object(locationdata.get(tmpArr[A[j]])).de_duration;
-							totalCost += Object(locationdata.get(tmpArr[A[j]])).de_cost;
+							totalDur += locationdata.get(tmpArr[A[j]]).de_duration;
+							totalCost += locationdata.get(tmpArr[A[j]]).de_cost;
 							let tmptotalDur = totalDur;
 							let tmptotalCost = totalCost;
 
@@ -2401,7 +2485,7 @@ function initMap(){
 		}
 
 		for(var i=0;i<tmpRoute.length;i++)
-			tmp[i] = (Object.entries(startLocat).length)?tmpArr[tmpRoute[i]-1]:tmpArr[tmpRoute[i]];
+			tmp[i] = (!isEmptyObj(startLocat))?tmpArr[tmpRoute[i]-1]:tmpArr[tmpRoute[i]];
 		locationID = tmp;
 
 		timeCostCheck((routeOptimized.duration.value!=undefined)?routeOptimized.duration.value:null,(routeOptimized.cost.value!=undefined)?routeOptimized.cost.value:null);	
@@ -2409,9 +2493,35 @@ function initMap(){
 		
 	}
 
-	function timeCostCheck(dur,cost){
+	function timeCostCheck(dur,cost,type){
 		let time = document.querySelector("#startDate")._flatpickr.selectedDates
 		let choosendur = 	(time[1]-time[0])/1000;
+
+		if(type === 'notOptimize'){
+			if(dur > choosendur && cost > choosenCost && !isNaN(choosendur) && choosenCost != 0){
+				alert('Thời gian và chi phí vượt quá bạn đã chọn hãy chọn lại')
+				updateButton();
+				return
+			}
+			if(dur > choosendur && !isNaN(choosendur)){
+				alert('Thời gian vượt quá bạn đã chọn hãy chọn lại')
+				updateButton();
+				return
+			}
+			if(cost > choosenCost &&  choosenCost != 0){
+				alert('Chi phí vượt quá bạn đã chọn hãy chọn lại')
+				updateButton();
+				return
+			}
+			function updateButton(){
+				$('#get-route').show();
+				$('#get-route').text('Chỉ đường');
+				$('#saveTour').hide();
+			}
+			drawRoutes();
+			return
+		}
+		
 
 		markerArray.forEach((value,key)=>{
 			if(!locationID.includes(key)){
@@ -2425,7 +2535,6 @@ function initMap(){
 		});
 
 		// Not Optimize
-		
 		function timecheck(){
 			if(dur > choosendur){
 				$("#timeAlert").modal("show");
@@ -2550,24 +2659,24 @@ function initMap(){
 		else
 			$(".content_modal_left").append('<span class="font-italic text-primary">from '+$('#startDate').val()+' to '+$('#endDate').val()+'</span>');
 		//set start locat
-		if(Object.entries(startLocat).length){
+		if(!isEmptyObj(startLocat)){
 			let startlocat_image = "{{asset('imgs/image.jpg')}}";
-			let startlocat_name = Object(locationdata.get(startLocat.id)).de_name;
-			let startlocat_duration = Object(locationdata.get(startLocat.id)).de_duration;
-			let formatCost = (Object(locationdata.get(startLocat.id)).de_cost).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+			let startlocat_name = locationdata.get(startLocat.id).de_name;
+			let startlocat_duration = locationdata.get(startLocat.id).de_duration;
+			let formatCost = (locationdata.get(startLocat.id).de_cost).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 			let startlocat_cost = formatCost + $(".currency").val();
 			$(".content_modal_left").append('<div class="detail_tour"><div class="left_content"><a data-fancybox="gallery" href="'+startlocat_image+'"><img class="img-fluid rounded mb-5" style="width:100%;" src="'+startlocat_image+'" alt=""></a></div><div class="right_content"><p class="mb-1">Place name: <span class="font-italic text-danger">'+startlocat_name+'</span></p><p class="mb-1">Duration: <span class="font-italic text-danger">'+converttime(startlocat_duration,'duration')+'</span></p><p class="mb-1">Cost: <span class="font-italic text-danger">'+startlocat_cost+'</span></p></div></div>');
 		}
 		//set detail
 		locationID.forEach(ele=>{
 			let detail_image;
-			if(Object(locationdata.get(ele)).de_img == undefined)
+			if(locationdata.get(ele).de_img == undefined)
 				detail_image = "{{asset('imgs/image.jpg')}}";
 			else
-				detail_image = Object(locationdata.get(ele)).de_img;
-			let detail_name = Object(locationdata.get(ele)).de_name;
-			let detail_duration = Object(locationdata.get(ele)).de_duration;
-			let formatCost = (Object(locationdata.get(ele)).de_cost).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+				detail_image = locationdata.get(ele).de_img;
+			let detail_name = locationdata.get(ele).de_name;
+			let detail_duration = locationdata.get(ele).de_duration;
+			let formatCost = (locationdata.get(ele).de_cost).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 			let detail_cost = formatCost + $(".currency").val();
 			$(".content_modal_left").append('<div class="detail_tour"><div class="left_content"><a data-fancybox="gallery" href="'+detail_image+'"><img class="img-fluid rounded mb-5" style="width:100%;" src="'+detail_image+'" alt=""></a></div><div class="right_content"><p class="mb-1">Place name: <span class="font-italic text-danger">'+detail_name+'</span></p><p class="mb-1">Duration: <span class="font-italic text-danger">'+converttime(detail_duration,'duration')+'</span></p><p class="mb-1">Cost: <span class="font-italic text-danger">'+detail_cost+'</span></p></div></div>');
 		})
@@ -2601,7 +2710,7 @@ function initMap(){
 							let currency = $(".currency").val();
 							let tmparr = [];
 							let val = {};
-							if(Object.entries(startLocat).length){
+							if(!isEmptyObj(startLocat)){
 								val.de_id = startLocat.id;
 								let coor = Object(locationdata.get(startLocat.id)).location;
 								val.location = coor.lat+"|"+coor.lng;
@@ -2726,7 +2835,7 @@ function initMap(){
 							let currency = $(".currency").val();
 							let tmparr = [];
 							let val = {};
-							if(Object.entries(startLocat).length){
+							if(!isEmptyObj(startLocat)){
 								val.de_id = startLocat.id;
 								let coor = Object(locationdata.get(startLocat.id)).location;
 								val.location = coor.lat+"|"+coor.lng;

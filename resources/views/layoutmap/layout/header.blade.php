@@ -37,7 +37,7 @@
                     </li>
                     @if(Auth::check())
                     <li class="nav-item mx-0 mx-lg-1" id="li_more">
-                        <a style="color: #497689;" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#">{{ trans('messages.More') }} <i class="fas fa-sort-down"></i></a>
+                        <div style="color: #497689;" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#">{{ trans('messages.More') }} <i class="fas fa-sort-down"></i></div>
                         <div id="div_more">
                             <a style="color: #497689;" class="nav-link py-3 px-0 px-lg-3  js-scroll-trigger" href="{{route('about')}}" id="header_about">{{ trans('messages.About') }}</a>
                             <a style="color: #497689;" class="nav-link py-3 px-0 px-lg-3  js-scroll-trigger" href="{{route('feedback')}}" id="header_feedback">{{ trans('messages.sendFeedback') }}</a>
@@ -52,7 +52,7 @@
                     @if(Auth::check())
                     <?php $user = Auth::user();?>
                     <li class="nav-item mx-0 mx-lg-1" id="li_person">
-                        <a style="color: #497689;" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#">{{ $user->us_fullName  }} <i class="fas fa-sort-down"></i></a>
+                        <div style="color: #497689;" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#">{{ $user->us_fullName  }} <i class="fas fa-sort-down"></i></div>
                         <div id="div_person">
                             <?php $user = Auth::user();?>
                             @if($user->us_type == "1")

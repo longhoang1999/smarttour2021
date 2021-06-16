@@ -307,3 +307,20 @@ ul.slick-dots li button {
     font-size: 22px;
     opacity: 0.8;
 }
+.hightly_div_child .tym_tour{
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    width: 2.2em; height: 2.2em;
+    text-align: center;
+    line-height: 2.2em;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+}
+.hightly_div_child .tym_tour svg{
+    color: white;
+}
+.hightly_div_child:hover .tym_tour svg {
+    transform: rotate(0deg) !important;
+}

@@ -489,14 +489,16 @@
                       position: results[0].geometry.location,
                       icon: {
                         url: "{{asset('images/red-dot.png')}}",
-                        labelOrigin: new google.maps.Point(65, 32),
+                        labelOrigin: new google.maps.Point(70, 45),
                         size: new google.maps.Size(40,40),
                         anchor: new google.maps.Point(16,32),
                       },
                       label: {
                         text: label,
                         color: "#C70E20",
-                        fontWeight: "bold"
+                        fontWeight: "bold",
+                        fontFamily: 'cursive',
+                        fontSize: '25px'
                       },
                     });
                     //đặt lại marker cào mảng để xóa

@@ -10,12 +10,14 @@
     <?php 
         use App\Models\Destination;
         use App\Models\Language;
+        use App\Models\ShareTour;
         use App\Models\Uservotes;
         use Illuminate\Support\Facades\Auth;
         use Illuminate\Support\Facades\DB;
         use App\Models\User;
         use App\Models\Comment;
         use Illuminate\Support\Arr;
+        use App\Models\Route;
     ?>
     <script type="text/javascript">
         function converStar(num){
@@ -55,7 +57,6 @@
             </div>
             <!-- Portfolio Grid Items-->
             <div class="row">
-                <?php use App\Models\Route; use App\Models\ShareTour;?>
                 <?php 
                     $route = Route::where("to_id",$share->sh_to_id)->first(); 
                     $pieces = explode("|", $route->to_des);
@@ -140,7 +141,12 @@
                     @if($route->to_startLocat != "")
                         <?php $des_startLocat = Destination::where("de_remove",$route->to_startLocat)->first(); ?>
                         <p><span class="font-weight-bold font-italic">{{ trans('newlang.startLocation') }}: </span>
-                        <span id="startLocation" data-id="{{$des_startLocat->de_remove}}"><i class="fas fa-street-view" style="color:#e74949;"></i> {{$des_startLocat->de_name}}</span></p>
+                            <span id="startLocation">
+                                <span data-id="{{$des_startLocat->de_remove}}">
+                                    <i class="fas fa-street-view" style="color:#e74949;"></i> {{$des_startLocat->de_name}}
+                                </span>
+                            </span>
+                        </p>
                     @else
                         <p><span class="font-weight-bold font-italic">{{ trans('newlang.startLocation') }}: <span class="badge badge-warning">{{ trans('newlang.Notavailable') }}</span></p>
                     @endif
@@ -178,8 +184,30 @@
     <div class="container mb-5 slide-show" id="slideshow">
         <div class="slide-show-tour">
             @foreach($shareTour as $value)
+
+            <?php   $findShare_hight = ShareTour::where("sh_id",$value->sh_id)->first();
+                    $findRoute_hight = Route::select('to_name','user_like')->where("to_id",$findShare_hight->sh_to_id)->first();
+                    $pieces_hight = explode("|", $findRoute_hight->user_like);
+                    $array_hight = array();
+                    for ($i=0; $i < count($pieces_hight)-1; $i++) {
+                        $array_hight = Arr::add($array_hight, $i ,$pieces_hight[$i]);
+                    }
+            ?>
             <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
-            <a href="{{route('viewtour',$value->sh_id)}}" class="hightly_div_child">
+            <a href="{{route('viewtour',$value->sh_id)}}" class="hightly_div_child tour_highlight">
+                @if(Auth::check())
+                    <div class="tym_tour" data-id="{{$value->sh_id}}">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    @foreach($array_hight as $ar)
+                        @if(Auth::user()->us_id == $ar)
+                            <style>
+                                .tour_highlight .tym_tour[data-id="{{$value->sh_id}}"]{background: rgba(255,255,255,0.9);}
+                                .tour_highlight .tym_tour[data-id="{{$value->sh_id}}"] svg{color: #ff0a0a;}
+                            </style>
+                        @endif
+                    @endforeach
+                @endif
                 <p class="tourContent">
                     <span class="nameTour">{{$route->to_name}}</span>
                     <span id="show_star_{{$value->sh_id}}"></span>
@@ -602,6 +630,34 @@
             }, 500);
         }
         $(document).ready(function(){
+            //tyrm icon
+            $(".tym_tour").click(function(e){
+                e.preventDefault();
+                let $url_path = '{!! url('/') !!}';
+                let _token = $('meta[name="csrf-token"]').attr('content');
+                let routeChangeLike = $url_path+"/changeLikeTour";
+                let shareId = $(this).data('id');
+                $.ajax({
+                      url:routeChangeLike,
+                      method:"post",
+                      data:{_token:_token,shareId:shareId},
+                      success:function(data){ 
+                        console.log(data[0])
+                        if(data[0] == 1)
+                        {
+                            $(`.tym_tour[data-id="${shareId}"]`).find('svg').css("color","#ff0a0a");
+                            $(`.tym_tour[data-id="${shareId}"]`).css("background-color","rgba(255,255,255,0.9)");
+                        }
+                        if(data[0] == 2)
+                        {
+                            $(`.tym_tour[data-id="${shareId}"]`).find('svg').css("color","white");
+                            $(`.tym_tour[data-id="${shareId}"]`).css("background-color","rgba(0,0,0,0.6)");
+                        }
+                    }
+                });
+            })
+
+
             @if(Auth::check())
             $(".icon_camera").click(function(){$(".input_file_img").click();})
             $(".input_file_img").change(function(){
@@ -760,119 +816,75 @@
             }),
             directionsService = new google.maps.DirectionsService();
             const geocoder = new google.maps.Geocoder();
-
             $(document).ready(function(){
-                <?php $dem2 = 0; ?>
-                @foreach ($array as  $ar)
-                    $(".openModal{{$dem2}}").click(function(){
-                        $("#modalDetailPlace").modal("show");
-                        let $url_path = '{!! url('/') !!}';
-                        let _token = $('meta[name="csrf-token"]').attr('content');
-                        let routeGetCooor = $url_path+"/takeInforPlace";
-                        let des_id = $(this).attr("data-id");
-                        $.ajax({
-                              url:routeGetCooor,
-                              method:"post",
-                              data:{_token:_token,des_id:des_id},
-                              success:function(data){ 
-                                $("#exampleModalLabel").html(data[2]);
-                                $(".imgPlace").empty();
-                                if(data[3] != "")
-                                {
-                                    $(".imgPlace").append("<a data-fancybox='gallery' href='"+data[3]+"'> <img class='img-fluid' src='"+data[3]+"' alt='' style='width: 70%'></a>");
-                                }
-                                else
-                                {
-                                    $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='{{ trans('newlang.locationNoPhoto') }}'></a>");
-                                }
-                                $(".showLink").attr("href",data[10]);
-                                $("#typePlace").empty();
-                                $("#typePlace").append(data[9]);
-                                $("#short").empty();
-                                $("#description").empty();
-                                if(data[4] != null)
-                                    $("#short").append(data[4]);
-                                else
-                                    $("#short").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
-                                if(data[5] != null)
-                                    $("#description").append(data[5]);
-                                else
-                                    $("#description").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');  
-
-                                $("#timeAvg").html(parseFloat(data[6])/60/60+" hours");
-                                $("#linkMap").empty();
-                                if(data[7] != null)
-                                    $("#linkMap").append('<a href="'+data[7]+'" target="_blank">Link here</a>');
-                                else
-                                    $("#linkMap").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
-                                $("#linkvr").empty();
-                                if(data[8] != null)
-                                    $("#linkvr").append('<a href="'+data[8]+'" target="_blank">Link here</a>');
-                                else
-                                    $("#linkvr").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
-                                //vẽ map
-                                deleteMarker();
-                                let add = data[0]+","+data[1];
-                                geocodeAddress(geocoder,map,data[2],add);
-                            }
-                        });
-                    });
-                    <?php $dem2++; ?>
-                @endforeach
-                $("#startLocation").click(function(){
-                    $("#modalDetailPlace").modal("show");
-                    let $url_path = '{!! url('/') !!}';
-                    let _token = $('meta[name="csrf-token"]').attr('content');
-                    let routeGetCooor = $url_path+"/takeInforPlace";
-                    let des_id = $(this).attr("data-id");
-                    $.ajax({
-                          url:routeGetCooor,
-                          method:"post",
-                          data:{_token:_token,des_id:des_id},
-                          success:function(data){ 
-                            $("#exampleModalLabel").html(data[2]);
-                            $(".imgPlace").empty();
-                            if(data[3] != "")
-                            {
-                                $(".imgPlace").append("<a data-fancybox='gallery' href='"+data[3]+"'> <img class='img-fluid' src='"+data[3]+"' alt='' style='width: 70%'></a>");
-                            }
-                            else
-                            {
-                                $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='{{ trans('newlang.locationNoPhoto') }}'></a>");
-                            }
-                            $("#typePlace").empty();
-                            $("#typePlace").append(data[9]);
-                            $("#short").empty();
-                            $("#description").empty();
-                            if(data[4] != null)
-                                $("#short").append(data[4]);
-                            else
-                                $("#short").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
-
-                            if(data[5] != null)
-                                $("#description").append(data[5]);
-                            else
-                                $("#description").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');  
-
-                            $("#timeAvg").html(parseFloat(data[6])/60/60+" hours");
-                            $("#linkMap").empty();
-                            if(data[7] != null)
-                                $("#linkMap").append('<a href="'+data[7]+'" target="_blank">Link here</a>');
-                            else
-                                $("#linkMap").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
-                            $("#linkvr").empty();
-                            if(data[8] != null)
-                                $("#linkvr").append('<a href="'+data[8]+'" target="_blank">Link here</a>');
-                            else
-                                $("#linkvr").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
-                            //vẽ map
-                            deleteMarker();
-                            let add = data[0]+","+data[1];
-                            geocodeAddress(geocoder,map,data[2],add);
-                        }
-                    });
+                $("#startLocation").on('click','span',function(){
+                    showdetail($(this).attr("data-id"));
+                  });
+                  $("#detail_location").on('click','span',function(){
+                    showdetail($(this).attr("data-id"));
                 });
+                
             });
+            function showdetail(data_id){
+                let $url_path = '{!! url('/') !!}';
+                let _token = $('meta[name="csrf-token"]').attr('content');
+                let routeGetCooor = $url_path+"/takeInforPlace";
+                let des_id = data_id;
+                $.ajax({
+                      url:routeGetCooor,
+                      method:"post",
+                      data:{_token:_token,des_id:des_id},
+                      success:function(data){ 
+                        if(data[11] == 0)
+                        {
+                            $(".showLink").show();
+                            $(".showLink").attr("href",data[10]);
+                        }
+                        else if(data[11] == 1)
+                            $(".showLink").hide();
+
+                        $("#exampleModalLabel").html(data[2]);
+                        $(".imgPlace").empty();
+                        if(data[3] != "")
+                        {
+                            $(".imgPlace").append("<a data-fancybox='gallery' href='"+data[3]+"'> <img class='img-fluid' src='"+data[3]+"' alt='' style='width: 70%'></a>");
+                        }
+                        else
+                        {
+                            $(".imgPlace").append("<a data-fancybox='gallery' href='{{asset('imgPlace/empty.png')}}'> <img class='img-fluid' src='{{asset('imgPlace/empty.png')}}' alt='' style='width: 70%' title='{{ trans('newlang.locationNoPhoto') }}'></a>");
+                        }
+                        $("#typePlace").empty();
+                        $("#typePlace").append(data[9]);
+                        $("#short").empty();
+                        $("#description").empty();
+                        if(data[4] != null)
+                            $("#short").append(data[4]);
+                        else
+                            $("#short").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
+                        if(data[5] != null)
+                            $("#description").append(data[5]);
+                        else
+                            $("#description").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');  
+
+                        $("#timeAvg").html(parseFloat(data[6])/60/60+" hours");
+                        $("#linkMap").empty();
+                        if(data[7] != null)
+                            $("#linkMap").append('<a href="'+data[7]+'" target="_blank">Link here</a>');
+                        else
+                            $("#linkMap").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
+                        $("#linkvr").empty();
+                        if(data[8] != null)
+                            $("#linkvr").append('<a href="'+data[8]+'" target="_blank">Link here</a>');
+                        else
+                            $("#linkvr").append('<span class="badge badge-warning">{{ trans("newlang.Notavailable") }}</span>');
+                        //vẽ map
+                        deleteMarker();
+                        let add = data[0]+","+data[1];
+                        geocodeAddress(geocoder,map,data[2],add);
+                    }
+                });
+                $("#modalDetailPlace").modal("show");
+            }
             function deleteMarker()
             {
                 $('.map-marker-label').remove();

@@ -5,15 +5,6 @@
 @stop
 @section('header_styles')
     <link rel="stylesheet" href="{{asset('css/listplace.css')}}">
-    <style>
-        #placeMap,#placeVr{
-            color: #005dcc !important;
-            font-weight: bold
-        }
-        .div_detail {
-            min-height: 50rem;
-        }
-    </style>
 @stop
 @section('content')
 	<section class="page-section" id="contact">
@@ -53,7 +44,8 @@
                             </a>
                         </div>
                         <div class="contentItem item">
-                            <p class="text-justify"><span class="font-weight-bold">
+                            <a href="#" class="showLink_Place">Detail Place</a>
+                            <p class="text-justify m-0"><span class="font-weight-bold">
                                 {{$langType}}:
                             </span><span class="font-italic" id="placeName"></span></p>
                             <p class="text-justify"><span class="font-weight-bold">{{ trans('messages.Shortdescription') }}: </span>
@@ -100,6 +92,7 @@
                       method:"POST",
                       data:{_token:_token,idPlace:idPlace},
                       success:function(data){ 
+                        $(".showLink_Place").attr("href",`${$url_path}/showDetailPlace/${idPlace}`);
                         $(".div_detail").slideDown("slow");
                         if(data['de_image'] == "")
                         {

@@ -195,7 +195,7 @@
                 }
             });
             //your account
-            $("#li_person a").click(function(){
+            $("#li_person div.nav-link").click(function(){
                 if ($('#div_person').is(':visible'))
                 {
                     $("#div_person").slideUp("fast");
@@ -226,7 +226,7 @@
             });
             @if(Auth::check())
             //more
-            $("#li_more a").click(function(){
+            $("#li_more div.nav-link").click(function(){
                 if ($('#div_more').is(':visible'))
                 {
                     $("#div_more").slideUp("fast");

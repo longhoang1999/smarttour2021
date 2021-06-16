@@ -313,3 +313,59 @@ ul.slick-dots li button {
 .hightly_div_child:hover .like_tour svg {
     transform: rotate(0deg) !important;
 }
+
+
+
+/* responsive */
+/*phone*/
+@media only screen and (max-width:  739px){
+
+}
+/*tablet*/
+@media only screen and (min-width: 740px) and (max-width:  1023px){
+    .box-header{
+        padding: 0;
+        height: 30px;
+        line-height: 30px;
+        font-size: 14px;
+        margin-right: 2px;
+        min-width: 103px;
+    }
+    .box-place a,.lan_title{
+        height: 30px;
+        line-height: 30px;
+        padding: 0 !important;
+        min-width: 60px;
+        text-align: center;
+    }
+    .Language{
+        font-size: 14px;
+        margin: 0 !important;
+    }
+    .child_header div{margin-right: 5px !important;}
+    .up_btn{
+        height: 30px;
+        line-height: 30px;
+        padding-top: 0;
+    }
+    .up_btn svg{
+        font-size: 14px;
+    }
+    #seeFeedback{
+        margin-right: 10px;
+    }
+    .nav-link{
+        padding-left: 25px !important;
+    }
+}
+/*pC*/
+@media only screen and (min-width: 1024px) and (max-width:  1200px){
+    .title-main-page{
+        width: 100%;
+        max-width: none;
+    }
+    #text_title h4{
+        font-size: 40px;
+    }
+
+}

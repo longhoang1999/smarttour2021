@@ -837,7 +837,7 @@
                     var durationString = duration.days() + 'd ' + duration.hours() + 'h ' + duration.minutes() + 'm';
                     $("#total_time").append(durationString);
                     // php check
-                      $("#total_cost").text(data[15].toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                    $("#total_cost").text(data[15].toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
                     $("#tour_creator").empty();
                     $("#tour_creator").append(data[16]);
                  }
@@ -1057,7 +1057,6 @@
               });
             });
             function showdetail(data_id){
-              $("#modalDetailPlace").modal("show");
               let $url_path = '{!! url('/') !!}';
               let _token = $('meta[name="csrf-token"]').attr('content');
               let routeGetCooor = $url_path+"/takeInforPlace";
@@ -1067,6 +1066,13 @@
                   method:"post",
                   data:{_token:_token,des_id:des_id},
                   success:function(data){ 
+                    if(data[11] == 0)
+                    {
+                        $(".showLink").show();
+                        $(".showLink").attr("href",data[10]);
+                    }
+                    else if(data[11] == 1)
+                        $(".showLink").hide();
                     $("#exampleModalLabel").html(data[2]);
                     $(".imgPlace").empty();
                     if(data[3] != "")
@@ -1109,6 +1115,7 @@
                     geocodeAddress(geocoder,map,data[2],add);
                   }
                 });
+                $("#modalDetailPlace").modal("show");
             }
             function deleteMarker()
             {

@@ -164,3 +164,6 @@ form .txt_field{
 #link_login:hover{
     opacity: 0.5;
 }
+#li_more div.nav-link, #li_person div.nav-link{
+    cursor: pointer;
+}

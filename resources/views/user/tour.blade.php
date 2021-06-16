@@ -60,7 +60,7 @@
                         <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
                         <p class="tourName" title="{{$route->to_name}}">{{$route->to_name}}</p>
                         <div class="hightly_div_child">
-                            <p class="tourContent">{{$value->number_star}} <i class="fas fa-star text-warning"></i> - {{$value->numberReviews}} votes</p>
+                            <p class="tourContent">{{number_format((float)$value->number_star, 1, '.', '')}} <i class="fas fa-star text-warning"></i> - {{$value->numberReviews}} votes</p>
                             @if($value->image != "")
                                 <img src="{{asset($value->image)}}" alt="" class="img_open_model{{$value->sh_id}}">
                             @else

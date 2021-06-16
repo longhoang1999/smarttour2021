@@ -74,7 +74,7 @@ class MapDirectController {
 			if($findRatingPlace->count() > 0)
 			{
 				$avg = $sumStar / $findRatingPlace->count();
-				array_push($array_ratez_votes, number_format((float)$avg, 1, '.', ''), $findRatingPlace->count());
+				array_push($array_ratez_votes, floatval(number_format((float)$avg, 1, '.', '')), $findRatingPlace->count());
 			}
 			else
 			{
@@ -329,6 +329,4 @@ class MapDirectController {
 		}
 		return $timeline;
 	}
-
-	
 }

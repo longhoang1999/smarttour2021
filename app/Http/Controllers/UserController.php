@@ -177,11 +177,20 @@ class UserController extends Controller
             $user = Auth::user();
             $route = Route::where('to_id_user',$user->us_id)->orderBy('to_startDay', 'desc')->get();
             if($user->tour_seen != null)
-                $arrayTourSeen = $this->cutArrray($user->tour_seen);
+            {
+                $arrayTourSeen = $this->cutArrray($user->tour_seen); 
+                $reverseArray = array_reverse($arrayTourSeen, false);
+                $resultArr = array();
+                foreach($reverseArray as $key => $value)
+                {
+                    if($key <= 10)
+                        array_push($resultArr, $value);
+                }
+            }    
             else
-                $arrayTourSeen = array();
+                $resultArr = array();
             session()->put('route',$route);
-            return view('user.dashboard',['fullName'=>$user->us_fullName,'shareTour'=>$shareTour,'arrayTourSeen'=>$arrayTourSeen]);
+            return view('user.dashboard',['fullName'=>$user->us_fullName,'shareTour'=>$shareTour,'arrayTourSeen'=>$resultArr]);
         }
         else
         {

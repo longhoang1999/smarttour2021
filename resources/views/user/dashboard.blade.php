@@ -47,7 +47,7 @@
         }
     </script>
 	<section class="page-section portfolio" id="portfolio" style="margin-bottom: 10rem;">
-        <div class="container">
+        <div class="container title-main-page">
             <!-- Portfolio Grid Items-->
             <div class="row" id="introduce-page">
                 <!-- Portfolio Item 0-->  
@@ -85,15 +85,15 @@
                                     $array = Arr::add($array, $i ,$pieces[$i]);
                                 }
                          ?>
-                        <a href="{{route('viewtour',$arr)}}" class="hightly_div_child">
+                        <a href="{{route('viewtour',$arr)}}" class="hightly_div_child us_seen">
                             <div class="like_tour" data-id="{{$arr}}">
                                 <i class="fas fa-heart"></i>
                             </div>
                             @foreach($array as $ar)
                                 @if(Auth::user()->us_id == $ar)
                                     <style>
-                                        .like_tour[data-id="{{$arr}}"]{background: rgba(255,255,255,0.9);}
-                                        .like_tour[data-id="{{$arr}}"] svg{color: #ff0a0a;}
+                                        .us_seen .like_tour[data-id="{{$arr}}"]{background: rgba(255,255,255,0.9);}
+                                        .us_seen .like_tour[data-id="{{$arr}}"] svg{color: #ff0a0a;}
                                     </style>
                                 @endif
                             @endforeach
@@ -238,8 +238,29 @@
                     <span class="title_start_tour text-uppercase mt-5">{{ trans('messages.HIGHLIGHTS_TOUR') }}</span>
                     <div class="slide-show-tour">
                         @foreach($shareTour as $value)
+                        <?php   $findShare_hight = ShareTour::where("sh_id",$value->sh_id)->first();
+                                $findRoute_hight = Route::select('to_name','user_like')->where("to_id",$findShare_hight->sh_to_id)->first();
+                                $pieces_hight = explode("|", $findRoute_hight->user_like);
+                                $array_hight = array();
+                                for ($i=0; $i < count($pieces_hight)-1; $i++) {
+                                    $array_hight = Arr::add($array_hight, $i ,$pieces_hight[$i]);
+                                }
+                        ?>
                         <?php $route = Route::where("to_id",$value->sh_to_id)->first(); ?>
-                        <a href="{{route('viewtour',$value->sh_id)}}" class="hightly_div_child">
+                        <a href="{{route('viewtour',$value->sh_id)}}" class="hightly_div_child tour_highlight">
+                            @if(Auth::check())
+                                <div class="like_tour" data-id="{{$value->sh_id}}">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                @foreach($array_hight as $ar)
+                                    @if(Auth::user()->us_id == $ar)
+                                        <style>
+                                            .tour_highlight .like_tour[data-id="{{$value->sh_id}}"]{background: rgba(255,255,255,0.9);}
+                                            .tour_highlight .like_tour[data-id="{{$value->sh_id}}"] svg{color: #ff0a0a;}
+                                        </style>
+                                    @endif
+                                @endforeach
+                            @endif
                             <p class="tourContent">
                                 <span class="nameTour">{{$route->to_name}}</span>
                                 <span id="show_star_{{$value->sh_id}}"></span>
@@ -379,6 +400,7 @@
     @endif
 @stop
 @section('footer-js')
+    <script type="text/javascript" src="{{asset('js/dashboard_2.js')}}"></script>
 	<!-- map -->
     <script type="text/javascript">
         $(document).ready(function(){

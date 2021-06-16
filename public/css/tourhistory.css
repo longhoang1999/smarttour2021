@@ -22,3 +22,22 @@ body{padding-top: 6rem;}
 	text-decoration: none;
 	color: black;
 }
+.div_empty_img{
+	width: 100%;
+	display: flex;
+}
+.div_empty_img span{
+	font-size: 30px;
+  margin: auto;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  display: block;
+  font-style: italic;
+  color: #675a5a;
+  text-shadow: 13px -1px 8px #959595;
+  height: 20rem; line-height: 20rem;
+  background-image: url(https://image.freepik.com/free-vector/empty-studio-background_35947-194.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}

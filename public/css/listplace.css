@@ -42,3 +42,29 @@
     padding: 0 1rem;
     color: black;
 }
+.showLink_Place{
+    display: block;
+    padding: .4rem 0;
+    border-radius: 2rem;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    width: 35%;
+    text-align: center;
+    margin-bottom: 4px;
+    background: rgb(200 200 200);
+    background: linear-gradient(338deg, rgb(208 208 208) 0%, rgb(207 214 199) 32%, rgb(166 233 193) 100%);
+}
+.showLink_Place:hover{
+    text-decoration: none;
+    opacity: .8;
+}
+#placeMap,#placeVr{
+    color: #005dcc !important;
+    font-weight: bold
+}
+.div_detail {
+    min-height: 50rem;
+}
